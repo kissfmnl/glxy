@@ -1,16 +1,7 @@
-import { prisma } from "@/lib/prisma";
+import type { HomePageLayoutVariant } from "@/types/home-wave";
 
-export type HomePageLayoutVariant = "classic" | "wave";
+/** Static GLXY fork: homepage uses wave hero only (no CMS). */
 
 export async function getHomePageLayout(): Promise<HomePageLayoutVariant> {
-  try {
-    const row = await prisma.siteSetting.findUnique({
-      where: { key: "HOME_PAGE_LAYOUT" },
-      select: { value: true },
-    });
-    const v = (row?.value || "wave").trim().toLowerCase();
-    return v === "classic" ? "classic" : "wave";
-  } catch {
-    return "wave";
-  }
+  return "wave";
 }

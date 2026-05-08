@@ -45,7 +45,7 @@ export function DjProfileHero({
             />
           ) : (
             <div className="flex h-full min-h-[240px] w-full items-center justify-center p-6" style={{ backgroundColor: "#1e375a" }}>
-              <AppImage src={fallbackLogoUrl} alt="KISS FM" className="h-full w-full max-h-[320px] object-contain" />
+              <AppImage src={fallbackLogoUrl} alt="GLXY Radio" className="h-full w-full max-h-[320px] object-contain" />
             </div>
           )}
         </div>

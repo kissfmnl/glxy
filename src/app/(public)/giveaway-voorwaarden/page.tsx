@@ -1,8 +1,4 @@
-import { prisma } from "@/lib/prisma";
-import {
-  DEFAULT_GIVEAWAY_TERMS_BULLETS,
-  websiteTextGroups,
-} from "@/lib/websiteTextsConfig";
+import { DEFAULT_GIVEAWAY_TERMS_BULLETS, websiteTextGroups } from "@/lib/websiteTextsConfig";
 import { PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 
 function fallbackForKey(key: string): string {
@@ -14,21 +10,9 @@ function fallbackForKey(key: string): string {
   return "";
 }
 
-export default async function GiveawayTermsPage() {
-  const keys = ["GIVEAWAY_TERMS_PAGE_TITLE", "GIVEAWAY_TERMS_BULLETS"] as const;
-
-  let title = fallbackForKey("GIVEAWAY_TERMS_PAGE_TITLE");
-  let bulletsRaw = fallbackForKey("GIVEAWAY_TERMS_BULLETS") || DEFAULT_GIVEAWAY_TERMS_BULLETS;
-
-  try {
-    const rows = await prisma.siteSetting.findMany({
-      where: { key: { in: [...keys] } },
-      select: { key: true, value: true },
-    });
-    const map = new Map(rows.map((r) => [r.key, r.value]));
-    title = map.get("GIVEAWAY_TERMS_PAGE_TITLE")?.trim() || title;
-    bulletsRaw = map.get("GIVEAWAY_TERMS_BULLETS")?.trim() || bulletsRaw;
-  } catch {}
+export default function GiveawayTermsPage() {
+  const title = fallbackForKey("GIVEAWAY_TERMS_PAGE_TITLE") || "Giveaway-voorwaarden (demo)";
+  const bulletsRaw = fallbackForKey("GIVEAWAY_TERMS_BULLETS") || DEFAULT_GIVEAWAY_TERMS_BULLETS;
 
   const bullets = bulletsRaw
     .split("\n")

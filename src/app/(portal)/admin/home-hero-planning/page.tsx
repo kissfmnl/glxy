@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-/** Oude URL; planning staat nu onder Site instellingen. */
-export default function HomeHeroPlanningRedirectPage() {
-  redirect("/settings/home-hero-planning");
+export default function Page() {
+  return <PortalMockPage />;
 }

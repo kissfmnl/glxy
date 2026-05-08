@@ -1,20 +1,18 @@
-import type { HomeHeroHeadlineSlot } from "@prisma/client";
 import { amsterdamWeekdayISO } from "@/lib/amsterdamClock";
 
-type SlotPick = Pick<
-  HomeHeroHeadlineSlot,
-  | "startsOn"
-  | "endsOn"
-  | "weekdays"
-  | "startTime"
-  | "endTime"
-  | "titleLine1"
-  | "titleLine2"
-  | "titleLine1Color"
-  | "titleLine2Color"
-  | "priority"
-  | "isActive"
->;
+export type SlotPick = {
+  startsOn: Date;
+  endsOn: Date;
+  weekdays: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  titleLine1: string;
+  titleLine2: string | null;
+  titleLine1Color: string | null;
+  titleLine2Color: string | null;
+  priority: number;
+  isActive: boolean;
+};
 
 function ymdFromDbDate(d: Date): string {
   return d.toISOString().slice(0, 10);

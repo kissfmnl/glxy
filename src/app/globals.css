@@ -6,17 +6,18 @@
 
 @layer base {
   :root {
-    --brand-primary: #37bfbf;
-    --brand-accent: #37bfbf;
-    --brand-navy: #1e375a;
-    
-    /* Light Mode (Premium High Contrast) */
-    --bg-dark: #F1F3F5;
+    --brand-primary: #22d3ee;
+    --brand-accent: #c084fc;
+    --brand-navy: #0f172a;
+    --glxy-panel-bg: rgba(10, 15, 31, 0.96);
+
+    /* Light shells still used on some legacy cards */
+    --bg-dark: #0b1020;
     --bg-card: #FFFFFF;
     --bg-sidebar: #FFFFFF;
     --border-color: #DEE2E6;
-    --text-main: #111111;
-    --text-muted: #495057;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
   }
 
   .dark {

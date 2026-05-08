@@ -7,7 +7,7 @@ export function FrequentiesCoverageMap({ src }: { src: string }) {
       <div className="w-full overflow-hidden lg:absolute lg:inset-0 lg:min-h-0" style={{ borderRadius: R }}>
         <AppImage
           src={src}
-          alt="KISS FM frequentiegebied"
+          alt="GLXY Radio dekking — illustratie"
           loading="eager"
           decoding="async"
           fetchPriority="high"

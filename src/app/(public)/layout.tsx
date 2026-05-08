@@ -1,15 +1,12 @@
 import { PublicThemeGuard } from "@/components/public/PublicThemeGuard";
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicMiniPlayer } from "@/components/public/PublicMiniPlayer";
-import { PublicVisitTracker } from "@/components/public/PublicVisitTracker";
 import { CookieNotice } from "@/components/public/CookieNotice";
 import { PublicTabTitle } from "@/components/public/PublicTabTitle";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { PUBLIC_NAV_ITEMS, resolvePublicNavItems } from "@/lib/publicNavConfig";
-import AppImage from "@/components/AppImage";
-/** Slightly smaller initial scale on phones (~90% feel) without affecting desktop. */
-export const dynamic = "force-dynamic";
+import { MOCK_NAV, MOCK_PUBLIC_UI, MOCK_SOCIAL } from "@/lib/mock/site";
+import { GlxyWordmark } from "@/components/public/GlxyWordmark";
+
 export const viewport = {
   width: "device-width",
   initialScale: 0.92,
@@ -17,94 +14,18 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-function logoSrc() {
-  return `/api/assets/Website/Logo/${encodeURIComponent("KISS WITTE LETTERS TRANSPARANT.png")}`;
-}
-
-function normalizeHexColor(raw: string | null | undefined, fallback: string) {
-  const t = (raw || "").trim().toLowerCase();
-  if (/^#[0-9a-f]{6}$/i.test(t)) return t;
-  if (/^#[0-9a-f]{3}$/i.test(t)) {
-    const h = t.slice(1);
-    return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`;
-  }
-  return fallback;
-}
-
-export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const defaultInstagram = "https://instagram.com/kissfmnl";
-  const defaultWhatsApp = "https://wa.me/318001078";
-  async function getLinks() {
-    try {
-      const rows = await prisma.siteSetting.findMany({
-        where: { key: { in: ["PUBLIC_INSTAGRAM_URL", "PUBLIC_WHATSAPP_URL"] } },
-        select: { key: true, value: true },
-      });
-      const map = new Map(rows.map((r) => [r.key, r.value]));
-      return {
-        instagramUrl: map.get("PUBLIC_INSTAGRAM_URL") || defaultInstagram,
-        whatsAppUrl: map.get("PUBLIC_WHATSAPP_URL") || defaultWhatsApp,
-      };
-    } catch {
-      return {
-        instagramUrl: defaultInstagram,
-        whatsAppUrl: defaultWhatsApp,
-      };
-    }
-  }
-  async function getUiSettings() {
-    try {
-      const rows = await prisma.siteSetting.findMany({
-        where: {
-          key: {
-            in: [
-              "FALLBACK_ALBUM_BG_COLOR",
-              "COOKIE_BANNER_SHOW",
-              "COOKIE_BANNER_TEXT",
-              "COOKIE_BANNER_CTA",
-              "PUBLIC_TAB_TITLE",
-              ...PUBLIC_NAV_ITEMS.map((i) => i.settingKey),
-            ],
-          },
-        },
-        select: { key: true, value: true },
-      });
-      const map = new Map(rows.map((r) => [r.key, r.value]));
-      return {
-        fallbackAlbumBg: normalizeHexColor(map.get("FALLBACK_ALBUM_BG_COLOR"), "#f2f8fb"),
-        showCookieBanner: (map.get("COOKIE_BANNER_SHOW") || "yes") !== "no",
-        cookieBannerText: map.get("COOKIE_BANNER_TEXT") || "Wij gebruiken alleen functionele cookies om de site goed te laten werken.",
-        cookieBannerCta: map.get("COOKIE_BANNER_CTA") || "Ok, begrepen",
-        tabTitle: map.get("PUBLIC_TAB_TITLE") || "KISS FM",
-        navItems: resolvePublicNavItems(map),
-      };
-    } catch {
-      return {
-        fallbackAlbumBg: "#f2f8fb",
-        showCookieBanner: true,
-        cookieBannerText: "Wij gebruiken alleen functionele cookies om de site goed te laten werken.",
-        cookieBannerCta: "Ok, begrepen",
-        tabTitle: "KISS FM",
-        navItems: PUBLIC_NAV_ITEMS.filter((i) => i.defaultVisible).map((i) => ({ href: i.href, label: i.label })),
-      };
-    }
-  }
-  const links = await getLinks();
-  const ui = await getUiSettings();
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  const ui = MOCK_PUBLIC_UI;
+  const navItems = [...MOCK_NAV];
   return (
     <div
-      className="kiss-public-root min-h-screen w-full max-w-[100%] bg-[#e5eaf0] text-gray-900 overflow-x-hidden flex flex-col"
+      className="kiss-public-root galaxy-public-root flex min-h-screen w-full max-w-[100%] flex-col overflow-x-hidden bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(56,189,248,0.18),transparent_55%),linear-gradient(180deg,#070a14_0%,#0c1028_45%,#080c18_100%)] text-gray-100"
       style={{ ["--fallback-album-bg" as string]: ui.fallbackAlbumBg }}
     >
       <PublicTabTitle title={ui.tabTitle} />
       <PublicThemeGuard />
-      <PublicVisitTracker />
-      <PublicHeader
-        initialInstagramUrl={links.instagramUrl}
-        initialWhatsAppUrl={links.whatsAppUrl}
-        navItems={ui.navItems}
-      />
-      <main className="pt-16 md:pt-[4.5rem] w-full min-w-0 overflow-x-hidden flex-1 flex flex-col min-h-0">
+      <PublicHeader instagramUrl={MOCK_SOCIAL.instagramUrl} tiktokUrl={MOCK_SOCIAL.tiktokUrl} navItems={navItems} />
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pt-16 md:pt-[4.5rem]">
         {children}
       </main>
       <CookieNotice enabled={ui.showCookieBanner} text={ui.cookieBannerText} cta={ui.cookieBannerCta} />
@@ -112,31 +33,31 @@ export default async function PublicLayout({ children }: { children: React.React
 
       <footer
         id="kiss-public-footer"
-        className="relative z-[40] isolate mt-0 mb-[calc(5.25rem+env(safe-area-inset-bottom))] border-t border-white/10 bg-[#1a2f4a]"
+        className="relative z-[40] isolate mt-0 mb-[calc(5.25rem+env(safe-area-inset-bottom))] border-t border-cyan-500/15 bg-[#060914]/95 backdrop-blur-sm"
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-full bg-[#1a2f4a]"
+          className="pointer-events-none absolute inset-x-0 top-full bg-[#060914]"
           style={{ height: "calc(5.25rem + env(safe-area-inset-bottom))" }}
         />
-        <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] items-center justify-between gap-4 bg-[#1a2f4a] px-4 py-4 md:px-10 md:py-5">
+        <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] flex-wrap items-center justify-between gap-4 bg-transparent px-4 py-4 md:px-10 md:py-5">
           <div className="flex shrink-0 items-center gap-1.5 md:gap-2.5">
-            <AppImage src={logoSrc()} alt="KISS FM" className="h-10 w-auto object-contain opacity-95 md:h-14" />
+            <GlxyWordmark className="text-xl md:text-2xl" />
           </div>
-          <div className="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs font-black text-white/75 flex-wrap justify-end">
-            <Link href="/contact" className="hover:text-white transition-colors">
+          <div className="flex flex-wrap items-center justify-end gap-3 font-black text-white/65 md:gap-5 text-[11px] md:text-xs">
+            <Link href="/contact" className="transition-colors hover:text-cyan-200">
               Contact
             </Link>
-            <Link href="/join-kiss" className="hover:text-white transition-colors">
-              Join KISS
+            <Link href="/join-kiss" className="transition-colors hover:text-cyan-200">
+              Word host
             </Link>
-            <Link href="/acties" className="hover:text-white transition-colors">
+            <Link href="/acties" className="transition-colors hover:text-cyan-200">
               Acties
             </Link>
-            <Link href="/giveaway-voorwaarden" className="hover:text-white transition-colors">
-              Giveaway terms
+            <Link href="/giveaway-voorwaarden" className="transition-colors hover:text-cyan-200">
+              Giveaway-voorwaarden
             </Link>
-            <Link href="/disclaimer" className="hover:text-white transition-colors">
+            <Link href="/disclaimer" className="transition-colors hover:text-cyan-200">
               Disclaimer
             </Link>
           </div>
@@ -145,4 +66,3 @@ export default async function PublicLayout({ children }: { children: React.React
     </div>
   );
 }
-

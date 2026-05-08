@@ -1,16 +1,5 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { PortalPageShell } from "@/components/portal/PortalPageShell";
-import SettingsPageClient from "./SettingsPageClient";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-export default async function SettingsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-
-  return (
-    <PortalPageShell width="readable">
-      <SettingsPageClient />
-    </PortalPageShell>
-  );
+export default function Page() {
+  return <PortalMockPage />;
 }

@@ -1,59 +1,36 @@
-import { prisma } from "@/lib/prisma";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import AppImage from "@/components/AppImage";
+import { MOCK_HERO_BACKDROP_PATHS } from "@/lib/mock/site";
 
 export default function Kiss40Page() {
-  return <Kiss40PageContent />;
-}
-
-async function KISS40Description() {
-  try {
-    const row = await prisma.siteSetting.findUnique({
-      where: { key: "KISS40_DESCRIPTION" },
-      select: { value: true },
-    });
-    return (
-      row?.value ||
-      "Elk weekend vanaf 16:00 uur hoor je Bas van Teylingen met de 40 grootste hits van het moment in de KISS40. Samengesteld door jou via de KISS app, website en sociale media."
-    );
-  } catch {
-    return "Elk weekend vanaf 16:00 uur hoor je Bas van Teylingen met de 40 grootste hits van het moment in de KISS40. Samengesteld door jou via de KISS app, website en sociale media.";
-  }
-}
-
-async function Kiss40PageContent() {
-  const logoSrc = `/api/assets/${["Website", "KISS40.png"].map(encodeURIComponent).join("/")}`;
-  const description = await KISS40Description();
-  let helpText = "Benieuwd naar de lijst van deze week? Check 'm hieronder!";
-  try {
-    const row = await prisma.siteSetting.findUnique({
-      where: { key: "KISS40_HELP_TEXT" },
-      select: { value: true },
-    });
-    helpText = row?.value || helpText;
-  } catch {}
+  const description =
+    "GLXY40 — onze fictieve countdown-show: elk weekend een neon-trip door de grootste cosmic hits van dit moment.";
+  const helpText = "De embed hieronder is een losstaande Spotify-demo-playlist.";
+  const headerSrc = MOCK_HERO_BACKDROP_PATHS[0] || "";
 
   return (
     <div className={PUBLIC_PAGE_SHELL}>
       <div className={PUBLIC_PAGE_INTRO}>
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight" style={{ color: "var(--brand-navy)" }}>
-          KISS40
+        <h1 className="text-3xl font-black tracking-tight md:text-4xl" style={{ color: "var(--brand-navy)" }}>
+          GLXY40
         </h1>
-        <p className="mt-3 text-gray-600 max-w-3xl">{description}</p>
-        <p className="mt-2 text-gray-700 font-bold max-w-3xl">{helpText}</p>
+        <p className="mt-3 max-w-3xl text-gray-600">{description}</p>
+        <p className="mt-2 max-w-3xl font-bold text-gray-700">{helpText}</p>
       </div>
 
       <div className="mt-8 rounded-3xl border border-[#d3dae4] bg-[#eef2f6] p-5 md:p-6">
-        <div className="rounded-2xl border border-[#2a496f] bg-[#1e375a] p-4 md:p-5">
-          <AppImage src={logoSrc} alt="KISS40" className="w-full h-auto max-h-24 object-contain" loading="lazy" />
+        <div className="overflow-hidden rounded-2xl border border-cyan-500/25 bg-black/40 p-4 md:p-5">
+          {headerSrc ? (
+            <AppImage src={headerSrc} alt="" className="h-auto max-h-40 w-full object-cover opacity-95" loading="lazy" />
+          ) : null}
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-[#d6dee8] bg-white">
           <iframe
-            title="KISS40 Spotify playlist"
-            src="https://open.spotify.com/embed/playlist/0GPgveHzxptXDqUQWm8JtM?utm_source=generator"
+            title="Demo Spotify playlist embed"
+            src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIG1Y5CtK?utm_source=generator"
             width="100%"
-            height={2210}
+            height={352}
             frameBorder="0"
             allowFullScreen
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -64,4 +41,3 @@ async function Kiss40PageContent() {
     </div>
   );
 }
-

@@ -28,8 +28,6 @@ export function toPublicCoverSrc(raw: string | null | undefined): string | null 
   if (!value) return null;
   if (/^https?:\/\//i.test(value)) return value;
   if (value.startsWith("/")) return value;
-  if (value.startsWith("Website/")) {
-    return "/api/assets/" + value.split("/").map(encodeURIComponent).join("/");
-  }
+  if (value.startsWith("Website/")) return null;
   return null;
 }

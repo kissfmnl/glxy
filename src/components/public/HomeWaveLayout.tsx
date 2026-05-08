@@ -10,13 +10,10 @@ import { AppDownloadPopup } from "@/components/public/AppDownloadPopup";
 import { HomeHeroSubtitle } from "@/components/public/HomeHeroSubtitle";
 import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
 import { heroTitleColorStyle } from "@/lib/heroTitleColor";
-import type { HeroTitleLayout, HomeWaveCopy } from "@/lib/homePageWaveCopy";
+import type { HeroTitleLayout, HomeWaveCopy } from "@/types/home-wave";
 import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
 import AppImage from "@/components/AppImage";
-
-function kissLipsSrc() {
-  return `/api/assets/Website/Logo/${encodeURIComponent("KISS - Lippen (groen)_transparant (1) (4).png")}`;
-}
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -229,7 +226,7 @@ export function HomeWaveLayout({
               {copy.showLipsLogo ? (
                 <div className="shrink-0 flex translate-y-1 items-center justify-center self-start max-md:-translate-y-0.5 max-md:-mr-2 sm:translate-y-1.5 md:mr-0">
                   <AppImage
-                    src={kissLipsSrc()}
+                    src={MOCK_COVER_FALLBACK}
                     alt=""
                     className="h-14 w-auto sm:h-[4.5rem] md:h-28 lg:h-[7.75rem] object-contain drop-shadow-lg opacity-95"
                     loading="lazy"

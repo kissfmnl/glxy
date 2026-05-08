@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 
 type Slot = {
   id: string;
@@ -51,7 +52,7 @@ function timeToMinutes(value: string) {
 
 function formatShowName(value: string) {
   const v = value.trim().toLowerCase();
-  if (v === "non-stop" || v === "nonstop" || v === "kiss non-stop" || v === "kiss nonstop") return "KISS Non-stop";
+  if (v === "non-stop" || v === "nonstop" || v === "kiss non-stop" || v === "kiss nonstop") return "GLXY Non-stop";
   return value;
 }
 
@@ -63,11 +64,8 @@ function isNonStopProgram(slot: Slot) {
 
 function assetSrc(imagePath: string | null | undefined) {
   if (!imagePath) return null;
-  return "/api/assets/" + imagePath.split("/").map(encodeURIComponent).join("/");
-}
-
-function fallbackLogoSrc() {
-  return `/api/assets/Website/Logo/${encodeURIComponent("KISS BLAUW 5000 X 5000.png.png")}`;
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  return imagePath;
 }
 
 export function ProgrammingAgenda({
@@ -288,7 +286,7 @@ export function ProgrammingAgenda({
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center p-2" style={{ backgroundColor: "#1e375a" }}>
-                          <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="w-full h-full object-contain" loading="lazy" />
+                          <AppImage src={MOCK_COVER_FALLBACK} alt="GLXY Radio" className="h-full w-full object-contain" loading="lazy" />
                         </div>
                       )}
                     </div>
@@ -336,7 +334,7 @@ export function ProgrammingAgenda({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center p-8 bg-[#1e375a]">
-                    <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="w-40 h-auto object-contain" />
+                    <AppImage src={MOCK_COVER_FALLBACK} alt="GLXY Radio" className="h-40 w-auto object-contain" />
                   </div>
                 )}
 

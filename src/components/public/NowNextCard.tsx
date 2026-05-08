@@ -1,19 +1,14 @@
 "use client";
 
-import useSWR from "swr";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK, MOCK_NOW_PLAYING_PAYLOAD, MOCK_SOCIAL } from "@/lib/mock/site";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-const STREAM_URL = "https://stream.kissfm.nl/kissfm";
+const STREAM_URL = MOCK_SOCIAL.streamUrl;
 
 function kissVolumeSliderStyle(volume: number): CSSProperties {
   return { ["--kiss-vol-pct" as string]: `${Math.round(volume * 100)}%` } as CSSProperties;
-}
-
-function kissLipsSrc() {
-  return "/api/fallback-album-logo";
 }
 
 function HeroCoverThumb({ src }: { src: string | null | undefined }) {
@@ -26,7 +21,7 @@ function HeroCoverThumb({ src }: { src: string | null | undefined }) {
   }
   return (
     <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #f2f8fb)" }}>
-      <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" loading="lazy" draggable={false} />
+      <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" loading="lazy" draggable={false} />
     </div>
   );
 }
@@ -42,15 +37,15 @@ const HERO_NEXT_FILL =
 // Keep one shared audio element alive across route/component remounts.
 function getSharedAudio() {
   if (typeof window === "undefined") return null;
-  const w = window as typeof window & { __kissAudio?: HTMLAudioElement };
-  if (!w.__kissAudio) {
+  const w = window as typeof window & { __glxyAudio?: HTMLAudioElement };
+  if (!w.__glxyAudio) {
     const a = new Audio(STREAM_URL);
     a.preload = "auto";
     a.crossOrigin = "anonymous";
     a.volume = 0.8;
-    w.__kissAudio = a;
+    w.__glxyAudio = a;
   }
-  return w.__kissAudio;
+  return w.__glxyAudio;
 }
 
 export function NowNextCard({
@@ -64,7 +59,7 @@ export function NowNextCard({
   variant?: "default" | "hero";
   labels?: { nowPlaying?: string; nextPlaying?: string; live?: string };
 }) {
-  const { data } = useSWR("/api/now-playing", fetcher, { refreshInterval: 15_000 });
+  const data = MOCK_NOW_PLAYING_PAYLOAD;
 
   const current = data?.current;
   const next = data?.next;
@@ -303,7 +298,7 @@ export function NowNextCard({
                       {current?.title ?? "Laden..."}
                     </h3>
                     <p className="mt-auto pt-1 text-sm font-bold leading-snug text-gray-600 line-clamp-2 md:text-base">
-                      {current?.artist ?? "KISS FM"}
+                      {current?.artist ?? "GLXY Radio"}
                     </p>
                   </div>
                 </div>
@@ -361,7 +356,7 @@ export function NowNextCard({
                 <h3 className="mt-2 text-lg font-black leading-snug text-gray-900 line-clamp-2 sm:text-xl">
                   {current?.title ?? "Laden..."}
                 </h3>
-                <p className="mt-auto pt-1 text-sm font-bold text-gray-600 line-clamp-2">{current?.artist ?? "KISS FM"}</p>
+                <p className="mt-auto pt-1 text-sm font-bold text-gray-600 line-clamp-2">{current?.artist ?? "GLXY Radio"}</p>
               </div>
             </div>
           )}
@@ -418,7 +413,7 @@ export function NowNextCard({
             {current?.title ?? "Laden..."}
           </h3>
           <p className="text-sm font-bold text-gray-600 truncate">
-            {current?.artist ?? "KISS FM"}
+            {current?.artist ?? "GLXY Radio"}
           </p>
           {withPlayer && (
             <div className="mt-4 flex flex-wrap items-center gap-3">

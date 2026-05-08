@@ -1,7 +1,8 @@
 "use client";
 
-import { submitThrowbackPartySubmission } from "@/app/actions/throwbackActions";
+import { usePathname, useRouter } from "next/navigation";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 
 type Song = {
   id: string;
@@ -10,10 +11,6 @@ type Song = {
   year: number | null;
   coverUrl: string | null;
 };
-
-function fallbackCover() {
-  return "/api/fallback-album-logo";
-}
 
 export function ThrowbackSubmissionDetailsForm({
   songs,
@@ -26,9 +23,18 @@ export function ThrowbackSubmissionDetailsForm({
   audioHelpText: string;
   videoHelpText: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const startedAt = Date.now();
+
   return (
-    <form action={submitThrowbackPartySubmission} encType="multipart/form-data" className="space-y-6 rounded-3xl border border-[#1e375a]/12 bg-white/95 p-5 shadow-sm md:p-7">
+    <form
+      className="space-y-6 rounded-3xl border border-[#1e375a]/12 bg-white/95 p-5 shadow-sm md:p-7"
+      onSubmit={(e) => {
+        e.preventDefault();
+        router.push(`${pathname}?submitted=1`);
+      }}
+    >
       <div className="rounded-2xl border border-[#d9e4ef] bg-[#f7fbff] p-4">
         <p className="text-sm font-black text-[#1e375a]">Jouw selectie ({songs.length + freeChoiceCount} nummers)</p>
       </div>
@@ -37,7 +43,7 @@ export function ThrowbackSubmissionDetailsForm({
         {songs.map((song, index) => (
           <div key={song.id} className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-2.5">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-[#f2f8fb]">
-              <AppImage src={song.coverUrl || fallbackCover()} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <AppImage src={song.coverUrl || MOCK_COVER_FALLBACK} alt="" className="h-full w-full object-cover" loading="lazy" />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-black text-[#1e375a]">
@@ -68,11 +74,11 @@ export function ThrowbackSubmissionDetailsForm({
       </div>
 
       {songs.map((song) => (
-        <input key={song.id} type="hidden" name="songIds" value={song.id} />
+        <input key={song.id} type="hidden" name="songIds" value={song.id} readOnly />
       ))}
-      <input type="hidden" name="freeChoiceCount" value={String(freeChoiceCount)} />
-      <input type="hidden" name="startedAt" value={String(startedAt)} />
-      <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+      <input type="hidden" name="freeChoiceCount" value={String(freeChoiceCount)} readOnly />
+      <input type="hidden" name="startedAt" value={String(startedAt)} readOnly />
+      <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" readOnly />
 
       {freeChoiceCount > 0 ? (
         <div className="rounded-2xl border border-[#d9e4ef] bg-[#f7fbff] p-4">
@@ -118,7 +124,7 @@ export function ThrowbackSubmissionDetailsForm({
             required
             maxLength={120}
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-bold text-gray-900 outline-none transition focus:ring-2 focus:ring-[#37bfbf]/45"
-            placeholder="Bijv. Team KISS Logistics"
+            placeholder="Demo team GLXY"
           />
         </label>
         <label className="block">
@@ -128,7 +134,7 @@ export function ThrowbackSubmissionDetailsForm({
             required
             maxLength={120}
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-bold text-gray-900 outline-none transition focus:ring-2 focus:ring-[#37bfbf]/45"
-            placeholder="Naam contactpersoon"
+            placeholder="Naam"
           />
         </label>
         <label className="block">
@@ -139,7 +145,7 @@ export function ThrowbackSubmissionDetailsForm({
             required
             maxLength={200}
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-bold text-gray-900 outline-none transition focus:ring-2 focus:ring-[#37bfbf]/45"
-            placeholder="naam@bedrijf.nl"
+            placeholder="hello@demo.nl"
           />
         </label>
         <label className="block">
@@ -149,7 +155,7 @@ export function ThrowbackSubmissionDetailsForm({
             required
             maxLength={25}
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-bold text-gray-900 outline-none transition focus:ring-2 focus:ring-[#37bfbf]/45"
-            placeholder="+31 6 12345678"
+            placeholder="+31 6 00000000"
           />
         </label>
         <label className="block">
@@ -186,7 +192,7 @@ export function ThrowbackSubmissionDetailsForm({
 
       <div className="flex justify-end border-t border-gray-200 pt-4">
         <button type="submit" className="rounded-xl bg-[#1e375a] px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-[#162c49]">
-          Inzending versturen
+          Demo: voltooien
         </button>
       </div>
     </form>

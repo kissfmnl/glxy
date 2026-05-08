@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-/** Website teksten staan onder Instellingen (alleen admins). */
-export default function AdminTekstenRedirectPage() {
-  redirect("/settings/website-teksten");
+export default function Page() {
+  return <PortalMockPage />;
 }

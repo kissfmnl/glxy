@@ -1,12 +1,10 @@
 export type HomeHeroSlide = { src: string };
 
-function assetSrc(imagePath: string) {
-  return "/api/assets/" + imagePath.split("/").map(encodeURIComponent).join("/");
-}
-
-function isImagePath(p: string | null | undefined) {
-  if (!p?.trim()) return false;
-  return /\.(png|jpe?g|webp|gif|avif)$/i.test(p);
+function resolveBackdropSrc(imagePath: string): string | null {
+  const t = imagePath.trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  return null;
 }
 
 export function uniqueSlideSrcs(
@@ -17,9 +15,8 @@ export function uniqueSlideSrcs(
   const seen = new Set<string>();
   const out: HomeHeroSlide[] = [];
   for (const p of adminPaths) {
-    if (!isImagePath(p)) continue;
-    const src = assetSrc(p);
-    if (seen.has(src)) continue;
+    const src = resolveBackdropSrc(p);
+    if (!src || seen.has(src)) continue;
     seen.add(src);
     out.push({ src });
     if (out.length >= max) return out;

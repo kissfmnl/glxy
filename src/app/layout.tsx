@@ -3,8 +3,12 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "KISS FM",
-  description: "KISS FM — Luister live, playlist, programmering en meer.",
+  title: "GLXY Radio",
+  description: "GLXY Radio — demo frontend: live-stream UI, playlist en programmering (statische data).",
+  icons: {
+    icon: "/glxy-favicon.svg",
+    apple: "/glxy-favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -15,8 +19,6 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/api/favicon" />
-        <link rel="apple-touch-icon" href="/api/favicon" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

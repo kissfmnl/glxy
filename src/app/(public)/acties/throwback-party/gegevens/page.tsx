@@ -1,40 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import { ThrowbackSubmissionDetailsForm } from "@/components/public/ThrowbackSubmissionDetailsForm";
-import { buildTrackKeys, toPublicCoverSrc } from "@/lib/throwbackCovers";
+import { MOCK_THROWBACK_SONGS } from "@/lib/mock/site";
 
-export const dynamic = "force-dynamic";
-
-export default async function ThrowbackPartyDetailsPage({
+export default function ThrowbackPartyDetailsPage({
   searchParams,
 }: {
   searchParams?: { songIds?: string; submitted?: string; free?: string };
 }) {
-  const [kickerRow, titleRow, step2SubtitleRow, successTitleRow, successCtaRow, backCtaRow] = await Promise.all([
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_KICKER" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_TITLE" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_STEP2_SUBTITLE" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_SUCCESS_TITLE" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_SUCCESS_CTA" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "THROWBACK_BACK_CTA" }, select: { value: true } }),
-  ]);
-  const kicker = kickerRow?.value?.trim() || "Actie";
-  const title = titleRow?.value?.trim() || "KISS Throwback Party";
-  const step2Subtitle = step2SubtitleRow?.value?.trim() || "Stap 2 van 2: vul je gegevens in en verstuur je inzending.";
-  const successTitle = successTitleRow?.value?.trim() || "Top! Jullie inzending is ontvangen.";
-  const successCta = successCtaRow?.value?.trim() || "Nieuwe inzending starten";
-  const backCta = backCtaRow?.value?.trim() || "← Terug naar nummerselectie";
-
-  const [audioHelpRow, videoHelpRow] = await Promise.all([
-    prisma.siteSetting.findUnique({ where: { key: "ACTION_THROWBACK_AUDIO_HELP" }, select: { value: true } }),
-    prisma.siteSetting.findUnique({ where: { key: "ACTION_THROWBACK_VIDEO_HELP" }, select: { value: true } }),
-  ]);
-  const audioHelpText =
-    audioHelpRow?.value || "Stuur een korte shoutout namens je team (max 20MB, mp3/wav/m4a/webm/ogg).";
-  const videoHelpText =
-    videoHelpRow?.value || "Stuur een korte video van jullie team (max 100MB, mp4/webm/mov/avi).";
+  const kicker = "Actie · demo";
+  const title = "GLXY Throwback Mix";
+  const step2Subtitle = "Stap 2 van 2: vul je gegevens in (demo — er wordt niets opgeslagen).";
+  const successTitle = "Top! In een echte omgeving zou je inzending hier binnenkomen.";
+  const successCta = "Nieuwe selectie";
+  const backCta = "← Terug naar nummerselectie";
+  const audioHelpText = "Audio is optioneel in deze demo.";
+  const videoHelpText = "Video is optioneel in deze demo.";
 
   if (searchParams?.submitted === "1") {
     return (
@@ -68,35 +50,10 @@ export default async function ThrowbackPartyDetailsPage({
     redirect("/throwback");
   }
 
-  const played = await prisma.playedTrack.findMany({
-    where: { cover: { not: null } },
-    orderBy: { playedAt: "desc" },
-    take: 4000,
-    select: { artist: true, title: true, cover: true },
-  });
-  const playedCoverByKey = new Map<string, string>();
-  for (const row of played) {
-    const cover = toPublicCoverSrc(row.cover);
-    if (!cover) continue;
-    for (const key of buildTrackKeys(row.artist, row.title)) {
-      if (!playedCoverByKey.has(key)) playedCoverByKey.set(key, cover);
-    }
-  }
-
-  const songs = await prisma.throwbackSong.findMany({
-    where: { id: { in: dedupedIds }, isActive: true },
-    select: { id: true, artist: true, title: true, year: true, coverUrl: true },
-  });
-  const byId = new Map(songs.map((s) => [s.id, s]));
+  const byId = new Map(MOCK_THROWBACK_SONGS.map((s) => [s.id, s]));
   const orderedSongs = dedupedIds
     .map((id) => byId.get(id))
-    .filter((song): song is NonNullable<typeof song> => Boolean(song))
-    .map((song) => {
-      const ownCover = toPublicCoverSrc(song.coverUrl);
-      if (ownCover) return { ...song, coverUrl: ownCover };
-      const fallback = buildTrackKeys(song.artist, song.title).map((k) => playedCoverByKey.get(k)).find(Boolean) || null;
-      return { ...song, coverUrl: fallback };
-    });
+    .filter((song): song is NonNullable<typeof song> => Boolean(song));
   if (orderedSongs.length + freeChoiceCount < 6 || orderedSongs.length + freeChoiceCount > 10) {
     redirect("/throwback");
   }
@@ -115,7 +72,12 @@ export default async function ThrowbackPartyDetailsPage({
             {backCta}
           </Link>
         </div>
-        <ThrowbackSubmissionDetailsForm songs={orderedSongs} freeChoiceCount={freeChoiceCount} audioHelpText={audioHelpText} videoHelpText={videoHelpText} />
+        <ThrowbackSubmissionDetailsForm
+          songs={orderedSongs}
+          freeChoiceCount={freeChoiceCount}
+          audioHelpText={audioHelpText}
+          videoHelpText={videoHelpText}
+        />
       </div>
     </div>
   );

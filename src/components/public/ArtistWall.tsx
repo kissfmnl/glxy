@@ -3,28 +3,24 @@
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK, MOCK_JOCKS, MOCK_PLAYED_TRACKS } from "@/lib/mock/site";
 
 /**
  * Mark Maakt Media–achtige 3-kolom scroll, nu met vierkante tegels (zijde = kolombreedte).
  * Grotere kolommen + hogere/top-offset buitenbak voor meer verticale bleed binnen de page-clip.
  */
 const PATHS = [
-  "Website/DJ fotos/portret_dualipa.webp",
-  "Website/DJ fotos/portret_harrystyles.jpg",
-  "Website/DJ fotos/zang_taylorswift.webp",
-  "Website/DJ fotos/portret_bensonboone.avif",
-  "Website/DJ fotos/portret_edheeran.avif",
-  "Website/DJ fotos/zang_sabrinacarpenter.jpg",
-  "Website/DJ fotos/portret_shaboozey.webp",
-  "Website/DJ fotos/zang_sombr.jpeg",
-];
+  ...MOCK_JOCKS.map((j) => j.imagePath),
+  ...MOCK_PLAYED_TRACKS.map((t) => t.cover).filter(Boolean),
+] as string[];
 
 function assetUrl(p: string) {
-  return "/api/assets/" + p.split("/").map(encodeURIComponent).join("/");
+  if (/^https?:\/\//i.test(p)) return p;
+  return MOCK_COVER_FALLBACK;
 }
 
 function fallbackLogoSrc() {
-  return `/api/assets/Website/Logo/${encodeURIComponent("KISS BLAUW 5000 X 5000.png.png")}`;
+  return MOCK_COVER_FALLBACK;
 }
 
 export function ArtistWall() {

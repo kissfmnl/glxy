@@ -1,32 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import useSWR from "swr";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK, MOCK_NOW_PLAYING_PAYLOAD, MOCK_SOCIAL } from "@/lib/mock/site";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-const STREAM_URL = "https://stream.kissfm.nl/kissfm";
-const PIN_KEY = "kiss_mini_player_pinned";
+const STREAM_URL = MOCK_SOCIAL.streamUrl;
+const PIN_KEY = "glxy_mini_player_pinned";
 
 function kissVolumeSliderStyle(volume: number): CSSProperties {
   return { ["--kiss-vol-pct" as string]: `${Math.round(volume * 100)}%` } as CSSProperties;
 }
 
-function kissLipsSrc() {
-  return "/api/fallback-album-logo";
-}
-
 function getSharedAudio() {
   if (typeof window === "undefined") return null;
-  const w = window as typeof window & { __kissAudio?: HTMLAudioElement };
-  if (!w.__kissAudio) {
+  const w = window as typeof window & { __glxyAudio?: HTMLAudioElement };
+  if (!w.__glxyAudio) {
     const a = new Audio(STREAM_URL);
     a.preload = "auto";
     a.crossOrigin = "anonymous";
     a.volume = 0.8;
-    w.__kissAudio = a;
+    w.__glxyAudio = a;
   }
-  return w.__kissAudio;
+  return w.__glxyAudio;
 }
 
 /** Vastzetten: pijl naar beneden richting onderlijn */
@@ -52,7 +47,7 @@ function IconUndock({ className }: { className?: string }) {
 }
 
 export function PublicMiniPlayer() {
-  const { data } = useSWR("/api/now-playing", fetcher, { refreshInterval: 15_000 });
+  const data = MOCK_NOW_PLAYING_PAYLOAD;
   const [isPlaying, setIsPlaying] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -229,7 +224,7 @@ export function PublicMiniPlayer() {
       }}
     >
       <div
-        className="relative mx-auto overflow-hidden border border-white/15 bg-[#1e375a] px-4 py-3 text-white"
+        className="relative mx-auto overflow-hidden border border-cyan-500/25 bg-[linear-gradient(135deg,#0c1528_0%,#111b33_50%,#0a1020_100%)] px-4 py-3 text-white shadow-[0_0_40px_rgba(34,211,238,0.12)]"
         style={{
           width: "100%",
           maxWidth,
@@ -244,14 +239,14 @@ export function PublicMiniPlayer() {
                 <AppImage src={cover} alt="" className="w-full h-full object-cover" onError={() => setCoverFailed(true)} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #1e375a)" }}>
-                  <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
+                  <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
                 </div>
               )}
             </div>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-[0.2em] font-black text-white/70">Nu live</p>
-              <p className="text-sm font-black truncate">{data?.current?.title || "KISS FM Live"}</p>
-              <p className="text-xs font-bold text-white/75 truncate">{data?.current?.artist || "KISS FM"}</p>
+              <p className="text-sm font-black truncate">{data?.current?.title || "GLXY Radio"}</p>
+              <p className="text-xs font-bold text-white/75 truncate">{data?.current?.artist || "Live stream"}</p>
             </div>
           </div>
 
@@ -261,7 +256,7 @@ export function PublicMiniPlayer() {
               if (audio.paused) void audio.play().catch(() => {});
               else audio.pause();
             }}
-            className="kiss-mini-player-btn w-11 h-11 rounded-full bg-[#37bfbf] text-[#10253f] font-black shrink-0 flex items-center justify-center"
+            className="kiss-mini-player-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-cyan-400 font-black text-[#070a14]"
             aria-label={isPlaying ? "Pauzeer stream" : "Speel stream"}
           >
             {isPlaying ? (
@@ -309,7 +304,7 @@ export function PublicMiniPlayer() {
                 dockLockedByScroll
                   ? "border-white/10 bg-white/10 text-white/35 cursor-not-allowed pointer-events-none"
                   : pinned
-                    ? "border-[#37bfbf] bg-[#37bfbf]/20 text-[#37bfbf]"
+                    ? "border-cyan-400 bg-cyan-400/15 text-cyan-200"
                     : "border-white/20 text-white/80 hover:text-white"
               }`}
               aria-label={

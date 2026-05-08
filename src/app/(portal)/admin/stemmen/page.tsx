@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-export default async function AdminStemmenPage() {
-  redirect("/admin/inzendingen?tab=playlist");
+export default function Page() {
+  return <PortalMockPage />;
 }

@@ -87,7 +87,7 @@ export default async function MonitorPage({
         </form>
       </div>
       <p className="mb-5 text-sm text-gray-600">
-        Laat deze pagina open op de monitor-pc. Hij blijft `/api/now-playing` pollen zodat logging actief blijft.
+        Demo-monitor: vast mock-playout en recente tracks — geen serverpoll naar een database.
       </p>
       <NowPlayingMonitorClient />
     </div>

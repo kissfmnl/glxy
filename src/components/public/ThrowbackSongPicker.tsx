@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import AppImage from "@/components/AppImage";
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 
 type Song = {
   id: string;
@@ -11,10 +12,6 @@ type Song = {
   year: number | null;
   coverUrl: string | null;
 };
-
-function fallbackCover() {
-  return "/api/fallback-album-logo";
-}
 
 export function ThrowbackSongPicker({ songs }: { songs: Song[] }) {
   const [selectedSongIds, setSelectedSongIds] = useState<string[]>([]);
@@ -147,7 +144,7 @@ export function ThrowbackSongPicker({ songs }: { songs: Song[] }) {
                 }`}
               >
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-[#f2f8fb]">
-                  <AppImage src={song.coverUrl || fallbackCover()} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <AppImage src={song.coverUrl || MOCK_COVER_FALLBACK} alt="" className="h-full w-full object-cover" loading="lazy" />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-black text-[#1e375a]">{song.title}</p>
@@ -171,7 +168,7 @@ export function ThrowbackSongPicker({ songs }: { songs: Song[] }) {
             selectedSongs.map((song, index) => (
               <div key={song.id} className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
                 <div className="h-10 w-10 overflow-hidden rounded-lg border border-gray-200 bg-[#f2f8fb]">
-                  <AppImage src={song.coverUrl || fallbackCover()} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <AppImage src={song.coverUrl || MOCK_COVER_FALLBACK} alt="" className="h-full w-full object-cover" loading="lazy" />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-black text-[#1e375a]">

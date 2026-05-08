@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-export default function HomepageWaveRedirectPage() {
-  redirect("/settings/homepage-collage");
+export default function Page() {
+  return <PortalMockPage />;
 }

@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE_ON_DARK } from "@/lib/publicPanelChrome";
+import { MOCK_CONCERTS } from "@/lib/mock/site";
 
 type ConcertRow = {
   id: string;
@@ -60,75 +61,59 @@ function groupConcertRuns(input: ConcertRow[]): GroupedConcert[] {
 }
 
 export async function ConcertsPanel({ sectionTitle = "Concerten" }: { sectionTitle?: string }) {
-  let concerts: ConcertRow[] = [];
-  try {
-    const upcoming = await prisma.concert.findMany({
-      where: { isActive: true, date: { gte: new Date() } },
-      orderBy: { date: "asc" },
-      take: 24,
-      select: { id: true, title: true, venue: true, city: true, date: true, url: true },
-    });
-    if (upcoming.length > 0) {
-      concerts = upcoming;
-    } else {
-      concerts = await prisma.concert.findMany({
-        where: { isActive: true },
-        orderBy: { date: "desc" },
-        take: 24,
-        select: { id: true, title: true, venue: true, city: true, date: true, url: true },
-      });
-    }
-  } catch {
-    concerts = [];
-  }
+  const now = new Date();
+  const concerts: ConcertRow[] = MOCK_CONCERTS.map((c, i) => ({
+    id: c.id,
+    title: c.name,
+    venue: null,
+    city: c.city,
+    date: new Date(now.getFullYear(), 6 + (i % 3), 12 + i * 2),
+    url: c.url,
+  }));
 
   const grouped = groupConcertRuns(concerts).slice(0, 4);
 
   return (
-    <div className="kiss-public-panel kiss-public-panel--navy rounded-3xl border border-[#2a496f] bg-[linear-gradient(145deg,#1e375a_0%,#284a75_100%)] text-white overflow-hidden flex flex-col">
+    <div className="kiss-public-panel kiss-public-panel--navy galaxy-concerts-panel flex flex-col overflow-hidden rounded-3xl border border-white/15 bg-[linear-gradient(155deg,#0f1729_0%,#141d35_42%,#0b1022_100%)] text-white">
       <div className={KISS_PANEL_HEADER_BOX}>
         <p className={KISS_PANEL_TITLE_ON_DARK}>{sectionTitle}</p>
       </div>
       <div className="px-5 pb-5 pt-0">
         <div className={`${KISS_PANEL_HEADER_GAP} space-y-2.5`}>
-        {grouped.length ? (
-          grouped.map((c) => (
-            <a
-              key={c.key}
-              href={c.url || undefined}
-              target={c.url ? "_blank" : undefined}
-              rel={c.url ? "noreferrer" : undefined}
-              className="kiss-public-concert-row flex flex-col rounded-2xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur transition-colors hover:bg-white/15"
-            >
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/65">
-                {dayKey(c.start) === dayKey(c.end)
-                  ? new Intl.DateTimeFormat("nl-NL", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                      timeZone: "Europe/Amsterdam",
-                    }).format(new Date(c.start))
-                  : `${new Intl.DateTimeFormat("nl-NL", {
-                      day: "numeric",
-                      month: "long",
-                      timeZone: "Europe/Amsterdam",
-                    }).format(new Date(c.start))} t/m ${new Intl.DateTimeFormat("nl-NL", {
-                      day: "numeric",
-                      month: "long",
-                      timeZone: "Europe/Amsterdam",
-                    }).format(new Date(c.end))}`}
-              </p>
-              <p className="mt-1 text-sm font-black text-white truncate">{c.title}</p>
-              <p className="text-xs font-bold text-white/80 truncate">{[c.venue, c.city].filter(Boolean).join(" • ")}</p>
-            </a>
-          ))
-        ) : (
-          <div className="kiss-public-concert-row rounded-2xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur">
-            <p className="text-sm font-black text-white">Nog geen concerten zichtbaar.</p>
-            <p className="mt-1 text-xs font-bold text-white/80">
-              Voeg in admin een concert toe en zet het op actief om het hier te tonen.
-            </p>
-          </div>
-        )}
+          {grouped.length ? (
+            grouped.map((c) => (
+              <Link
+                key={c.key}
+                href={c.url && c.url !== "#" ? c.url : "#"}
+                {...(c.url && c.url !== "#" ? { target: "_blank", rel: "noreferrer" } : {})}
+                className="kiss-public-concert-row flex flex-col rounded-2xl border border-white/12 bg-white/8 px-3 py-3 backdrop-blur transition-colors hover:bg-white/12"
+              >
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/65">
+                  {dayKey(c.start) === dayKey(c.end)
+                    ? new Intl.DateTimeFormat("nl-NL", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                        timeZone: "Europe/Amsterdam",
+                      }).format(new Date(c.start))
+                    : `${new Intl.DateTimeFormat("nl-NL", {
+                        day: "numeric",
+                        month: "long",
+                        timeZone: "Europe/Amsterdam",
+                      }).format(new Date(c.start))} t/m ${new Intl.DateTimeFormat("nl-NL", {
+                        day: "numeric",
+                        month: "long",
+                        timeZone: "Europe/Amsterdam",
+                      }).format(new Date(c.end))}`}
+                </p>
+                <p className="mt-1 truncate text-sm font-black text-white">{c.title}</p>
+                <p className="truncate text-xs font-bold text-white/80">{[c.venue, c.city].filter(Boolean).join(" • ")}</p>
+              </Link>
+            ))
+          ) : (
+            <div className="kiss-public-concert-row rounded-2xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur">
+              <p className="text-sm font-black text-white">Nog geen concerten voor deze demo.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { PortalMockPage } from "@/components/portal/PortalMockPage";
 
-export default function AdminConcertenRedirectPage() {
-  redirect("/settings/concerten");
+export default function Page() {
+  return <PortalMockPage />;
 }

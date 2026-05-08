@@ -2,14 +2,12 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import useSWR from "swr";
 import { amsterdamHour, formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import { KISS_PANEL_TITLE_ON_DARK } from "@/lib/publicPanelChrome";
 import { RichTextWithLinks } from "@/components/public/RichTextWithLinks";
 import AppImage from "@/components/AppImage";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { MOCK_COVER_FALLBACK, MOCK_NOW_PLAYING_PAYLOAD, buildMockPlaylistTracks } from "@/lib/mock/site";
 
 const DESKTOP_MENU_CLOSE_MS = 220;
 
@@ -22,10 +20,6 @@ type DesktopMenuState = {
   anchor: AnchorRect;
   placed?: { left: number; top: number; transformOrigin: string };
 };
-
-function kissLipsSrc() {
-  return "/api/fallback-album-logo";
-}
 
 function resolvePlaylistDate(initial: string, dayOptions: { ymd: string }[]): string {
   if (dayOptions.some((o) => o.ymd === initial)) return initial;
@@ -111,7 +105,7 @@ function TrackCover({ src, alt }: { src: string | null; alt: string }) {
   }
   return (
     <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #f2f8fb)" }}>
-      <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" draggable={false} />
+      <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" draggable={false} />
     </div>
   );
 }
@@ -244,7 +238,7 @@ export function PlaylistPageClient({
     const maxH = d0 === dateMax ? Math.min(initialHour, amsterdamHour(new Date())) : 23;
     return Math.min(Math.max(0, initialHour), maxH);
   });
-  const [voterId, setVoterId] = useState("");
+  const [userVotes, setUserVotes] = useState<Record<string, 1 | -1>>({});
   const [sheetTrack, setSheetTrack] = useState<Track | null>(null);
   const [sheetLeaving, setSheetLeaving] = useState(false);
   const [desktopMenu, setDesktopMenu] = useState<DesktopMenuState | null>(null);
@@ -278,40 +272,11 @@ export function PlaylistPageClient({
     return () => window.clearTimeout(t);
   }, [sheetTrack, sheetLeaving]);
 
-  useEffect(() => {
-    try {
-      const key = "kiss_vote_voter_id";
-      const existing = window.localStorage.getItem(key);
-      if (existing) {
-        setVoterId(existing);
-        return;
-      }
-      const generated = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-      window.localStorage.setItem(key, generated);
-      setVoterId(generated);
-    } catch {
-      setVoterId("anon");
-    }
-  }, []);
-
-  const listUrl = useMemo(() => {
-    const hourQs = hourFilter === "all" ? "" : `&hour=${hourFilter}`;
-    return `/api/recent-tracks?date=${encodeURIComponent(date)}${hourQs}&limit=80`;
-  }, [date, hourFilter]);
-
-  const { data: nowData } = useSWR("/api/now-playing", fetcher, { refreshInterval: 15_000 });
-  const { data: recentData, isValidating } = useSWR(listUrl, fetcher, { refreshInterval: 30_000 });
-  const { data: voteData, mutate: mutateVotes } = useSWR(
-    voterId ? `/api/playlist-votes?voterId=${encodeURIComponent(voterId)}` : null,
-    fetcher,
-    { refreshInterval: 10_000 }
-  );
-
+  const nowData = MOCK_NOW_PLAYING_PAYLOAD;
   const now = nowData?.current;
   const nowCover = nowData?.cover as string | null | undefined;
 
-  const tracks = (recentData?.tracks as Track[] | undefined) || [];
-  const userVotes = (voteData?.userVotes as Record<string, 1 | -1> | undefined) || {};
+  const tracks = useMemo(() => buildMockPlaylistTracks(date, hourFilter), [date, hourFilter]);
 
   const todayYmd = formatAmsterdamYMD(new Date());
   const isSelectedToday = date === todayYmd;
@@ -403,19 +368,8 @@ export function PlaylistPageClient({
     return () => window.removeEventListener("keydown", onKey);
   }, [desktopMenu, desktopMenuLeaving, closeDesktopMenu]);
 
-  async function sendVote(track: Track, voteType: "up" | "down") {
-    await fetch("/api/playlist-votes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        trackId: track.id,
-        title: track.title,
-        artist: track.artist,
-        voteType,
-        voterId,
-      }),
-    });
-    void mutateVotes();
+  function sendVote(track: Track, voteType: "up" | "down") {
+    setUserVotes((prev) => ({ ...prev, [track.id]: voteType === "up" ? 1 : -1 }));
   }
 
   function onMenuTrigger(track: Track, button: HTMLButtonElement) {
@@ -479,7 +433,7 @@ export function PlaylistPageClient({
                   className="mt-auto truncate pt-1 text-sm font-bold leading-snug md:text-base"
                   style={{ color: "rgba(255,255,255,0.88)" }}
                 >
-                  {now?.artist ?? "KISS FM"}
+                  {now?.artist ?? "GLXY Radio"}
                 </p>
               </div>
             </div>
@@ -546,10 +500,6 @@ export function PlaylistPageClient({
         </div>
 
         {texts.voteHint ? <RichTextWithLinks text={texts.voteHint} className="mb-6 text-sm font-bold text-[#1f3f62]" /> : null}
-
-        {isValidating ? (
-          <div className="mb-2 text-right text-xs font-bold text-gray-400">Bijwerken…</div>
-        ) : null}
 
         {tracks.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#1e375a]/20 bg-white/90 py-16 text-center shadow-sm">
@@ -649,7 +599,7 @@ export function PlaylistPageClient({
                       userVotes={userVotes}
                       size="sm"
                       onVote={(v) => {
-                        void sendVote(desktopTrack, v);
+                        sendVote(desktopTrack, v);
                       }}
                     />
                   </div>
@@ -697,7 +647,7 @@ export function PlaylistPageClient({
                   </span>
                 </span>
               </a>
-              <VotePillRow track={sheetTrack} userVotes={userVotes} size="md" onVote={(v) => void sendVote(sheetTrack, v)} />
+              <VotePillRow track={sheetTrack} userVotes={userVotes} size="md" onVote={(v) => sendVote(sheetTrack, v)} />
             </div>
             <button
               type="button"
