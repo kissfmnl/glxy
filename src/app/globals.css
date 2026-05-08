@@ -1,26 +1,995 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --brand-primary: #37bfbf;
+    --brand-accent: #37bfbf;
+    --brand-navy: #1e375a;
+    
+    /* Light Mode (Premium High Contrast) */
+    --bg-dark: #F1F3F5;
+    --bg-card: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+    --border-color: #DEE2E6;
+    --text-main: #111111;
+    --text-muted: #495057;
+  }
+
+  .dark {
+    /* Dark Mode (Deep OLED) */
+    --bg-dark: #050505;
+    --bg-card: #0F0F14;
+    --bg-sidebar: #0F0F14;
+    --border-color: #1E1E26;
+    --text-main: #FFFFFF;
+    --text-muted: #A0A0AB;
+  }
+
+  html, body {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-main);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    overscroll-behavior-y: none;
+  }
+
+  html {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* ==========================================
+     Kaart / Widget basisstijl
+  ========================================== */
+  .card {
+    @apply border rounded-2xl p-5 transition-colors duration-200;
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  /* ==========================================
+     Knoppen
+  ========================================== */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg
+           transition-colors duration-200 focus:outline-none focus:ring-2;
+    background-color: var(--brand-primary);
+    &:hover { background-color: var(--brand-accent); }
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg
+           border transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-black/5;
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    &:hover { 
+      background-color: rgba(0,0,0,0.05); 
+      color: var(--text-main);
+    }
+  }
+  
+  .dark .btn-secondary:hover {
+    background-color: rgba(255,255,255,0.05);
+  }
+
+  /* ==========================================
+     Privacy / Blur
+  ========================================== */
+  .privacy-blur {
+    @apply blur-sm hover:blur-none transition-all duration-300 cursor-help;
+  }
+
+  /* ==========================================
+     Badge stijlen
+  ========================================== */
+  .badge-unread {
+    @apply inline-block px-2 py-0.5 text-xs font-semibold rounded-full;
+    background-color: rgba(55, 181, 171, 0.1);
+    color: var(--brand-primary);
+  }
+
+  .badge-pinned {
+    @apply inline-block px-2 py-0.5 text-xs font-semibold rounded-full;
+    background-color: rgba(234, 179, 8, 0.1);
+    color: #EAB308;
+  }
 }
+
+/* ==========================================
+   Custom Scrollbar (OLED friendly)
+   ========================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-gray-300 dark:bg-white/10;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-white/20;
+}
+
+/* Selection colors */
+::selection {
+  @apply bg-brand-primary/30 text-brand-primary;
+}
+
+/* ==========================================
+   Public site photo wall animations
+   ========================================== */
+@keyframes kiss-wall-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+
+@keyframes kiss-wall-right {
+  from { transform: translateX(-33.333%); }
+  to { transform: translateX(0); }
+}
+
+.kiss-wall-left {
+  animation: kiss-wall-left 42s linear infinite;
+}
+
+.kiss-wall-right {
+  animation: kiss-wall-right 42s linear infinite;
+}
+
+@keyframes kiss-scroll-down {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes kiss-scroll-up {
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+.kiss-scroll-down {
+  animation: kiss-scroll-down 160s linear infinite;
+}
+
+.kiss-scroll-up {
+  animation: kiss-scroll-up 210s linear infinite;
+}
+
+/* Public player volume: set --kiss-vol-pct inline (e.g. "72%") for gevulde track links van de thumb */
+.kiss-volume-slider {
+  --kiss-vol-pct: 0%;
+  --kiss-vol-fill: rgba(30, 55, 90, 0.48);
+  --kiss-vol-empty: rgba(30, 55, 90, 0.16);
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kiss-volume-slider:hover {
+  --kiss-vol-fill: rgba(30, 55, 90, 0.58);
+  --kiss-vol-empty: rgba(30, 55, 90, 0.24);
+}
+
+.kiss-volume-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--kiss-vol-fill) 0%,
+    var(--kiss-vol-fill) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) 100%
+  );
+}
+
+.kiss-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  margin-top: -5px;
+  background: #1e375a;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.kiss-volume-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.12);
+  background: #37bfbf;
+}
+
+.kiss-volume-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--kiss-vol-empty);
+}
+
+.kiss-volume-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--kiss-vol-fill);
+}
+
+.kiss-volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #1e375a;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.kiss-volume-slider:hover::-moz-range-thumb {
+  transform: scale(1.12);
+  background: #37bfbf;
+}
+
+.kiss-volume-slider-dark {
+  --kiss-vol-fill: rgba(255, 255, 255, 0.52);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.2);
+}
+
+.kiss-volume-slider-dark:hover {
+  --kiss-vol-fill: rgba(255, 255, 255, 0.62);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.3);
+}
+
+.kiss-volume-slider-dark::-webkit-slider-thumb {
+  background: #37bfbf;
+  border-color: rgba(16, 37, 63, 0.75);
+}
+
+.kiss-volume-slider-dark::-moz-range-thumb {
+  background: #37bfbf;
+  border-color: rgba(16, 37, 63, 0.75);
+}
+
+/* Hero live player: dunne track */
+.kiss-volume-slider-hero {
+  --kiss-vol-pct: 0%;
+  --kiss-vol-fill: rgba(255, 255, 255, 0.52);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.26);
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kiss-volume-slider-hero:hover {
+  --kiss-vol-fill: rgba(255, 255, 255, 0.62);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.34);
+}
+
+.kiss-volume-slider-hero::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--kiss-vol-fill) 0%,
+    var(--kiss-vol-fill) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) 100%
+  );
+}
+
+.kiss-volume-slider-hero::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -5.5px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.kiss-volume-slider-hero::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--kiss-vol-empty);
+}
+
+.kiss-volume-slider-hero::-moz-range-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--kiss-vol-fill);
+}
+
+.kiss-volume-slider-hero::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Hero player op lichte glas-achtergrond */
+.kiss-volume-slider-hero-on-light {
+  --kiss-vol-pct: 0%;
+  --kiss-vol-fill: rgba(30, 55, 90, 0.42);
+  --kiss-vol-empty: rgba(30, 55, 90, 0.12);
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kiss-volume-slider-hero-on-light:hover {
+  --kiss-vol-fill: rgba(30, 55, 90, 0.52);
+  --kiss-vol-empty: rgba(30, 55, 90, 0.18);
+}
+
+.kiss-volume-slider-hero-on-light::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--kiss-vol-fill) 0%,
+    var(--kiss-vol-fill) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) 100%
+  );
+}
+
+.kiss-volume-slider-hero-on-light::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+.kiss-volume-slider-hero-on-light::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--kiss-vol-empty);
+}
+
+.kiss-volume-slider-hero-on-light::-moz-range-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--kiss-vol-fill);
+}
+
+.kiss-volume-slider-hero-on-light::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Mini-player */
+.kiss-volume-slider-mini {
+  --kiss-vol-pct: 0%;
+  --kiss-vol-fill: rgba(255, 255, 255, 0.5);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.18);
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kiss-volume-slider-mini:hover {
+  --kiss-vol-fill: rgba(255, 255, 255, 0.6);
+  --kiss-vol-empty: rgba(255, 255, 255, 0.26);
+}
+
+.kiss-volume-slider-mini::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--kiss-vol-fill) 0%,
+    var(--kiss-vol-fill) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) var(--kiss-vol-pct),
+    var(--kiss-vol-empty) 100%
+  );
+}
+
+.kiss-volume-slider-mini::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+.kiss-volume-slider-mini::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--kiss-vol-empty);
+}
+
+.kiss-volume-slider-mini::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--kiss-vol-fill);
+}
+
+.kiss-volume-slider-mini::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #37bfbf;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+/* Public live dot: constant red + subtle pulsing */
+@keyframes kiss-live-dot-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.kiss-live-dot {
+  animation: kiss-live-dot-pulse 1.8s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.09);
+}
+
+/* Mobile hamburger menu animation */
+@keyframes kiss-mobile-menu-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kiss-mobile-menu-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes kiss-filter-in {
+  0% {
+    opacity: 0.25;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kiss-mobile-menu-overlay {
+  animation: kiss-mobile-menu-overlay-in 180ms ease-out both;
+}
+
+.kiss-mobile-menu-panel {
+  animation: kiss-mobile-menu-panel-in 220ms ease-out both;
+}
+
+@keyframes kiss-mobile-menu-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes kiss-mobile-menu-panel-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+.kiss-mobile-menu-overlay-out {
+  animation: kiss-mobile-menu-overlay-out 160ms ease-in both;
+}
+
+.kiss-mobile-menu-panel-out {
+  animation: kiss-mobile-menu-panel-out 180ms ease-in both;
+}
+
+/* Fixed public header */
+.kiss-public-site-header {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Nav: subtiele lift i.p.v. kleur (geen franje met gradient). */
+.kiss-public-nav-logo {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kiss-public-nav-logo img {
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .kiss-public-nav-logo:hover img {
+    transform: scale(1.06);
+  }
+}
+
+.kiss-public-nav-link {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kiss-public-nav-link:active {
+  transform: none;
+}
+
+.kiss-public-nav-link span {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+@media (hover: hover) {
+  .kiss-public-nav-link:hover span {
+    transform: translateY(-2px);
+  }
+
+  .kiss-public-nav-link--active:hover span {
+    transform: translateY(-1px);
+  }
+}
+
+.kiss-public-social-icon {
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+@media (hover: hover) {
+  a.kiss-public-social-icon:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: scale(1.07);
+  }
+}
+
+/* Homepage hero: drie identieke segmenten → -33.33% (geen gat rechts bij start) */
+@keyframes kiss-home-hero-row-slide-l {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+@keyframes kiss-home-hero-row-slide-r {
+  from {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.kiss-home-hero-row-track--l,
+.kiss-home-hero-row-track--r {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.kiss-home-hero-row-track--l {
+  animation-name: kiss-home-hero-row-slide-l;
+}
+
+.kiss-home-hero-row-track--r {
+  animation-name: kiss-home-hero-row-slide-r;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiss-home-hero-row-track--l,
+  .kiss-home-hero-row-track--r {
+    animation: none !important;
+  }
+}
+
+/* Gedraaid: Spotify-rij — volledige rij vult mee (geen “witte binnenkant”). */
+.kiss-playlist-spotify-link {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.kiss-playlist-spotify-link:hover {
+  background-color: rgba(29, 185, 84, 0.12);
+}
+
+.kiss-playlist-spotify-link .kiss-playlist-spotify-link__sub {
+  transition: color 0.22s ease;
+}
+
+/* Gedraaid: contextmenu + mobiel sheet */
+@keyframes kiss-playlist-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.kiss-playlist-context-menu {
+  animation: kiss-playlist-menu-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes kiss-playlist-menu-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+.kiss-playlist-context-menu--leaving {
+  animation: kiss-playlist-menu-out 0.1s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes kiss-playlist-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.kiss-playlist-sheet-panel {
+  animation: kiss-playlist-sheet-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes kiss-playlist-sheet-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(105%);
+  }
+}
+
+.kiss-playlist-sheet-panel--leaving {
+  animation: kiss-playlist-sheet-out 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes kiss-playlist-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.kiss-playlist-sheet-backdrop {
+  animation: kiss-playlist-backdrop-in 0.22s ease-out forwards;
+}
+
+/* Base shadow matches Tailwind shadow-sm so hover animates smoothly (not “popping” in). */
+.kiss-public-panel {
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+  }
+}
+
+.kiss-public-panel:active {
+  transform: translateY(-2px) scale(0.995);
+  transition-duration: 0.08s;
+}
+
+/* Donker navy-paneel (concerten): zelfde hover-idee als lichte panels, maar zichtbare schaduw op donkere achtergrond. */
+.kiss-public-panel--navy {
+  box-shadow: 0 2px 16px rgba(30, 55, 90, 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-panel--navy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+  }
+}
+
+.kiss-public-panel--navy:active {
+  transform: translateY(-2px) scale(0.995);
+  transition-duration: 0.08s;
+}
+
+.kiss-public-track-row {
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-track-row:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+.kiss-public-track-row:active {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Concerten: duidelijke hover (geen pointer:fine — werkt ook op hybride/trackpads). */
+.kiss-public-track-row-on-dark {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.18s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .kiss-public-track-row-on-dark:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  }
+}
+
+.kiss-public-track-row-on-dark:active {
+  background-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(0);
+}
+
+/* Concerten op homepage: alleen achtergrond op hover (geen lift). */
+.kiss-public-concert-row {
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .kiss-public-concert-row:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+  }
+}
+
+.kiss-public-concert-row:active {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Geen scale/hover-shift op socials in het mobiele menu (voelt vreemd op touch). */
+@media (hover: hover) {
+  .kiss-mobile-menu-socials a.kiss-public-social-icon:hover {
+    transform: none;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.kiss-public-menu-item {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-menu-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.kiss-public-menu-item:active {
+  transform: scale(0.98);
+}
+
+.kiss-public-play-btn {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-play-btn:hover {
+    transform: scale(1.03);
+    filter: brightness(1.04);
+  }
+}
+
+.kiss-public-play-btn:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+}
+
+.kiss-public-spotify-btn {
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-public-spotify-btn:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.kiss-public-spotify-btn:active {
+  filter: brightness(0.92);
+  transform: scale(0.96);
+}
+
+@keyframes kissScheduleSwap {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.kiss-schedule-swap {
+  animation: kissScheduleSwap 220ms ease-out;
+}
+
+@keyframes kissMiniPlayerIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kiss-mini-player-in {
+  animation: kissMiniPlayerIn 260ms ease-out;
+}
+
+.kiss-mini-player-btn {
+  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kiss-mini-player-btn:hover {
+    transform: translateY(-1px) scale(1.04);
+    filter: brightness(1.05);
+  }
+}
+
+.kiss-mini-player-btn:active {
+  transform: scale(0.94);
+}
+
+@keyframes kissProgramInfoIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kiss-program-info-in {
+  animation: kissProgramInfoIn 220ms ease-out;
+}
+
+@keyframes kissFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kissFloatOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+.kiss-float-in {
+  animation: kissFloatIn 220ms ease-out both;
+}
+
+.kiss-float-out {
+  animation: kissFloatOut 180ms ease-in both;
+}
+
+.kiss-social-embed iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  border: 0;
+  border-radius: 12px;
+}
+
+.kiss-fact-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+}
+
+details[open] > .kiss-fact-expand {
+  grid-template-rows: 1fr;
+}
+
+.kiss-fact-expand__inner {
+  overflow: hidden;
+}
+
+/* Admin/portal: duidelijke klik-feedback op submit/save knoppen */
+.portal-main button[type="submit"] {
+  transition: filter 0.16s ease, transform 0.08s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.portal-main button[type="submit"]:active {
+  filter: brightness(0.92);
+  transform: translateY(1px);
+}
+

@@ -1,0 +1,429 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  password      String   
+  role          String   @default("DJ") // "ADMIN" of "DJ"
+  permissionsJson String @default("[]") @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  showMockMessages Boolean @default(false)
+  image            String?
+
+  @@map("users")
+}
+
+// Elk inkomend WhatsApp bericht wordt als een Message opgeslagen
+model Message {
+  id            String      @id @default(cuid())
+  type          String      @default("TEXT") // "TEXT", "AUDIO", "IMAGE", "VIDEO"
+  
+  // Afzender informatie
+  senderPhone   String   
+  senderName    String?  
+  
+  // Bericht inhoud
+  content       String?     
+  mediaId       String?     
+  mediaUrl      String?     
+  messageId     String      @unique 
+  
+  // Metadata
+  receivedAt    DateTime @default(now()) 
+  
+  // Status velden
+  isRead        Boolean  @default(false)
+  isPinned      Boolean  @default(false)
+
+  @@index([receivedAt(sort: Desc)])
+  @@index([isRead])
+  @@map("messages")
+}
+
+// Publieke DJ/jock profielen (voor website programmering)
+model Jock {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  imagePath String?  // bijv. Website/Jockfotos/ferryoomen.png
+  /// Focuspunt (%) voor crop op tiles/avatars (X: 0 links, 100 rechts)
+  imageFocusX Int @default(50)
+  /// Focuspunt (%) voor crop op tiles/avatars (Y: 0 boven, 100 onder)
+  imageFocusY Int @default(50)
+  /// Losse foto voor persoonlijke DJ pagina (bijv. half-body)
+  profileImagePath String?
+  /// Focuspunt (%) voor crop op persoonlijke DJ-foto
+  profileFocusX Int @default(50)
+  /// Focuspunt (%) voor crop op persoonlijke DJ-foto
+  profileFocusY Int @default(50)
+  isActive  Boolean  @default(true)
+  /// Korte intro/bio op persoonlijke DJ pagina
+  bioText String?
+  /// JSON array: [{ "question": "...", "answer": "..." }, ...]
+  personalFactsJson String?
+  /// Korte quote op de DJ-kaart; leeg = standaard “Bekijk meer”
+  cardQuote           String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  slots ScheduleSlot[]
+  temporarySlots ScheduleTemporarySlot[]
+
+  @@map("jocks")
+}
+
+// Programmering slots (dag + tijdvak)
+model ScheduleSlot {
+  id        String   @id @default(cuid())
+  dayOfWeek Int      // 1=ma ... 7=zo
+  startTime String   // "HH:MM"
+  endTime   String   // "HH:MM"
+  label     String?  // bijv. "Ochtendshow" (optioneel)
+  notes     String?  // intern
+  coHostName String? // optionele co-host naam voor publieke weergave
+  programImagePath String? // optionele programmabeeld/flyer (overschrijft DJ-foto in programmering)
+  programColor String? // hex kleur (#rrggbb) voor admin schema-block
+
+  jockId String
+  jock   Jock   @relation(fields: [jockId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dayOfWeek])
+  @@index([jockId])
+  @@map("schedule_slots")
+}
+
+/// Tijdelijke afwijkingen op de vaste programmering (bijv. invalweek / speciale week).
+model ScheduleTemporarySlot {
+  id         String   @id @default(cuid())
+  startsOn   DateTime @db.Date
+  endsOn     DateTime @db.Date
+  dayOfWeek  Int      // 1=ma ... 7=zo
+  startTime  String   // "HH:MM"
+  endTime    String   // "HH:MM"
+  label      String?
+  notes      String?
+  coHostName String?
+  programImagePath String?
+  programColor String?
+  isActive   Boolean  @default(true)
+
+  jockId String
+  jock   Jock   @relation(fields: [jockId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, startsOn, endsOn, dayOfWeek])
+  @@index([jockId])
+  @@map("schedule_temporary_slots")
+}
+
+// Auto opgebouwde "last played" playlist (op basis van Now Playing)
+model PlayedTrack {
+  id        String   @id @default(cuid())
+  title     String
+  artist    String
+  cover     String?
+  playedAt  DateTime @default(now())
+
+  @@index([playedAt(sort: Desc)])
+  @@index([artist, title])
+  @@map("played_tracks")
+}
+
+/// Cache voor externe album-cover lookups (bijv. iTunes).
+model AlbumCoverCache {
+  key       String   @id
+  coverUrl  String
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt(sort: Desc)])
+  @@map("album_cover_cache")
+}
+
+/// Negatieve cache om herhaalde lookups bij miss/errors te voorkomen.
+model AlbumCoverNegativeCache {
+  key       String   @id
+  reason    String?
+  httpStatus Int?
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt(sort: Desc)])
+  @@map("album_cover_negative_cache")
+}
+
+/// Debug-log voor album cover lookups (developer tools).
+model AlbumCoverLookupLog {
+  id          String   @id @default(cuid())
+  key         String
+  artist      String
+  title       String
+  source      String   // "cache" | "itunes"
+  queryUrl    String?
+  httpStatus  Int?
+  resultsCount Int?
+  coverUrl    String?
+  error       String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@index([key])
+  @@map("album_cover_lookup_logs")
+}
+
+/// Publieke actie-kaarten (voor /acties en homepage acties panel).
+model PublicAction {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  statusLabel String?  // bijv. "Lopend"
+  body        String?
+  ctaLabel    String?  // bijv. "Naar actie"
+  href        String   // bijv. "/throwback"
+  imagePath   String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("public_actions")
+}
+
+model Concert {
+  id        String   @id @default(cuid())
+  title     String
+  venue     String?
+  city      String?
+  date      DateTime
+  url       String?
+  imagePath String?  // Website/... served via /api/assets
+  source    String?  // bijv. "ticketmaster"
+  externalKey String? // bijv. "ticketmaster:Z698xZb..." voor sync-upserts
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date(sort: Desc)])
+  @@index([isActive])
+  @@index([externalKey])
+  @@map("concerts")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+/// Geplande home-hero titels (Amsterdam); bij overlap wint hoogste priority.
+model HomeHeroHeadlineSlot {
+  id              String   @id @default(cuid())
+  /// Eerste dag waarop deze titels gelden (inclusief)
+  startsOn        DateTime @db.Date
+  /// Laatste dag waarop deze titels gelden (inclusief)
+  endsOn          DateTime @db.Date
+  /// Optioneel: welke weekdagen (ISO 1=ma … 7=zo), komma-gescheiden. Leeg = elke dag in het interval.
+  weekdays        String?
+  /// Optioneel tijdvenster HH:MM waarin dit slot geldt (Amsterdam). Leeg = hele dag.
+  startTime       String?
+  endTime         String?
+  titleLine1      String
+  titleLine2      String?
+  titleLine1Color String   @default("white")
+  titleLine2Color String   @default("teal")
+  /// Bij meerdere actieve slots op dezelfde dag: hoogste eerst
+  priority        Int      @default(0)
+  isActive        Boolean  @default(true)
+  note            String?
+  createdAt       DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, startsOn, endsOn])
+  @@map("home_hero_headline_slots")
+}
+
+/// Vacatures op /join-kiss (vaste slots: DJ, producer, overig).
+model JoinKissVacancy {
+  id           String   @id @default(cuid())
+  slot         String   @unique // DJ | PRODUCER | OTHER
+  title        String
+  category     String   @default("")
+  location     String   @default("")
+  jobType      String   @default("")
+  description  String   @default("") @db.Text
+  requirements String   @default("") @db.Text
+  applyLabel   String   @default("Solliciteer")
+  applyUrl     String   @default("mailto:info@kissfm.nl")
+  imagePath    String?
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("join_kiss_vacancies")
+}
+
+/// Voordelen werken bij KISS (kaarten onder vacatures).
+model JoinKissBenefit {
+  id        String   @id @default(cuid())
+  sortOrder Int      @default(0)
+  title     String
+  body      String   @default("") @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@map("join_kiss_benefits")
+}
+
+/// KISS40 weeklijsten (admin; nog in uitbreiding).
+model Kiss40Week {
+  id         String   @id @default(cuid())
+  weekStart  DateTime @db.Date
+  title      String   @default("")
+  status     String   @default("draft")
+  tracksJson String   @default("[]") @db.Text
+  notes      String   @default("") @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([weekStart])
+  @@map("kiss40_weeks")
+}
+
+/// Externe concert-keys die niet meer terug mogen komen vanuit sync.
+model ConcertSyncBlock {
+  externalKey String   @id
+  source      String   @default("ticketmaster")
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  @@map("concert_sync_blocks")
+}
+
+/// Interne studio-reserveringen (beta planner).
+model StudioBooking {
+  id                String   @id @default(cuid())
+  startAt           DateTime
+  endAt             DateTime
+  title             String
+  purpose           String   @default("CUSTOM")
+  notes             String?
+  bookedByName      String
+  bookedByUserId    String?
+  recurrenceGroupId String?
+  isCancelled       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([startAt])
+  @@index([endAt])
+  @@index([isCancelled, startAt])
+  @@index([recurrenceGroupId])
+  @@map("studio_bookings")
+}
+
+model VisitEvent {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  ipHash    String?
+  country   String?
+  city      String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@index([path])
+  @@index([country])
+  @@map("visit_events")
+}
+
+/// Nummerlijst voor de KISS Throwback Party actie.
+model ThrowbackSong {
+  id        String   @id @default(cuid())
+  artist    String
+  title     String
+  year      Int?
+  coverUrl  String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  picks ThrowbackSubmissionSong[]
+
+  @@index([isActive, sortOrder])
+  @@index([artist, title])
+  @@map("throwback_songs")
+}
+
+/// Inzending van een bedrijfsteam voor de throwback actie.
+model ThrowbackSubmission {
+  id            String   @id @default(cuid())
+  companyName   String
+  contactName   String
+  email         String
+  phone         String
+  teamPhotoPath String
+  audioMessagePath String?
+  videoMessagePath String?
+  status        String   @default("PENDING")
+  createdAt     DateTime @default(now())
+
+  picks ThrowbackSubmissionSong[]
+  customPicks ThrowbackSubmissionCustomSong[]
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("throwback_submissions")
+}
+
+/// Gekozen nummers per inzending met volgorde.
+model ThrowbackSubmissionSong {
+  id           String   @id @default(cuid())
+  submissionId String
+  songId       String
+  rank         Int
+  createdAt    DateTime @default(now())
+
+  submission ThrowbackSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  song       ThrowbackSong       @relation(fields: [songId], references: [id], onDelete: Restrict)
+
+  @@unique([submissionId, rank])
+  @@index([songId])
+  @@map("throwback_submission_songs")
+}
+
+/// Vrije keuze nummers per inzending (niet uit de admin-lijst).
+model ThrowbackSubmissionCustomSong {
+  id           String   @id @default(cuid())
+  submissionId String
+  artist       String
+  title        String
+  year         Int?
+  rank         Int
+  createdAt    DateTime @default(now())
+
+  submission ThrowbackSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, rank])
+  @@index([submissionId])
+  @@map("throwback_submission_custom_songs")
+}

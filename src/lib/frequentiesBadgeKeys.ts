@@ -1,0 +1,4 @@
+export const FREQUENTIES_APP_STORE_BADGE_PATH_KEY = "FREQUENTIES_APP_STORE_BADGE_PATH";
+export const FREQUENTIES_PLAY_STORE_BADGE_PATH_KEY = "FREQUENTIES_PLAY_STORE_BADGE_PATH";
+/** Relatief pad onder Website/ voor de kaart rechts op /frequenties (upload via admin). */
+export const FREQUENTIES_COVERAGE_MAP_PATH_KEY = "FREQUENTIES_COVERAGE_MAP_PATH";
