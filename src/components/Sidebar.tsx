@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 type Nav = { href: string; label: string };
@@ -20,15 +21,19 @@ const NAV_SETTINGS: Nav[] = [
   { href: "/settings/kiss40", label: "GLXY40" },
 ];
 
-const NAV_ADMIN: Nav[] = [
-  { href: "/admin", label: "Gebruikers (demo)" },
+const NAV_ADMIN_DEMO: Nav[] = [
+  { href: "/admin/gebruikers", label: "Gebruikers & uitnodigingen" },
+  { href: "/admin/branding", label: "Huisstijl (GLXY)" },
   { href: "/admin/djs", label: "Hosts (demo)" },
   { href: "/admin/programmering", label: "Planner (demo)" },
+  { href: "/admin/acties", label: "Acties (demo)" },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
 
   useEffect(() => setMobileOpen(false), [pathname]);
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function Sidebar() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${
               active(item.href)
-                ? "bg-[#00f0ff]/15 text-[#00f0ff] ring-1 ring-[#00f0ff]/30"
+                ? "bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30"
                 : "text-white/70 hover:bg-white/5 hover:text-white"
             }`}
           >
@@ -91,7 +96,7 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
           <Link href="/dashboard" className="font-black tracking-tight text-white" onClick={() => setMobileOpen(false)}>
-            <span className="bg-gradient-to-r from-[#00f0ff] to-[#a855f7] bg-clip-text text-lg text-transparent">GLXY</span>
+            <span className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] bg-clip-text text-lg text-transparent">GLXY</span>
             <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/50">Radio</span>
           </Link>
           <button
@@ -106,12 +111,34 @@ export default function Sidebar() {
         <div className="flex-1 space-y-5 py-4">
           {section("Workspace", NAV_MAIN)}
           {section("Instellingen", NAV_SETTINGS)}
-          {section("Admin demo", NAV_ADMIN)}
+          {isAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
         </div>
 
-        <div className="border-t border-white/10 p-4">
-          <p className="text-[11px] font-semibold leading-relaxed text-white/45">Static UI-demo · geen database</p>
-          <Link href="/" className="mt-2 inline-flex text-xs font-black text-[#00f0ff] hover:underline" onClick={() => setMobileOpen(false)}>
+        <div className="border-t border-white/10 p-4 space-y-3">
+          {status === "authenticated" ? (
+            <div className="space-y-1">
+              <p className="text-[11px] font-black text-white/80 truncate" title={session?.user?.email ?? ""}>
+                {session?.user?.email}
+              </p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">{session?.user?.role ?? ""}</p>
+              <button
+                type="button"
+                className="mt-2 w-full rounded-xl border border-white/15 py-2 text-xs font-black text-white/85 hover:bg-white/5"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Uitloggen
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="flex w-full items-center justify-center rounded-xl bg-[var(--brand-primary)]/20 py-2.5 text-xs font-black text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30 hover:bg-[var(--brand-primary)]/30"
+              onClick={() => setMobileOpen(false)}
+            >
+              Inloggen
+            </Link>
+          )}
+          <Link href="/" className="inline-flex text-xs font-black text-[var(--brand-primary)] hover:underline" onClick={() => setMobileOpen(false)}>
             Naar GLXY.live site
           </Link>
         </div>

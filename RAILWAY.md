@@ -1,0 +1,62 @@
+# Deploying GLXY on Railway
+
+De app gebruikt alleen **omgevingsvariabelen** op Railway (geen `.env.local` in productie).
+
+## Build & start (repository)
+
+- **Build:** `npm run build` → draait `prisma generate && next build`.
+- **Start:** `npm start` → `prisma db push && prisma db seed && next start -H 0.0.0.0`  
+  (`PORT` wordt door Railway gezet; Next.js leest `PORT` automatisch.)
+- **Alleen Next (zonder DB-migratie):** `npm run start:next-only` — alleen als je zelf migrations beheert.
+
+`prisma` en `tsx` staan in **dependencies** zodat `db push` en `db seed` ook werken als devDependencies niet geïnstalleerd zijn.
+
+## Checklist: variabelen op je Railway *web*-service
+
+Zet deze op de service die **Next.js** draait (niet alleen op de Postgres-plugin).
+
+### Verplicht
+
+| Variable | Voorbeeld / uitleg |
+|----------|---------------------|
+| `DATABASE_URL` | Gebruik **Reference** naar je Railway Postgres: “Add variable” → “Reference” → Postgres → `DATABASE_URL` (interne URL is ok voor app + DB op hetzelfde project). |
+| `NEXTAUTH_URL` | Exact de publieke origin, **zonder** slash op het eind: `https://glxy-production.up.railway.app` |
+| `NEXTAUTH_SECRET` | Lange random string, bv. `openssl rand -base64 32` (één keer genereren en vasthouden). |
+
+### Aanbevolen (proxy / uitnodigingslinks)
+
+| Variable | Waarde |
+|----------|--------|
+| `AUTH_TRUST_HOST` | `true` — helpt NextAuth achter Railway’s reverse proxy (forwarded host / HTTPS). |
+
+### Eerste beheerder (optioneel maar handig bij eerste deploy)
+
+Alleen nodig als de database nog **geen** `User`-rijen heeft. De seed maakt dan één admin aan.
+
+| Variable | Uitleg |
+|----------|--------|
+| `ADMIN_BOOTSTRAP_EMAIL` | E-mail van de eerste admin. |
+| `ADMIN_BOOTSTRAP_PASSWORD` | Minimaal 8 tekens. |
+
+Na de eerste geslaagde seed kun je deze twee verwijderen of leeg laten (veiliger).
+
+### Optioneel
+
+| Variable | Uitleg |
+|----------|--------|
+| `NEXT_PUBLIC_GLXY_HLS_URL` | Fallback HLS-URL als branding in de DB niet bereikbaar is. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Uitnodigingsmail; zonder SMTP blijft de **invite-link** in `/admin/gebruikers` kopieerbaar. |
+| `PRISMA_DEBUG` | `1` — Prisma logging (alleen voor debug). |
+
+## Postgres-plugin
+
+- Koppel **Postgres** aan het project en **reference** `DATABASE_URL` naar de Next-service.
+- Voor **lokaal** ontwikkelen: gebruik `DATABASE_PUBLIC_URL` uit Railway met `?sslmode=require` (zie `.env.example`).
+
+## Verificatie na deploy
+
+1. Homepage laadt; livestream blok speelt (muted) als `Branding`/HLS-url klopt.
+2. `/login` — inloggen met bootstrap- of geïnviteerd account.
+3. `/admin/gebruikers` en `/admin/branding` — alleen als je `ADMIN` bent.
+
+Als cookies/auth misgaan: controleer `NEXTAUTH_URL` (exact `https://…`), `NEXTAUTH_SECRET`, en `AUTH_TRUST_HOST=true`.

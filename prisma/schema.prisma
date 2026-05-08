@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DJ
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(DJ)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Invite {
+  id        String    @id @default(cuid())
+  email     String
+  role      Role      @default(DJ)
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  @@index([email])
+}
+
+/// Singleton (id moet altijd 1 zijn) — GLXY kleuren/logo’s/livestream.
+model Branding {
+  id         Int      @id @default(1)
+  primaryHex String   @default("#22d3ee")
+  accentHex  String   @default("#c084fc")
+  navyHex    String   @default("#0f172a")
+  logoUrl    String?
+  faviconUrl String?
+  homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
+  updatedAt  DateTime @updatedAt
+}

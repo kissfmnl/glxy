@@ -4,10 +4,12 @@ import { HomeWaveLayout, type HomeImageTile } from "@/components/public/HomeWave
 import { uniqueSlideSrcs } from "@/lib/homeHeroBackdropData";
 import { loadHomeWavePageData } from "@/lib/homePageWaveCopy";
 import { MOCK_JOCKS, MOCK_PLAYED_TRACKS } from "@/lib/mock/site";
+import { getBranding } from "@/lib/brandingDb";
 
 export default async function PublicHomePage() {
-  const variant = await getHomePageLayout();
-  if (variant === "classic") return <HomeClassicLayout />;
+  const [variant, branding] = await Promise.all([getHomePageLayout(), getBranding()]);
+  const homeHlsSrc = branding.homeHlsUrl;
+  if (variant === "classic") return <HomeClassicLayout homeHlsSrc={homeHlsSrc} />;
 
   const { copy, heroBgPaths } = await loadHomeWavePageData();
 
@@ -32,6 +34,7 @@ export default async function PublicHomePage() {
       heroBackdropSlides={heroBackdropSlides}
       trackCovers={trackCovers}
       djPhotos={djPhotos}
+      homeHlsSrc={homeHlsSrc}
     />
   );
 }

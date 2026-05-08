@@ -1,23 +1,42 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import type { CSSProperties } from "react";
+import { getServerSession } from "next-auth";
 import { Providers } from "@/components/Providers";
+import { authOptions } from "@/lib/auth";
+import { getBranding } from "@/lib/brandingDb";
 
-export const metadata: Metadata = {
-  title: "GLXY Radio",
-  description: "GLXY Radio — demo frontend: live-stream UI, playlist en programmering (statische data).",
-  icons: {
-    icon: "/glxy-favicon.svg",
-    apple: "/glxy-favicon.svg",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const b = await getBranding();
+  return {
+    title: "GLXY Radio",
+    description:
+      "GLXY Radio — live-stream UI, playlist en programmering.",
+    icons: b.faviconUrl
+      ? { icon: b.faviconUrl, apple: b.faviconUrl }
+      : {
+          icon: "/glxy-favicon.svg",
+          apple: "/glxy-favicon.svg",
+        },
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [session, branding] = await Promise.all([getServerSession(authOptions), getBranding()]);
+
+  const htmlBrandingVars: CSSProperties & Record<string, string> = {
+    "--brand-primary": branding.primaryHex,
+    "--brand-accent": branding.accentHex,
+    "--brand-navy": branding.navyHex,
+    "--glxy-panel-bg": "rgba(10, 15, 31, 0.96)",
+  };
+
   return (
-    <html lang="nl" suppressHydrationWarning>
+    <html lang="nl" suppressHydrationWarning style={htmlBrandingVars}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -86,9 +105,8 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans transition-colors duration-200">
-        <Providers>
-          <main className="min-h-screen"
-                style={{ backgroundColor: 'var(--bg-dark)' }}>
+        <Providers session={session}>
+          <main className="min-h-screen" style={{ backgroundColor: "var(--bg-dark)" }}>
             {children}
           </main>
         </Providers>

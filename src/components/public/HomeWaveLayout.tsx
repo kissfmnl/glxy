@@ -14,6 +14,7 @@ import type { HeroTitleLayout, HomeWaveCopy } from "@/types/home-wave";
 import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
 import AppImage from "@/components/AppImage";
 import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
+import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -166,11 +167,14 @@ export function HomeWaveLayout({
   heroBackdropSlides,
   trackCovers = [],
   djPhotos = [],
+  homeHlsSrc,
 }: {
   copy: HomeWaveCopy;
   heroBackdropSlides: { src: string }[];
   trackCovers?: HomeImageTile[];
   djPhotos?: HomeImageTile[];
+  /** HLS .m3u8 URL for homepage live embed */
+  homeHlsSrc?: string | null;
 }) {
   const polaroids = uniqueBySrc(trackCovers, 14);
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
@@ -239,7 +243,13 @@ export function HomeWaveLayout({
 
           {copy.showPolaroids ? <PolaroidStrip items={polaroids} /> : null}
 
-          <div className="mt-10 md:mt-12">
+          <div className="mt-10 md:mt-12 space-y-6 md:space-y-8">
+            {homeHlsSrc ? (
+              <div>
+                <p className="mb-3 text-[11px] font-black uppercase tracking-[0.28em] text-[#7fe8e8]/90">Live beeld</p>
+                <HomeHlsEmbed src={homeHlsSrc} title="GLXY live video" />
+              </div>
+            ) : null}
             <NowNextCard
               withPlayer
               variant="hero"

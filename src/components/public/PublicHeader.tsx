@@ -4,15 +4,30 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { GlxyWordmark } from "@/components/public/GlxyWordmark";
+import AppImage from "@/components/AppImage";
+
+function BrandLockup({ logoUrl, className }: { logoUrl?: string | null; className?: string }) {
+  if (logoUrl) {
+    return (
+      <span className={`relative inline-flex h-9 max-h-9 min-w-0 items-center sm:h-10 sm:max-h-10 ${className ?? ""}`}>
+        <AppImage src={logoUrl} alt="GLXY" className="h-full w-auto max-w-[min(44vw,200px)] object-contain object-left" />
+      </span>
+    );
+  }
+  return <GlxyWordmark className={className} />;
+}
 
 export function PublicHeader({
   instagramUrl,
   tiktokUrl,
   navItems,
+  logoUrl,
 }: {
   instagramUrl: string;
   tiktokUrl: string;
   navItems: Array<{ href: string; label: string }>;
+  /** Vervangt het standaard GLXY wordmark wanneer gezet (admin huisstijl). */
+  logoUrl?: string | null;
 }) {
   const pathname = usePathname();
   const [menuVisible, setMenuVisible] = useState(false);
@@ -55,7 +70,7 @@ export function PublicHeader({
             href="/"
             className="kiss-public-nav-logo relative z-[1] ml-3 flex min-w-0 shrink-0 touch-manipulation items-center outline-none md:ml-0"
           >
-            <GlxyWordmark className="text-lg sm:text-xl md:text-2xl" />
+            <BrandLockup logoUrl={logoUrl} className="text-lg sm:text-xl md:text-2xl" />
           </Link>
 
           <nav
@@ -136,7 +151,7 @@ export function PublicHeader({
             data-kiss-mobile-menu
           >
             <div className="flex items-center justify-between gap-3 border-b border-white/10 p-5">
-              <GlxyWordmark className="text-xl" />
+              <BrandLockup logoUrl={logoUrl} className="text-xl" />
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 text-white outline-none transition-colors hover:bg-white/10 touch-manipulation"

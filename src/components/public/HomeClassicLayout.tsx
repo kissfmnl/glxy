@@ -1,15 +1,22 @@
 import { ArtistWall } from "@/components/public/ArtistWall";
 import { HomePagePanelColumn } from "@/components/public/HomePagePanelColumn";
+import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
 
 /** Originele homepage-indeling: linker kolom met panels, rechts de artiestenmuur. */
-export function HomeClassicLayout() {
+export function HomeClassicLayout({ homeHlsSrc }: { homeHlsSrc?: string | null }) {
   return (
     <div className="relative flex-1 flex flex-col min-h-0 w-full min-w-0 max-w-full overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0 md:hidden bg-[radial-gradient(120%_70%_at_50%_0%,rgba(55,191,191,0.14),transparent_58%),linear-gradient(180deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0)_42%)]" />
       <section className="relative z-10 w-full min-w-0 max-w-full -mt-16 md:-mt-[4.5rem] pt-24 md:pt-28 px-4 md:px-8 overflow-x-hidden overflow-hidden">
         <div className="relative z-10 mx-auto w-full min-w-0 max-w-[1500px] pb-7 md:pb-10">
           <div className="grid gap-8 lg:grid-cols-[560px_1fr] items-start lg:items-stretch relative min-h-0">
-            <div className="relative z-20 flex flex-col lg:ml-8 xl:ml-12 min-w-0 w-full max-w-full">
+            <div className="relative z-20 flex flex-col lg:ml-8 xl:ml-12 min-w-0 w-full max-w-full gap-8">
+              {homeHlsSrc ? (
+                <div>
+                  <p className="mb-3 text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600/95">Live beeld</p>
+                  <HomeHlsEmbed src={homeHlsSrc} title="GLXY live video" />
+                </div>
+              ) : null}
               <HomePagePanelColumn />
             </div>
 

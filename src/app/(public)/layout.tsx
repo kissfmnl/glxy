@@ -6,6 +6,7 @@ import { PublicTabTitle } from "@/components/public/PublicTabTitle";
 import Link from "next/link";
 import { MOCK_NAV, MOCK_PUBLIC_UI, MOCK_SOCIAL } from "@/lib/mock/site";
 import { GlxyWordmark } from "@/components/public/GlxyWordmark";
+import { getBranding } from "@/lib/brandingDb";
 
 export const viewport = {
   width: "device-width",
@@ -14,9 +15,13 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const ui = MOCK_PUBLIC_UI;
-  const navItems = [...MOCK_NAV];
+  const navItems = [...MOCK_NAV] as Array<{ href: string; label: string }>;
+  const branding = await getBranding();
+
+  const navExtras = [{ href: "/login", label: "DJ-login" }, ...navItems];
+
   return (
     <div
       className="kiss-public-root galaxy-public-root flex min-h-screen w-full max-w-[100%] flex-col overflow-x-hidden bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(56,189,248,0.18),transparent_55%),linear-gradient(180deg,#070a14_0%,#0c1028_45%,#080c18_100%)] text-gray-100"
@@ -24,7 +29,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     >
       <PublicTabTitle title={ui.tabTitle} />
       <PublicThemeGuard />
-      <PublicHeader instagramUrl={MOCK_SOCIAL.instagramUrl} tiktokUrl={MOCK_SOCIAL.tiktokUrl} navItems={navItems} />
+      <PublicHeader
+        instagramUrl={MOCK_SOCIAL.instagramUrl}
+        tiktokUrl={MOCK_SOCIAL.tiktokUrl}
+        navItems={navExtras}
+        logoUrl={branding.logoUrl}
+      />
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pt-16 md:pt-[4.5rem]">
         {children}
       </main>
