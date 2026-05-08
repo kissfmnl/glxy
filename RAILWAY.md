@@ -1,5 +1,7 @@
 # Deploying GLXY on Railway
 
+> **Niet technisch?** Lees eerst **[docs/START-HIER-RAILWAY.md](./docs/START-HIER-RAILWAY.md)** — daar staat stap voor stap hoe je de database op Railway bijwerkt (`npm run db:push:railway` of `npm run db:push:env`).
+
 De app gebruikt alleen **omgevingsvariabelen** op Railway (geen `.env.local` in productie).
 
 **Database:** Er staat **geen** vaste hostnaam, volume-mount (`postgres-volume`) of pad in deze repo. Prisma leest alleen `process.env.DATABASE_URL` (`url = env("DATABASE_URL")` in `prisma/schema.prisma`). Stel `DATABASE_URL` in bij je web-service (bijv. **Variable Reference** naar de Postgres-plugin).
