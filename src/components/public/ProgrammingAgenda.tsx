@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
+import AppImage from "@/components/AppImage";
 
 type Slot = {
   id: string;
@@ -278,7 +279,7 @@ export function ProgrammingAgenda({
                   >
                     <div className="w-[68px] h-[68px] md:w-[86px] md:h-[86px] rounded-2xl overflow-hidden bg-black/5 border border-black/10 shrink-0">
                       {jockImage ? (
-                        <img
+                        <AppImage
                           src={jockImage}
                           alt={slot.jock.name}
                           className="w-full h-full object-cover"
@@ -287,7 +288,7 @@ export function ProgrammingAgenda({
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center p-2" style={{ backgroundColor: "#1e375a" }}>
-                          <img src={fallbackLogoSrc()} alt="KISS FM" className="w-full h-full object-contain" loading="lazy" />
+                          <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="w-full h-full object-contain" loading="lazy" />
                         </div>
                       )}
                     </div>
@@ -327,7 +328,7 @@ export function ProgrammingAgenda({
             <article className="hidden lg:block rounded-2xl border border-[#d1d9e5] bg-white overflow-hidden shadow-sm">
               <div className="relative aspect-square">
                 {assetSrc(featuredSlot.programImagePath || featuredSlot.jock.imagePath) ? (
-                  <img
+                  <AppImage
                     src={assetSrc(featuredSlot.programImagePath || featuredSlot.jock.imagePath)!}
                     alt={featuredSlot.jock.name}
                     className="w-full h-full object-cover"
@@ -335,7 +336,7 @@ export function ProgrammingAgenda({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center p-8 bg-[#1e375a]">
-                    <img src={fallbackLogoSrc()} alt="KISS FM" className="w-40 h-auto object-contain" />
+                    <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="w-40 h-auto object-contain" />
                   </div>
                 )}
 

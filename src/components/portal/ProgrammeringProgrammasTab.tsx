@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Jock, ScheduleSlot } from "@prisma/client";
+import AppImage from "@/components/AppImage";
 import {
   bulkUpdateScheduleSlotProgramFields,
   deleteProgramPreset,
@@ -213,7 +214,7 @@ export function ProgrammeringProgrammasTab({
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#c5d2e2] bg-white">
                       {assetSrc(first.programImagePath || first.jock.imagePath) ? (
-                        <img
+                        <AppImage
                           src={assetSrc(first.programImagePath || first.jock.imagePath)!}
                           alt=""
                           className="h-full w-full object-cover"
@@ -304,7 +305,7 @@ export function ProgrammeringProgrammasTab({
                     <div className="md:col-span-2">
                       <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-2">
                         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                          <img
+                          <AppImage
                             src={assetSrc(first.programImagePath || first.jock.imagePath)!}
                             alt=""
                             className="h-full w-full object-cover"

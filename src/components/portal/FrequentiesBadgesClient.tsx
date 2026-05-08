@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import AppImage from "@/components/AppImage";
 import {
   clearFrequentiesCoverageMap,
   clearFrequentiesStoreBadge,
@@ -38,7 +39,7 @@ export function FrequentiesBadgesClient({
         </p>
         {coverageMapPath ? (
           <div className="mt-4 overflow-hidden rounded-xl border border-black/5 bg-white p-3 dark:bg-black/25">
-            <img
+            <AppImage
               src={assetUrl(coverageMapPath)}
               alt=""
               className="mx-auto max-h-48 w-full max-w-md object-contain object-center"
@@ -129,7 +130,7 @@ export function FrequentiesBadgesClient({
               <h2 className="text-sm font-black text-gray-900 dark:text-white">{label}</h2>
               {path ? (
                 <div className="mt-3 rounded-xl border border-black/5 bg-gray-50 p-4 dark:bg-black/20">
-                  <img
+                  <AppImage
                     src={assetUrl(path)}
                     alt=""
                     className="mx-auto max-h-16 w-auto max-w-full object-contain object-center"

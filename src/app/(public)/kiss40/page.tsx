@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
+import AppImage from "@/components/AppImage";
 
 export default function Kiss40Page() {
   return <Kiss40PageContent />;
@@ -44,7 +45,7 @@ async function Kiss40PageContent() {
 
       <div className="mt-8 rounded-3xl border border-[#d3dae4] bg-[#eef2f6] p-5 md:p-6">
         <div className="rounded-2xl border border-[#2a496f] bg-[#1e375a] p-4 md:p-5">
-          <img src={logoSrc} alt="KISS40" className="w-full h-auto max-h-24 object-contain" loading="lazy" />
+          <AppImage src={logoSrc} alt="KISS40" className="w-full h-auto max-h-24 object-contain" loading="lazy" />
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-[#d6dee8] bg-white">

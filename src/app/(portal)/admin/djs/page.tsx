@@ -9,6 +9,7 @@ import { listWebsiteImageFiles } from "@/lib/websiteImageFiles";
 import { redirect as navRedirect } from "next/navigation";
 import { hasPortalPermission } from "@/lib/portalPermissions";
 import { ExistingImagePickerModal } from "@/components/portal/ExistingImagePickerModal";
+import AppImage from "@/components/AppImage";
 
 function formatShowName(value: string) {
   const v = value.trim().toLowerCase();
@@ -178,7 +179,7 @@ export default async function AdminDjsPage({ searchParams }: { searchParams?: { 
                     <div className="min-w-0 flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/5 border border-black/5 shrink-0">
                         {assetSrc(j.imagePath) ? (
-                          <img
+                          <AppImage
                             src={assetSrc(j.imagePath)!}
                             alt={j.name}
                             className="w-full h-full object-cover"

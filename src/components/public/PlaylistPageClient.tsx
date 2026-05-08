@@ -7,6 +7,7 @@ import { amsterdamHour, formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import { KISS_PANEL_TITLE_ON_DARK } from "@/lib/publicPanelChrome";
 import { RichTextWithLinks } from "@/components/public/RichTextWithLinks";
+import AppImage from "@/components/AppImage";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -106,11 +107,11 @@ function TrackCover({ src, alt }: { src: string | null; alt: string }) {
     setFailed(false);
   }, [src]);
   if (src && !failed) {
-    return <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />;
+    return <AppImage src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />;
   }
   return (
     <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #f2f8fb)" }}>
-      <img src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" draggable={false} />
+      <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90" draggable={false} />
     </div>
   );
 }

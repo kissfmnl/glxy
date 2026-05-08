@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import AppImage from "@/components/AppImage";
 
 function initialsFromName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -44,7 +45,7 @@ export function HomeDjAvatarRow({
             {broken[i] ? (
               <span className="text-[11px] font-black text-white/95 leading-none text-center px-1">{initialsFromName(p.alt)}</span>
             ) : (
-              <img
+              <AppImage
                 src={p.src}
                 alt=""
                 className="w-full h-full object-cover"

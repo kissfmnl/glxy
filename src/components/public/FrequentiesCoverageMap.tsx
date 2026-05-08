@@ -1,10 +1,11 @@
+import AppImage from "@/components/AppImage";
 const R = "1.5rem";
 
 export function FrequentiesCoverageMap({ src }: { src: string }) {
   return (
     <div className="relative w-full min-w-0 lg:h-full lg:min-h-0">
       <div className="w-full overflow-hidden lg:absolute lg:inset-0 lg:min-h-0" style={{ borderRadius: R }}>
-        <img
+        <AppImage
           src={src}
           alt="KISS FM frequentiegebied"
           loading="eager"

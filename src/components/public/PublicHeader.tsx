@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
+import AppImage from "@/components/AppImage";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -37,14 +38,14 @@ export function PublicHeader({
     setMenuVisible(true);
   };
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     if (!menuVisible) return;
     setMenuClosing(true);
     window.setTimeout(() => {
       setMenuVisible(false);
       setMenuClosing(false);
     }, 260);
-  };
+  }, [menuVisible]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -52,7 +53,7 @@ export function PublicHeader({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [menuVisible]);
+  }, [closeMenu]);
 
   return (
     <>
@@ -65,7 +66,7 @@ export function PublicHeader({
             href="/"
             className="kiss-public-nav-logo relative z-[1] flex min-w-0 shrink-0 items-center touch-manipulation outline-none md:ml-0 ml-3"
           >
-            <img
+            <AppImage
               src={logoSrc()}
               alt="KISS FM"
               className="h-6 w-auto max-w-[120px] object-contain object-left sm:max-w-[132px] md:h-10"
@@ -151,7 +152,7 @@ export function PublicHeader({
             data-kiss-mobile-menu
           >
             <div className="p-5 flex items-center justify-between gap-3 border-b border-white/10">
-              <img src={logoSrc()} alt="KISS FM" className="h-9 w-auto object-contain object-left max-w-[180px]" draggable={false} />
+              <AppImage src={logoSrc()} alt="KISS FM" className="h-9 w-auto object-contain object-left max-w-[180px]" draggable={false} />
               <button
                 type="button"
                 className="w-11 h-11 rounded-2xl border border-white/15 flex items-center justify-center text-white touch-manipulation outline-none hover:bg-white/10 transition-colors"

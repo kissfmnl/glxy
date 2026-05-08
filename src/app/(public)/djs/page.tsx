@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
+import AppImage from "@/components/AppImage";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +56,7 @@ export default async function DJsPage() {
                 <>
                   <div className="w-full aspect-[4/5] rounded-3xl overflow-hidden bg-black/5 border border-black/5">
                     {j.imagePath ? (
-                      <img
+                      <AppImage
                         src={"/api/assets/" + j.imagePath.split("/").map(encodeURIComponent).join("/")}
                         alt={j.name}
                         className="h-full w-full object-cover scale-[1.06] transition-transform duration-300 group-hover:scale-[1.1]"
@@ -64,7 +65,7 @@ export default async function DJsPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center p-5" style={{ backgroundColor: "#1e375a" }}>
-                        <img src={fallbackLogoSrc()} alt="KISS FM" className="w-full h-full object-contain" loading="lazy" />
+                        <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="w-full h-full object-contain" loading="lazy" />
                       </div>
                     )}
                   </div>

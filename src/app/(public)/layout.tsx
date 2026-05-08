@@ -7,6 +7,7 @@ import { PublicTabTitle } from "@/components/public/PublicTabTitle";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { PUBLIC_NAV_ITEMS, resolvePublicNavItems } from "@/lib/publicNavConfig";
+import AppImage from "@/components/AppImage";
 /** Slightly smaller initial scale on phones (~90% feel) without affecting desktop. */
 export const dynamic = "force-dynamic";
 export const viewport = {
@@ -120,7 +121,7 @@ export default async function PublicLayout({ children }: { children: React.React
         />
         <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] items-center justify-between gap-4 bg-[#1a2f4a] px-4 py-4 md:px-10 md:py-5">
           <div className="flex shrink-0 items-center gap-1.5 md:gap-2.5">
-            <img src={logoSrc()} alt="KISS FM" className="h-10 w-auto object-contain opacity-95 md:h-14" />
+            <AppImage src={logoSrc()} alt="KISS FM" className="h-10 w-auto object-contain opacity-95 md:h-14" />
           </div>
           <div className="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs font-black text-white/75 flex-wrap justify-end">
             <Link href="/contact" className="hover:text-white transition-colors">

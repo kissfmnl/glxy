@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import useSWR from "swr";
+import AppImage from "@/components/AppImage";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const STREAM_URL = "https://stream.kissfm.nl/kissfm";
@@ -240,10 +241,10 @@ export function PublicMiniPlayer() {
           <div className="min-w-0 flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#28456e] shrink-0 shadow-sm">
               {cover && !coverFailed ? (
-                <img src={cover} alt="" className="w-full h-full object-cover" onError={() => setCoverFailed(true)} />
+                <AppImage src={cover} alt="" className="w-full h-full object-cover" onError={() => setCoverFailed(true)} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #1e375a)" }}>
-                  <img src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
+                  <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
                 </div>
               )}
             </div>

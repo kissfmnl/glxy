@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getAlbumCover } from "@/app/actions/albumActions";
+import AppImage from "@/components/AppImage";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -146,7 +147,7 @@ export default async function DashboardPage() {
                       </span>
                       <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-black/5 bg-gray-200 dark:bg-white/10">
                         {item.coverUrl ? (
-                          <img src={item.coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                          <AppImage src={item.coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
                         ) : null}
                       </div>
                       <div className="min-w-0 flex-1 pr-1">

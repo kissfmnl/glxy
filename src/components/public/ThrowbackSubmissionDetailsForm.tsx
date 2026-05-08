@@ -1,6 +1,7 @@
 "use client";
 
 import { submitThrowbackPartySubmission } from "@/app/actions/throwbackActions";
+import AppImage from "@/components/AppImage";
 
 type Song = {
   id: string;
@@ -36,7 +37,7 @@ export function ThrowbackSubmissionDetailsForm({
         {songs.map((song, index) => (
           <div key={song.id} className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-2.5">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-[#f2f8fb]">
-              <img src={song.coverUrl || fallbackCover()} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <AppImage src={song.coverUrl || fallbackCover()} alt="" className="h-full w-full object-cover" loading="lazy" />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-black text-[#1e375a]">

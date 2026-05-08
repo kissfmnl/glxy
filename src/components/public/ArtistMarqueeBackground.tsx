@@ -1,5 +1,7 @@
 "use client";
 
+import AppImage from "@/components/AppImage";
+
 const files = [
   "portret_alexwarren.jpg",
   "portret_bensonboone.avif",
@@ -80,7 +82,7 @@ function MarqueeRow({
             key={f + i}
             className="h-24 w-40 md:h-28 md:w-48 rounded-2xl overflow-hidden bg-black/5 border border-black/5"
           >
-            <img
+            <AppImage
               src={src(f)}
               alt=""
               className="h-full w-full object-cover"

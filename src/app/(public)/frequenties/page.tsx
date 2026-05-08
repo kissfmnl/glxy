@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import { FrequentiesCoverageMap } from "@/components/public/FrequentiesCoverageMap";
+import AppImage from "@/components/AppImage";
 
 /** Altijd uit DB lezen (uploads in admin), niet bij build vastzetten met fallback-badges. */
 export const dynamic = "force-dynamic";
@@ -105,7 +106,7 @@ export default async function FrequentiesPage() {
                   rel="noreferrer"
                   className={`${badgeSlot} flex min-w-0 shrink-0 justify-start`}
                 >
-                  <img
+                  <AppImage
                     src={iosSrc}
                     alt="Download in de App Store"
                     className="h-11 w-auto max-w-full object-contain sm:h-12 md:h-[3.25rem] md:max-w-[12rem]"
@@ -119,7 +120,7 @@ export default async function FrequentiesPage() {
                   rel="noreferrer"
                   className={`${badgeSlot} flex min-w-0 shrink-0 justify-start`}
                 >
-                  <img
+                  <AppImage
                     src={androidSrc}
                     alt="Ontdek het op Google Play"
                     className="h-11 w-auto max-w-full object-contain sm:h-12 md:h-[3.25rem] md:max-w-[12rem]"

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { removeTrackVotes, resetPlaylistVotes } from "@/app/actions/voteActions";
 import { updateThrowbackSubmissionStatus } from "@/app/actions/throwbackActions";
 import { hasPortalPermission } from "@/lib/portalPermissions";
+import AppImage from "@/components/AppImage";
 
 const MAP_KEY = "PLAYLIST_VOTES_MAP";
 const LOG_KEY = "PLAYLIST_VOTES_LOG";
@@ -116,7 +117,7 @@ export default async function AdminInzendingenPage({
                   <div key={item.trackId} className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-11 h-11 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
-                        {item.cover ? <img src={item.cover} alt="" className="w-full h-full object-cover" loading="lazy" /> : null}
+                        {item.cover ? <AppImage src={item.cover} alt="" className="w-full h-full object-cover" loading="lazy" /> : null}
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-black text-gray-900 truncate">{item.title}</p>
@@ -149,7 +150,7 @@ export default async function AdminInzendingenPage({
                 {logs.length === 0 ? <p className="text-sm text-gray-500">Nog geen stemmomenten.</p> : logs.slice(0, 200).map((item, idx) => (
                   <div key={`${item.trackId}-${idx}`} className="rounded-xl border border-gray-200 px-3 py-2 flex gap-3">
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
-                      {item.cover ? <img src={item.cover} alt="" className="w-full h-full object-cover" loading="lazy" /> : null}
+                      {item.cover ? <AppImage src={item.cover} alt="" className="w-full h-full object-cover" loading="lazy" /> : null}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-black text-gray-900 truncate">{item.title || item.trackId}</p>
@@ -183,7 +184,7 @@ export default async function AdminInzendingenPage({
                 </summary>
                 <div className="mt-3 grid gap-3 lg:grid-cols-[180px_1fr]">
                   <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                    <img src={websiteAssetUrl(entry.teamPhotoPath) || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
+                    <AppImage src={websiteAssetUrl(entry.teamPhotoPath) || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-white p-3">
                     <p className="text-xs font-black uppercase tracking-[0.15em] text-gray-500">Gekozen tracks</p>

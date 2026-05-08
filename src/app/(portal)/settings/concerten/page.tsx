@@ -8,6 +8,7 @@ import { deleteConcert, runConcertSyncNow, setConcertVisibility, upsertConcert }
 import { listWebsiteImageFiles } from "@/lib/websiteImageFiles";
 import { ConcertSyncSubmitButton } from "@/components/portal/ConcertSyncSubmitButton";
 import { hasPortalPermission } from "@/lib/portalPermissions";
+import AppImage from "@/components/AppImage";
 
 function toInputValue(d: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -206,7 +207,7 @@ export default async function SettingsConcertenPage({
                     <div className="flex min-w-0 items-center gap-4">
                       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-white/5">
                         {c.imagePath ? (
-                          <img
+                          <AppImage
                             src={"/api/assets/" + c.imagePath.split("/").map(encodeURIComponent).join("/")}
                             alt=""
                             className="h-full w-full object-cover"

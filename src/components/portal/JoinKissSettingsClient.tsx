@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import AppImage from "@/components/AppImage";
 import {
   saveJoinKissBenefits,
   saveJoinKissVacancies,
@@ -204,7 +205,7 @@ export function JoinKissSettingsClient({
                 <span className="mb-1 block text-[10px] font-black uppercase tracking-wide text-gray-400">Vacature afbeelding</span>
                 {r.imagePath?.trim() && websiteAssetUrl(r.imagePath) ? (
                   <div className="mb-2 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-2">
-                    <img
+                    <AppImage
                       src={`${websiteAssetUrl(r.imagePath) || ""}?v=${encodeURIComponent((r.imagePath || "").trim())}`}
                       alt={`Vacature ${JOIN_KISS_SLOT_LABELS[r.slot]}`}
                       className="h-12 w-20 rounded-lg object-cover"

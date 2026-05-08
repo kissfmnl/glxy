@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PortalPageShell } from "@/components/portal/PortalPageShell";
 import { deleteWebsiteFile, getWebsiteFileUsageMap, listWebsiteFiles, renameWebsiteFile, uploadWebsiteFile } from "@/app/actions/fileManagerActions";
 import { hasPortalPermission } from "@/lib/portalPermissions";
+import AppImage from "@/components/AppImage";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ export default async function SettingsBestandenPage({
               <summary className="cursor-pointer list-none px-3 py-2 text-sm font-black text-gray-800">
                 <div className="flex items-center gap-3">
                   {imageExt.has((f.split(".").pop() || "").toLowerCase()) ? (
-                    <img
+                    <AppImage
                       src={srcFor(f)}
                       alt={`Preview ${f}`}
                       className="h-12 w-12 rounded-lg border border-gray-200 bg-white object-cover"

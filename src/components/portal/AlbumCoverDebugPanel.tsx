@@ -24,7 +24,7 @@ export function AlbumCoverDebugPanel() {
   const { data, mutate } = useSWR<{ rows: LogRow[] }>("/api/admin/album-cover-logs", fetcher, {
     refreshInterval: 12_000,
   });
-  const rows = Array.isArray(data?.rows) ? data.rows : [];
+  const rows = useMemo(() => (Array.isArray(data?.rows) ? data.rows : []), [data?.rows]);
   const [artist, setArtist] = useState("");
   const [title, setTitle] = useState("");
   const [testing, setTesting] = useState(false);

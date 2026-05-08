@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 
@@ -18,6 +18,11 @@ export function AnimatedModal({
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
+
+  const closeWithAnimation = useCallback(() => {
+    setVisible(false);
+    window.setTimeout(() => router.push(closeHref), 190);
+  }, [router, closeHref]);
 
   useEffect(() => {
     setMounted(true);
@@ -37,12 +42,7 @@ export function AnimatedModal({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mounted]);
-
-  function closeWithAnimation() {
-    setVisible(false);
-    setTimeout(() => router.push(closeHref), 190);
-  }
+  }, [mounted, closeWithAnimation]);
 
   if (!mounted) return null;
 

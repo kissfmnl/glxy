@@ -148,7 +148,7 @@ function GroupPanel({ groupIndex, map }: { groupIndex: number; map: Map<string, 
       cur.items.push(item);
     }
     return out;
-  }, [groupIndex]);
+  }, [group]);
 
   return (
     <div className="space-y-6">

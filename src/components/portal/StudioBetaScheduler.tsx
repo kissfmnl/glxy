@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { STUDIO_PURPOSE_OPTIONS, type StudioPurpose } from "@/lib/studioBookingUtils";
 
 type Booking = {
@@ -90,7 +90,7 @@ export function StudioBetaScheduler({ userName, userId }: { userName: string; us
     return out;
   }, []);
 
-  async function loadWeek() {
+  const loadWeek = useCallback(async () => {
     setLoading(true);
     setError(null);
     const from = new Date(weekStart);
@@ -108,11 +108,11 @@ export function StudioBetaScheduler({ userName, userId }: { userName: string; us
     } finally {
       setLoading(false);
     }
-  }
+  }, [weekStart]);
 
   useEffect(() => {
     void loadWeek();
-  }, [weekStart]);
+  }, [loadWeek]);
 
   useEffect(() => {
     if (!calendarMenuOpen) return;

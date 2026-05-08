@@ -12,6 +12,7 @@ import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
 import { heroTitleColorStyle } from "@/lib/heroTitleColor";
 import type { HeroTitleLayout, HomeWaveCopy } from "@/lib/homePageWaveCopy";
 import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
+import AppImage from "@/components/AppImage";
 
 function kissLipsSrc() {
   return `/api/assets/Website/Logo/${encodeURIComponent("KISS - Lippen (groen)_transparant (1) (4).png")}`;
@@ -110,7 +111,7 @@ function PolaroidStrip({ items }: { items: HomeImageTile[] }) {
             >
               <div className="w-[154px] sm:w-[172px] md:w-[180px] bg-white p-2.5 pb-6 rounded-[2px] shadow-[0_14px_40px_rgba(0,0,0,0.45)] border border-white/90 hover:rotate-0 hover:scale-[1.02] transition-transform duration-300">
                 <div className="aspect-square overflow-hidden rounded-[1px] bg-white">
-                  <img
+                  <AppImage
                     src={t.src}
                     alt=""
                     className="h-full w-full object-cover"
@@ -144,7 +145,7 @@ function VoicesSidebar({ title, djs, maxItems }: { title: string; djs: HomeImage
             className="group relative rounded-2xl overflow-hidden border border-[#1e375a]/12 bg-white shadow-[0_8px_22px_rgba(30,55,90,0.1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#37bfbf]"
           >
             <div className="relative aspect-[1/1]">
-              <img
+              <AppImage
                 src={t.src}
                 alt={t.alt}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -227,7 +228,7 @@ export function HomeWaveLayout({
               </div>
               {copy.showLipsLogo ? (
                 <div className="shrink-0 flex translate-y-1 items-center justify-center self-start max-md:-translate-y-0.5 max-md:-mr-2 sm:translate-y-1.5 md:mr-0">
-                  <img
+                  <AppImage
                     src={kissLipsSrc()}
                     alt=""
                     className="h-14 w-auto sm:h-[4.5rem] md:h-28 lg:h-[7.75rem] object-contain drop-shadow-lg opacity-95"

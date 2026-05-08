@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { normalizePortalPermissions, type PortalPermissionKey } from "@/lib/portalPermissions";
+import AppImage from "@/components/AppImage";
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -233,7 +234,7 @@ export default function Sidebar() {
           onClick={() => setMobileOpen(false)}
           className="flex min-w-0 flex-1 items-center gap-2"
         >
-          <img
+          <AppImage
             src={`/api/assets/Website/Logo/${encodeURIComponent("KISS WITTE LETTERS TRANSPARANT (Edited).png")}`}
             alt="KISS FM"
             className="h-8 w-auto max-w-[min(100%,200px)] object-contain object-left sm:h-9"

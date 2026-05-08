@@ -5,6 +5,10 @@ const nextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  images: {
+    unoptimized: true,
+    dangerouslyAllowSVG: true,
+  },
 };
 
 export default nextConfig;

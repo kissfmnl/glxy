@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PortalPageShell } from "@/components/portal/PortalPageShell";
 import { buildTrackKeys, toPublicCoverSrc } from "@/lib/throwbackCovers";
+import AppImage from "@/components/AppImage";
 import {
   backfillThrowbackSongCovers,
   deleteThrowbackSong,
@@ -103,7 +104,7 @@ export default async function AdminActiesPage() {
               <summary className="cursor-pointer list-none">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-white">
-                    <img src={websiteAssetUrl(a.imagePath) || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
+                    <AppImage src={websiteAssetUrl(a.imagePath) || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-black text-gray-900">{a.title}</p>
@@ -164,7 +165,7 @@ export default async function AdminActiesPage() {
           </form>
           {actionImagePath ? (
             <div className="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white">
-              <img src={websiteAssetUrl(actionImagePath) || "/api/fallback-album-logo"} alt="" className="h-40 w-full object-cover" />
+              <AppImage src={websiteAssetUrl(actionImagePath) || "/api/fallback-album-logo"} alt="" className="h-40 w-full object-cover" />
             </div>
           ) : null}
         </section>
@@ -259,7 +260,7 @@ export default async function AdminActiesPage() {
               <summary className="cursor-pointer list-none">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-white">
-                    <img src={song._resolvedCover || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
+                    <AppImage src={song._resolvedCover || "/api/fallback-album-logo"} alt="" className="h-full w-full object-cover" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-black text-gray-900">{song.title}</p>

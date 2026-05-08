@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
+import AppImage from "@/components/AppImage";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,7 @@ export default async function ActiesPage() {
             <article key={a?.id ?? `legacy-${idx}`} className="rounded-3xl border border-[#1e375a]/12 bg-white p-6 shadow-sm">
               {image ? (
                 <div className="mb-4 overflow-hidden rounded-2xl border border-[#d3e2f1] bg-[#f4f9ff]">
-                  <img src={image} alt="" className="h-40 w-full object-cover" />
+                  <AppImage src={image} alt="" className="h-40 w-full object-cover" />
                 </div>
               ) : null}
               <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#365579]">{status}</p>

@@ -36,7 +36,8 @@ Zie ook `README_DEPLOYMENT.md` voor Railway/GitHub-deployment.
 
 ### Fase A — stabiel & meetbaar (laag risico)
 
-- ESLint warnings opruimen die je tot errors wilt maken bij build (`next/image`, `react-hooks/exhaustive-deps`).
+- ESLint en `next lint` zonder warnings houden (`npm run lint`).
+- **`next.config.mjs`**: `images.unoptimized: true` staat aan zodat `next/image` (via `AppImage`) werkt met willekeurige externe URLs en `/api/...` zonder hostname-allowlist. Zet dit uit en configureer `remotePatterns` als je echte optimalisatie wilt.
 - Geen majeure dependency-bumps.
 
 ### Fase B — Next.js 15 compat

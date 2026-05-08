@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
+import AppImage from "@/components/AppImage";
 
 /**
  * Mark Maakt Media–achtige 3-kolom scroll, nu met vierkante tegels (zijde = kolombreedte).
@@ -163,7 +164,7 @@ function Column({
               transform: "skewY(5deg)",
             }}
           >
-            <img
+            <AppImage
               src={src}
               alt=""
               draggable={false}

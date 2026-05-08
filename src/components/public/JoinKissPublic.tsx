@@ -2,6 +2,7 @@ import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
 import { JOIN_KISS_SLOT_LABELS } from "@/lib/joinKissDefaults";
 import type { JoinKissBenefitView, JoinKissVacancyView } from "@/lib/joinKissMerge";
 import { websiteAssetUrl } from "@/lib/websiteAssetUrl";
+import AppImage from "@/components/AppImage";
 
 const sectionShell = "rounded-3xl border border-[#d3dae4] bg-[#eef2f6] p-5 shadow-sm md:p-6";
 
@@ -55,7 +56,7 @@ function VacancyCard({ v }: { v: JoinKissVacancyView }) {
     <article className="rounded-2xl border border-[#1e375a]/10 bg-white p-6 shadow-[0_4px_24px_rgba(30,55,90,0.07)] md:p-8">
       {showVacancyImage ? (
         <div className="mb-5 aspect-[16/7] w-full overflow-hidden rounded-2xl border border-[#d1d9e5] bg-[#f2f8fb]">
-          <img
+          <AppImage
             src={imageSrc ? `${imageSrc}?v=${imageCacheKey}` : ""}
             alt={v.title}
             className="h-full w-full object-cover"

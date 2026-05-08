@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PortalPageShell } from "@/components/portal/PortalPageShell";
 import { getFaviconSettings, resetSiteFaviconToDefault, uploadSiteFavicon } from "@/app/actions/faviconActions";
 import { hasPortalPermission } from "@/lib/portalPermissions";
+import AppImage from "@/components/AppImage";
 
 export default async function FaviconSettingsPage() {
   const session = await getServerSession(authOptions);
@@ -28,7 +29,7 @@ export default async function FaviconSettingsPage() {
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.04] md:p-6">
         <div className="mb-5 flex items-center gap-4">
-          <img src="/api/favicon" alt="Huidige favicon" className="h-10 w-10 rounded-lg border border-gray-200 object-contain p-1 dark:border-white/10" />
+          <AppImage src="/api/favicon" alt="Huidige favicon" className="h-10 w-10 rounded-lg border border-gray-200 object-contain p-1 dark:border-white/10" />
           <div className="text-xs text-gray-600 dark:text-white/60">
             <p>
               Huidig pad: <span className="font-semibold">{currentPath || `(standaard) ${defaultPath}`}</span>

@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useEffect, useState } from "react";
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import AppImage from "@/components/AppImage";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -18,9 +19,9 @@ function TrackThumb({ cover }: { cover: string | null | undefined }) {
   return (
     <div className="flex h-full w-full items-center justify-center" style={{ backgroundColor: "var(--fallback-album-bg, #f2f8fb)" }}>
       {cover && !failed ? (
-        <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />
+        <AppImage src={cover} alt="" className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />
       ) : (
-        <img src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90 p-[18%]" loading="lazy" draggable={false} />
+        <AppImage src={kissLipsSrc()} alt="" className="h-full w-full max-h-[72%] object-contain opacity-90 p-[18%]" loading="lazy" draggable={false} />
       )}
     </div>
   );

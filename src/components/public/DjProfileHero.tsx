@@ -1,5 +1,7 @@
 "use client";
 
+import AppImage from "@/components/AppImage";
+
 type Fact = { question: string; answer: string };
 
 export function DjProfileHero({
@@ -33,7 +35,7 @@ export function DjProfileHero({
           }`}
         >
           {imageUrl ? (
-            <img
+            <AppImage
               src={imageUrl}
               alt={name}
               className={imgFill}
@@ -43,7 +45,7 @@ export function DjProfileHero({
             />
           ) : (
             <div className="flex h-full min-h-[240px] w-full items-center justify-center p-6" style={{ backgroundColor: "#1e375a" }}>
-              <img src={fallbackLogoUrl} alt="KISS FM" className="h-full w-full max-h-[320px] object-contain" />
+              <AppImage src={fallbackLogoUrl} alt="KISS FM" className="h-full w-full max-h-[320px] object-contain" />
             </div>
           )}
         </div>

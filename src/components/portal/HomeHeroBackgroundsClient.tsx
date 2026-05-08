@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { removeHomeHeroBackground, uploadHomeHeroBackground } from "@/app/actions/homeHeroBackgroundActions";
+import AppImage from "@/components/AppImage";
 
 function assetUrl(rel: string) {
   return "/api/assets/" + rel.split("/").map(encodeURIComponent).join("/");
@@ -72,7 +73,7 @@ export function HomeHeroBackgroundsClient({
         ) : (
           paths.map((p) => (
             <div key={p} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 aspect-[4/3] bg-gray-100 dark:bg-white/5">
-              <img src={assetUrl(p)} alt="" className="w-full h-full object-cover" />
+              <AppImage src={assetUrl(p)} alt="" className="w-full h-full object-cover" />
               <button
                 type="button"
                 disabled={pending}

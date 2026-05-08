@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import AppImage from "@/components/AppImage";
 
 function assetSrc(imagePath: string | null | undefined) {
   if (!imagePath) return null;
@@ -75,7 +76,7 @@ export function ExistingImagePickerModal({
                       }`}
                     >
                       <div className="aspect-[4/3] overflow-hidden rounded-md bg-black/5">
-                        {src ? <img src={src} alt={f} className="h-full w-full object-cover" loading="lazy" /> : null}
+                        {src ? <AppImage src={src} alt={f} className="h-full w-full object-cover" loading="lazy" /> : null}
                       </div>
                       <p className="mt-1 truncate text-[10px] font-bold text-gray-600" title={f}>
                         {f}

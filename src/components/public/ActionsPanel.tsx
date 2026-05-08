@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import AppImage from "@/components/AppImage";
 
 function websiteAssetUrl(rel: string | null | undefined) {
   const value = String(rel || "").trim();
@@ -30,7 +31,7 @@ export async function ActionsPanel() {
         <div className="rounded-2xl border border-[#d3e2f1] bg-[#f4f9ff] p-4">
           {actionImage ? (
             <div className="mb-3 overflow-hidden rounded-xl border border-[#c8dcef] bg-white">
-              <img src={actionImage} alt="" className="h-32 w-full object-cover" />
+              <AppImage src={actionImage} alt="" className="h-32 w-full object-cover" />
             </div>
           ) : null}
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#365579]">Nu live</p>

@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import AppImage from "@/components/AppImage";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -47,7 +48,7 @@ export function CurrentShowPanel({
         <div className={`px-5 ${KISS_PANEL_HEADER_GAP}`}>
           <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-[#1e375a]/10 bg-[#e8eef5] shadow-inner">
             {imagePath ? (
-              <img
+              <AppImage
                 src={"/api/assets/" + imagePath.split("/").map(encodeURIComponent).join("/")}
                 alt={data?.jock?.name || ""}
                 className="w-full h-full object-cover object-center"
@@ -55,7 +56,7 @@ export function CurrentShowPanel({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center p-5" style={{ backgroundColor: "#1e375a" }}>
-                <img src={fallbackLogoSrc()} alt="KISS FM" className="max-h-full max-w-full object-contain" loading="lazy" />
+                <AppImage src={fallbackLogoSrc()} alt="KISS FM" className="max-h-full max-w-full object-contain" loading="lazy" />
               </div>
             )}
           </div>

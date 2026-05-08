@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import AppImage from "@/components/AppImage";
 
 type Slide = { src: string };
 
@@ -88,7 +89,7 @@ export function HomeHeroBackdrop({ slides, motionEnabled = true }: { slides: Sli
                     key={`${s.src}-${ri}-${ii}`}
                     className="relative h-full w-[28vw] max-w-[10.25rem] shrink-0 overflow-hidden rounded-2xl sm:w-[132px] md:w-[150px]"
                   >
-                    <img src={s.src} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                    <AppImage src={s.src} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
                     <div
                       className="pointer-events-none absolute inset-0 rounded-[inherit]"
                       style={{
