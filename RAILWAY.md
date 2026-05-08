@@ -1,6 +1,6 @@
 # Deploying GLXY on Railway
 
-> **Niet technisch?** Lees eerst **[docs/START-HIER-RAILWAY.md](./docs/START-HIER-RAILWAY.md)** — daar staat stap voor stap hoe je de database op Railway bijwerkt (`npm run db:push:railway` of `npm run db:push:env`).
+> **Niet technisch?** Lees eerst **[docs/START-HIER-RAILWAY.md](./docs/START-HIER-RAILWAY.md)** — daar staat hoe je `db push` doet **vanaf je Mac** met **`DATABASE_PUBLIC_URL`** (aanbevolen). `npm run db:push:railway` faalt vaak lokaal omdat Railway een **interne** host gebruikt die alleen op hun servers werkt.
 
 De app gebruikt alleen **omgevingsvariabelen** op Railway (geen `.env.local` in productie).
 

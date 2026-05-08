@@ -9,84 +9,72 @@ Je hoeft niet te weten wat Prisma of `db push` precies doet. Je wilt alleen dat 
 Elke keer als Railway je site **opnieuw bouwt en start**, draait het script `npm start` al **`prisma db push`** vóór de site online gaat.  
 **Na een gewone deploy hoef je dus vaak niets handmatig te doen.**
 
-Alleen als je denkt dat iets niet klopt (nieuwe kolommen komen niet online), gebruik dan hieronder één van de twee methodes.
+---
+
+## Belangrijk: twee soorten database-URL op Railway
+
+| Variabele | Waar voor |
+|-----------|-----------|
+| **`DATABASE_URL`** (intern: `postgres.railway.internal`) | Alleen **binnen Railway** (je draaiende website). Werkt **niet** vanaf je Mac. |
+| **`DATABASE_PUBLIC_URL`** | Om **vanaf je eigen computer** te verbinden (Terminal op je Mac). |
+
+Als je een fout krijgt zoals **Can't reach database server at `postgres.railway.internal`**, dan probeerde je met de **interne** URL te verbinden vanaf je Mac. Gebruik dan hieronder **Methode A** (publieke URL).
 
 ---
 
-## Methode A — Railway CLI (aanbevolen)
+## Methode A — Vanaf je Mac (aanbevolen): publieke URL
 
-### Eén keer installeren
+Dit werkt altijd vanaf je laptop.
 
-Open **Terminal** op je Mac en voer uit:
+1. Ga in **Railway** naar je **Postgres**-service (niet je glxy-web-service).
+2. Open het tabblad **Variables**.
+3. Zoek **`DATABASE_PUBLIC_URL`** en kopieer de **volledige** waarde.
+4. Maak op je computer in de map `glxy` een bestand **`.env.railway`** met precies deze inhoud (plak jouw URL tussen de aanhalingstekens):
 
-```bash
-brew install railway
-```
+   ```bash
+   DATABASE_URL="plak-hier-DATABASE_PUBLIC_URL"
+   ```
 
-(Werkt `brew` niet? Zie [Railway CLI](https://docs.railway.com/develop/cli) voor andere installatie.)
+   **SSL:** staat er nog geen `?` in de URL, voeg aan het **einde** toe: `?sslmode=require`  
+   Staat er al een `?` in de URL, voeg toe: `&sslmode=require`
 
-### Eén keer inloggen en koppelen
+5. In Terminal:
 
-```bash
-railway login
-```
+   ```bash
+   cd /pad/naar/glxy
+   npm install
+   npm run db:push:env
+   ```
 
-(Browser opent; log in bij Railway.)
+6. Je zou iets als “Your database is now in sync” moeten zien.
 
-Ga naar je projectmap (waar deze repo staat):
+7. Optioneel: verwijder `.env.railway` daarna weer (staat in `.gitignore`, komt niet op GitHub).
 
-```bash
-cd /pad/naar/glxy
-```
+Zie ook **`railway.env.example`** in de projectmap.
 
-Koppel de map aan je Railway-project:
+---
 
-```bash
-railway link
-```
-
-- Kies je **Railway-project**.
-- Kies de **service waar je Next.js-app draait** (niet alleen de Postgres-database als losse service — tenzij daar je `DATABASE_URL` staat; meestal kies je de **web/glxy**-service).
-
-### Database bijwerken (wanneer je wilt)
+## Methode B — `railway run` (werkt meestal níét vanaf je Mac)
 
 ```bash
 npm run db:push:railway
 ```
 
-Dat is alles. Je ziet “Klaar” als het gelukt is.
+Dit gebruikt `DATABASE_URL` van je **gekoppelde service**. Die is bijna altijd de **interne** URL (`postgres.railway.internal`). Vanaf je Mac kan je computer die hostnaam niet bereiken → **fout P1001**.
+
+**Conclusie:** gebruik voor handmatig bijwerken vanaf huis **Methode A** met **`DATABASE_PUBLIC_URL`**.
 
 ---
 
-## Methode B — Zonder Railway CLI (alleen plakken van een URL)
+## Waarom dit zo is (kort)
 
-Handig als je CLI niet wilt installeren.
-
-1. Ga in **Railway** naar je **Postgres**-service → tab **Variables**.
-2. Kopieer **`DATABASE_PUBLIC_URL`** (om vanaf je eigen computer te verbinden).
-3. Maak op je computer in de map `glxy` een bestand **`.env.railway`** met **precies deze inhoud** (plak jouw URL tussen de aanhalingstekens):
-
-   ```bash
-   DATABASE_URL="plak-hier-de-url-van-railway"
-   ```
-
-   Als de verbinding faalt: zet aan het **einde** van de URL nog `?sslmode=require` (of `&sslmode=require` als er al een `?` in de URL zit).
-
-   Je kunt ook `railway.env.example` als voorbeeld openen en het bestand als `.env.railway` opslaan.
-
-4. In Terminal, in de map `glxy`:
-
-   ```bash
-   npm run db:push:env
-   ```
-
-5. Optioneel: verwijder `.env.railway` daarna weer (staat toch in `.gitignore`, komt niet op GitHub).
+Je live site draait **op Railway’s servers** — daar mag `DATABASE_PUBLIC_URL` niet nodig zijn; daar gebruikt Railway het **interne** netwerk (`postgres.railway.internal`).  
+Jouw Mac staat **daarbuiten**, daarom heb je de **publieke** connection string nodig.
 
 ---
 
 ## Hulp nodig?
 
-- Foutmelding over **DATABASE_URL**: controleer of de URL volledig gekopieerd is en of `?sslmode=require` nodig is.
-- Foutmelding **can't reach database**: dan bereikt je Mac de server niet — check internet, firewall, of gebruik Methode A met `railway run` (die gebruikt Railway’s netwerk).
-
-Meer technische details staan in **`RAILWAY.md`** in de root van het project.
+- **P1001 / can't reach postgres.railway.internal** → Methode A met `DATABASE_PUBLIC_URL` in `.env.railway`.
+- **SSL-fout** → voeg `?sslmode=require` of `&sslmode=require` toe aan de URL.
+- Meer technische details: **`RAILWAY.md`** in de root van het project.
