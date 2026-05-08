@@ -1,67 +1,42 @@
-# GLXY — volgende stappen na migratie van KISS
+# GLXY Radio — volgende stappen
 
-De KISS-stack draait nu in deze repo onder **`glxy`** (Next.js **14.2.x**, React 18, Prisma 5, NextAuth 4, Tailwind 3). Gebruik dit als checklist en als gefaseerd plan om verder naar een moderne stack te tillen zonder big bang.
+## Huidige stand (frontend‑only)
 
-## 1. Lokaal werkend krijgen (checklist)
+De **main**-branch bouwt als **statische demo**: Next.js **14.2.x**, React 18, Tailwind 3. Geen Prisma, geen NextAuth, geen `src/app/api`, geen WhatsApp‑webhook — alle publieke inhoud komt uit **`src/lib/mock/site.ts`**.
 
-1. **Postgres** installeren/starten en een database aanmaken (bijv. `kissfm` of eigen naam).
+- Lokaal: `npm install` → `npm run dev`
+- CI: `npm run lint`, `npm run build`
 
-2. **Omgevingsvariabelen**
-   ```bash
-   cp .env.example .env.local
-   ```
-   - Vul minstens **`DATABASE_URL`**, **`NEXTAUTH_SECRET`**, **`NEXTAUTH_URL`** (`http://localhost:3000` lokaal).
-   - Kopieer de overige secrets van je oude KISS `.env.local` waar nodig (WhatsApp, cron, SMTP, …).
+Deploy: zie **`README_DEPLOYMENT.md`**.
 
-3. **Database schema**
-   - Snel synchroon met schema:
-     ```bash
-     npm run db:push
-     ```
-     of gebruik migraties vanuit `prisma/migrations/` als je daar al op productie draait.
+## Als je backend opnieuw wilt (later)
 
-4. **`Website/` persistentie** (uploads/logo’s)
-   - Lokaal: map staat in de repo-root; uploads gaan daaronder naar `Website/…`.
-   - Productie: zet **`WEBSITE_FILES_ROOT`** naar je volume (zie `.env.example`).
+Dan is dit een nieuw ontwerp‑traject o.a.:
 
-5. **Start**
-   ```bash
-   npm install
-   npm run dev
-   ```
+1. Kiezen tussen Auth.js / eigen sessies / ander IdP  
+2. Databaselayer (PostgreSQL + ORM naar keuze)  
+3. File storage (CDN/volume i.p.v. oude `Website/`-routes)  
+4. Integraties opnieuw aansluiten (stream‑metadata, social, ticketing, enz.)
 
-Zie ook `README_DEPLOYMENT.md` voor Railway/GitHub-deployment.
+De oude KISS‑stack (Prisma‑schema, migraties, server actions) is uit deze tak verwijderd om de UI vrij te kunnen draaien zonder Postgres.
 
-## 2. gefaseerd moderniseren (aanbevolen volgorde)
+## Gefaseerd moderniseren (UI / framework)
 
-### Fase A — stabiel & meetbaar (laag risico)
+### Fase A — stabiel houden
 
-- ESLint en `next lint` zonder warnings houden (`npm run lint`).
-- **`next.config.mjs`**: `images.unoptimized: true` staat aan zodat `next/image` (via `AppImage`) werkt met willekeurige externe URLs en `/api/...` zonder hostname-allowlist. Zet dit uit en configureer `remotePatterns` als je echte optimalisatie wilt.
-- Geen majeure dependency-bumps.
+- ESLint: `npm run lint` groen  
+- **`next.config.mjs`**: `images.unoptimized` waar nodig voor willekeurige externe Unsplash/mock‑URLs met `next/image`.
 
-### Fase B — Next.js 15 compat
+### Fase B — Next 15–16
 
-- Lees vóór de bump de relevante gids onder `node_modules/next/dist/docs/` (Next wijkt af per versie).
-- Bump **Next → 15.x** nog op **React 18** waar mogelijk.
-- **`next lint`** / ESLint configuratie naar flat config kan later (ESLint 9).
+- Altijd eerst **`node_modules/next/dist/docs/`** voor deze repo (zie `AGENTS.md`).  
+- Niet auth + Next‑major tegelijk updaten tenzij je de migratiegidsen volgt.
 
-### Fase C — Next.js 16 + React 19 (+ Tailwind 4)
+### Fase C — GLXY product‑identiteit
 
-- Project was ooit een Next 16-stub; deze repo is terug naar 14 voor 1-op-1 KISS-compat.
-- Plan: ná Fase B: **React 19** + **Next 16**, daarna **`@tailwindcss/postcss`** + Tailwind v4 en `tailwind.config` migratie.
-- Controleer `middleware`, `cookies()`, en alle server actions tegen de nieuwe Next-docs.
+- Domeinen, legal copy en eventueel eigen assets i.p.v. Unsplash placeholders.  
+- Eventueel design tokens verder naar één Neon/Galaxy‑systeem in CSS variabelen.
 
-### Fase D — Authenticatie
+## Regressie (kort) na wijzigingen
 
-- **[Auth.js](https://authjs.dev/) / NextAuth v5)** is een apart project: routes, callbacks en types wijken af van v4.
-- Doe dit géén combinatie-upgrade met Next-major in één stap.
-
-### Fase E — GLXY-identiteit / product splits
-
-- Herbenoemen waar nodig (package name, branding, domeinen, kopieën).
-- Optioneel: `Website/` structuur naar `public/` of alleen CDN/volume-documentatie aanpassen (raakt veel paden en DB).
-
-## 3. Praktische regressietest (kort)
-
-Na elke bump: `npm run build`, login-flow, `/api/auth`, prisma-read path, uploads via bestanden-interface, webhook/cron waar je die gebruikt.
+Na elke relevante bump: `npm run build` en smoke‑test: `/`, `/playlist`, `/programmering`, `/djs`.

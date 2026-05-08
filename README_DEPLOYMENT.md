@@ -1,45 +1,44 @@
-# GLXY — Deployment (Railway / GitHub)
+# GLXY Radio — Deployment (statische frontend)
 
-Deze repo bevat de gemigreerde KISS-site stack. Deploy volgt hetzelfde patroon: GitHub ↔ Railway met Postgres.
+Deze repo is een **Next.js-demo** zonder database, API-routes of Prisma: `npm run build` produceert een volledige statische/UI-bundle. Hosting is daarom vooral **Node + `next start`** of een platform dat dat ondersteunt (Vercel, Railway als Node service zonder Postgres, Docker, eigen VPS).
 
-Zie **`docs/GLXY-NEXT-STEPS.md`** voor lokale setup en een gefaseerd upgrade-pad (Next / Tailwind / auth).
+## 1. Vereisten
 
-## 1. GitHub
+- Node 20.x (aanbevolen, zie engines in package-lock peer hints)
+- `npm ci` of `npm install`
 
-Als git al geïnitialiseerd is met remote **`origin`**:
+## 2. Lokaal
 
 ```bash
-git add .
-git commit -m "Your message"
-git push -u origin main
+npm install
+npm run dev
 ```
 
-Let op: `.env.local` wordt door `.gitignore` genegeerd; commit geen secrets.
+Productie-build lokaal testen:
 
-## 2. Deployen naar Railway
-1.  Log in op [Railway.app](https://railway.app).
-2.  Kies **New Project** → **Deploy from GitHub repo**.
-3.  Selecteer je repository.
-4.  Voeg een **PostgreSQL** database toe aan je project in Railway (**New** → **Database** → **Add PostgreSQL**).
-
-## 3. Environment Variables (Railway)
-Voeg de volgende variabelen toe aan je Railway service:
-- `DATABASE_URL`: Wordt automatisch ingevuld door Railway als je een Postgres plugin toevoegt.
-- `NEXTAUTH_SECRET`: Een lange willekeurige tekenreeks.
-- `NEXTAUTH_URL`: De URL van je Railway app (bijv. `https://kiss-fm-portal.up.railway.app`).
-- `WHATSAPP_VERIFY_TOKEN`: Jouw geheime token voor de webhook.
-- `WHATSAPP_API_TOKEN`: Jouw Meta API token.
-- `WHATSAPP_PHONE_NUMBER_ID`: Jouw Meta Phone ID.
-
-## 4. Database Sync
-Railway voert `npm run build` uit. Zorg dat je `package.json` de juiste prisma commando's heeft.
-Ik heb `prisma generate` al in het build-proces gezet. Na de eerste deploy kun je in de Railway terminal runnen:
 ```bash
-npx prisma db push
+npm run build
+npm start
 ```
 
-## Toekomstige Ideeën (v0.2)
-- **Track Progress**: Visuele balk die laat zien hoe ver een nummer is.
-- **Luistercijfers**: Live statistieken van het aantal luisteraars.
-- **Direct Reply**: Reageren op WhatsApp berichten direct vanuit het portaal.
-- **Regionale Edities**: Schakelen tussen verschillende KISS-regiofeeds.
+Geen **`DATABASE_URL`**, geen migrations, geen seed-scripts.
+
+## 3. Omgeving (optioneel)
+
+Alleen nog relevant als je lokale overrides wilt:
+
+| Variabele | Gebruik |
+|-----------|---------|
+| `MONITOR_PAGE_CODE` | Toegangscode voor `/monitor` (zie app); zonder deze var geldt een eenvoudige default in code. |
+
+Zie **`.env.example`** voor een minimaal sjabloon.
+
+## 4. CI / hosting‑tips
+
+- **Build‑command:** `npm run build`
+- **Start‑command:** `npm start`
+- **Health:** HTTP 200 op de homepage is voldoende; er is geen aparte readiness‑DB.
+
+## Toekomst (als je weer backend toevoegt)
+
+Dan kun je Postgres, auth en uploads opnieuw introduceren; houd deze README dan synchroon met `package.json` en je schema. De huidige `main`-branch beschrijft bewust alleen de **statische GLXY‑Radio‑UI**.

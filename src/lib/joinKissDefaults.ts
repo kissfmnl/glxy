@@ -29,11 +29,11 @@ export const DEFAULT_JOIN_VACANCIES: JoinKissVacancyDefault[] = [
     location: "Randstad / studio",
     jobType: "Parttime / freelance",
     description:
-      "Ben jij een strakke hitradio-jock die weet hoe je een show laat knallen? KISS FM zoekt stemmen die de grootste poptracks van dit moment nóg strakker maken. Je werkt samen met het team, bereidt je uitzending voor en zorgt dat de luisteraar blijft hangen.",
+      "Ben jij een host die kan laten voelen wat er in de ether gebeurt? GLXY Radio (demo‑copy) zoekt stemmen voor een futuristische hitradio‑ervaring. Je bereidt shows voor, bent scherp op muziek & timing en houdt de luisteraar in de neon‑golf.",
     requirements:
-      "Ervaring met radio of podcasting\nSterke stem en timing\nPassie voor hitradio en popmuziek\nBereid om in de avond/weekend te draaien",
+      "Ervaring met radio of podcasting\nSterke stem en ritme\nPassie voor hitradio en nieuwe geluid\nBereid om in de avond/weekend live te gaan waar nodig",
     applyLabel: "Solliciteer",
-    applyUrl: "mailto:info@kissfm.nl?subject=Sollicitatie%20DJ%20KISS%20FM",
+    applyUrl: "mailto:hello@glxy.radio?subject=Sollicitatie%20DJ%20GLXY%20Radio",
   },
   {
     slot: "PRODUCER",
@@ -43,25 +43,25 @@ export const DEFAULT_JOIN_VACANCIES: JoinKissVacancyDefault[] = [
     location: "Hybride",
     jobType: "Parttime / project",
     description:
-      "Jij weet hoe je een show technisch en creatief tot zijn recht laat komen: geluid, edits, bumps en alles wat de uitzending strak maakt. Samen met DJs en het team bouw je aan een moderne, frisse sound.",
+      "Jij tilt shows technisch en creatief: geluid, edits, cues en een strakke stream. Samen met hosts en redactie bouw je aan een moderne cosmic sound voor GLXY.",
     requirements:
-      "Ervaring met audio (DAW, studio of OB)\nOog voor detail en deadlines\nSamenwerken met hosts en redactie",
+      "Ervaring met audio (DAW, studio of OB)\nOog voor detail en deadlines\nSamenwerken met hosts",
     applyLabel: "Solliciteer",
-    applyUrl: "mailto:info@kissfm.nl?subject=Sollicitatie%20producer%20KISS%20FM",
+    applyUrl: "mailto:hello@glxy.radio?subject=Sollicitatie%20producer%20GLXY%20Radio",
   },
   {
     slot: "OTHER",
     sortOrder: 2,
     title: "Overige rollen",
-    category: "Team KISS",
+    category: "Team GLXY",
     location: "Nederland",
     jobType: "In overleg",
     description:
-      "Denk je dat KISS FM en jij bij elkaar passen, maar past geen van de andere vacatures? Laat van je horen. We zijn altijd nieuwsgierig naar marketing, social, events, sales en andere talenten die het station sterker maken.",
+      "Denk je dat GLXY bij je past maar zie je geen vacature die klopt? Laat weten waar je energie ligt — marketing, social, events, geluid … we horen graag van je.",
     requirements:
-      "Korte motivatie\nPortfolio of CV\nWaar zie jij jezelf bij KISS?",
+      "Korte motivatie\nPortfolio of CV\nWaar zie jij jezelf bij GLXY?",
     applyLabel: "Neem contact op",
-    applyUrl: "mailto:info@kissfm.nl?subject=Open%20sollicitatie%20KISS%20FM",
+    applyUrl: "mailto:hello@glxy.radio?subject=Open%20sollicitatie%20GLXY%20Radio",
   },
 ];
 
@@ -71,31 +71,31 @@ export const DEFAULT_JOIN_BENEFITS: JoinKissBenefitDefault[] = [
   {
     sortOrder: 0,
     title: "Creatieve cultuur",
-    body: "Werken met een team dat geïnspireerd is door muziek, radio en entertainment — en grenzen durft te verleggen.",
+    body: "Een team dat leeft op muziek, radio en vizie — niet bang om te experimenteren.",
   },
   {
     sortOrder: 1,
-    title: "Groeimogelijkheden",
-    body: "Ruimte om te leren, mee te denken en jezelf te ontwikkelen binnen een groeiend mediabedrijf.",
+    title: "Groeiruimte",
+    body: "Ruimte om te leren, scherp te worden en jezelf uit te bouwen als het station groeit.",
   },
   {
     sortOrder: 2,
     title: "Werk-privébalans",
-    body: "We houden rekening met roosters en welzijn; in overleg zijn flexibele invullingen mogelijk.",
+    body: "Roosters en afspraken in overleg; flexibel waar het kan.",
   },
   {
     sortOrder: 3,
-    title: "Connecties in de industrie",
-    body: "Je staat dichtbij artiesten, events en partners in de muziek- en mediasector.",
+    title: "Netwerk",
+    body: "Dicht bij artiesten, events en partners in pop en media.",
   },
   {
     sortOrder: 4,
-    title: "Moderne werkplek",
-    body: "Professionele studio’s en tools om je werk goed te kunnen doen — op locatie en waar passend hybride.",
+    title: "Moderne tooling",
+    body: "Werken met serieuze audio- en stream-stack — studio en/of hybride.",
   },
   {
     sortOrder: 5,
-    title: "Competitieve voorwaarden",
-    body: "Een passend pakket voor de rol die je vervult — in overleg en conform de wet.",
+    title: "Voorwaarden",
+    body: "Een eerlijk voorstel bij de rol — altijd conform de wet en in gesprek.",
   },
 ];
