@@ -8,9 +8,10 @@ async function main() {
     where: { id: 1 },
     create: {
       id: 1,
-      primaryHex: "#22d3ee",
-      accentHex: "#c084fc",
-      navyHex: "#0f172a",
+      primaryHex: "#0b7557",
+      accentHex: "#6d6d6d",
+      navyHex: "#363636",
+      yellowHex: "#ffe200",
       homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
     },
     update: {},

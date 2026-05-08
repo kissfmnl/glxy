@@ -32,7 +32,8 @@ export default async function RootLayout({
     "--brand-primary": branding.primaryHex,
     "--brand-accent": branding.accentHex,
     "--brand-navy": branding.navyHex,
-    "--glxy-panel-bg": "rgba(10, 15, 31, 0.96)",
+    "--brand-yellow": branding.yellowHex,
+    "--glxy-panel-bg": "rgba(54, 54, 54, 0.96)",
   };
 
   return (

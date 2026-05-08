@@ -24,6 +24,7 @@ const NAV_SETTINGS: Nav[] = [
 const NAV_ADMIN_DEMO: Nav[] = [
   { href: "/admin/gebruikers", label: "Gebruikers & uitnodigingen" },
   { href: "/admin/branding", label: "Huisstijl (GLXY)" },
+  { href: "/admin/media", label: "Mediabibliotheek" },
   { href: "/admin/djs", label: "Hosts (demo)" },
   { href: "/admin/programmering", label: "Planner (demo)" },
   { href: "/admin/acties", label: "Acties (demo)" },

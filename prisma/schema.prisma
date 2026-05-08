@@ -39,11 +39,24 @@ model Invite {
 /// Singleton (id moet altijd 1 zijn) — GLXY kleuren/logo’s/livestream.
 model Branding {
   id         Int      @id @default(1)
-  primaryHex String   @default("#22d3ee")
-  accentHex  String   @default("#c084fc")
-  navyHex    String   @default("#0f172a")
+  primaryHex String   @default("#0b7557")
+  accentHex  String   @default("#6d6d6d")
+  navyHex    String   @default("#363636")
+  yellowHex  String   @default("#ffe200")
   logoUrl    String?
   faviconUrl String?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
+}
+
+/// Geüploade afbeeldingen (op schijf onder Website/media/…).
+model MediaAsset {
+  id          String   @id @default(cuid())
+  filename    String
+  storagePath String   @unique
+  mimeType    String
+  sizeBytes   Int
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
 }

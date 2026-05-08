@@ -6,10 +6,11 @@
 
 @layer base {
   :root {
-    --brand-primary: #22d3ee;
-    --brand-accent: #c084fc;
-    --brand-navy: #0f172a;
-    --glxy-panel-bg: rgba(10, 15, 31, 0.96);
+    --brand-primary: #0b7557;
+    --brand-accent: #6d6d6d;
+    --brand-navy: #363636;
+    --brand-yellow: #ffe200;
+    --glxy-panel-bg: rgba(54, 54, 54, 0.96);
 
     /* Light shells still used on some legacy cards */
     --bg-dark: #0b1020;

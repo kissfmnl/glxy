@@ -5,9 +5,10 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 const FALLBACK = {
-  primaryHex: "#22d3ee",
-  accentHex: "#c084fc",
-  navyHex: "#0f172a",
+  primaryHex: "#0b7557",
+  accentHex: "#6d6d6d",
+  navyHex: "#363636",
+  yellowHex: "#ffe200",
   logoUrl: "",
   faviconUrl: "",
   homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
@@ -29,6 +30,7 @@ export default async function AdminBrandingPage() {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
         navyHex: row.navyHex,
+        yellowHex: row.yellowHex ?? FALLBACK.yellowHex,
         logoUrl: row.logoUrl ?? "",
         faviconUrl: row.faviconUrl ?? "",
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,

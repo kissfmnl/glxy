@@ -13,7 +13,8 @@ async function requireAdmin() {
 }
 
 function normalizeHex(hex: string, fallback: string) {
-  const t = hex.trim();
+  let t = hex.trim();
+  if (t && !t.startsWith("#")) t = `#${t}`;
   const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(t);
   if (!m) return fallback;
   return `#${m[1]!.length === 3 ? m[1]!.split("").map((c) => c + c).join("") : m[1]!}`.toLowerCase();
@@ -29,9 +30,10 @@ function normalizeUrl(raw: string | null | undefined): string | null {
 export async function updateBrandingAction(formData: FormData): Promise<{ ok?: true; error?: string }> {
   await requireAdmin();
 
-  const primaryHex = normalizeHex(String(formData.get("primaryHex")), "#22d3ee");
-  const accentHex = normalizeHex(String(formData.get("accentHex")), "#c084fc");
-  const navyHex = normalizeHex(String(formData.get("navyHex")), "#0f172a");
+  const primaryHex = normalizeHex(String(formData.get("primaryHex")), "#0b7557");
+  const accentHex = normalizeHex(String(formData.get("accentHex")), "#6d6d6d");
+  const navyHex = normalizeHex(String(formData.get("navyHex")), "#363636");
+  const yellowHex = normalizeHex(String(formData.get("yellowHex")), "#ffe200");
   const logoUrl = normalizeUrl(String(formData.get("logoUrl") ?? ""));
   const faviconUrl = normalizeUrl(String(formData.get("faviconUrl") ?? ""));
   const homeHlsUrl = String(formData.get("homeHlsUrl") ?? "").trim();
@@ -47,6 +49,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       primaryHex,
       accentHex,
       navyHex,
+      yellowHex,
       logoUrl,
       faviconUrl,
       homeHlsUrl: hlsFinal,
@@ -55,6 +58,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       primaryHex,
       accentHex,
       navyHex,
+      yellowHex,
       logoUrl,
       faviconUrl,
       homeHlsUrl: hlsFinal,
