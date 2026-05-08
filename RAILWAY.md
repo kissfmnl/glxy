@@ -2,6 +2,10 @@
 
 De app gebruikt alleen **omgevingsvariabelen** op Railway (geen `.env.local` in productie).
 
+**Database:** Er staat **geen** vaste hostnaam, volume-mount (`postgres-volume`) of pad in deze repo. Prisma leest alleen `process.env.DATABASE_URL` (`url = env("DATABASE_URL")` in `prisma/schema.prisma`). Stel `DATABASE_URL` in bij je web-service (bijv. **Variable Reference** naar de Postgres-plugin).
+
+Er is geen verplichte `nixpacks.toml`; Nixpacks detecteert Node automatisch. Er staat wel een minimale `railway.json` met het startcommando.
+
 ## Build & start (repository)
 
 - **Build:** `npm run build` → draait `prisma generate && next build`.

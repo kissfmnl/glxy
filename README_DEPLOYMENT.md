@@ -1,6 +1,8 @@
-# GLXY Radio — Deployment (statische frontend)
+# GLXY Radio — Deployment
 
-Deze repo is een **Next.js-demo** zonder database, API-routes of Prisma: `npm run build` produceert een volledige statische/UI-bundle. Hosting is daarom vooral **Node + `next start`** of een platform dat dat ondersteunt (Vercel, Railway als Node service zonder Postgres, Docker, eigen VPS).
+**Huidige `main`:** Next.js met Prisma/PostgreSQL, NextAuth en Railway-start (`npm start` → `db push`, `seed`, `next start`). Zie **[RAILWAY.md](./RAILWAY.md)** voor omgevingsvariabelen (`DATABASE_URL` alleen; geen hardcoded DB-hosts in de repo).
+
+`npm run build` bundelt de app; database-connectie gaat **uitsluitend** via `DATABASE_URL`.
 
 ## 1. Vereisten
 
@@ -21,7 +23,7 @@ npm run build
 npm start
 ```
 
-Geen **`DATABASE_URL`**, geen migrations, geen seed-scripts.
+In productie/lokaal met DB: zet **`DATABASE_URL`** (zie `.env.example`). Zonder DB faalt auth/admin.
 
 ## 3. Omgeving (optioneel)
 
@@ -39,6 +41,6 @@ Zie **`.env.example`** voor een minimaal sjabloon.
 - **Start‑command:** `npm start`
 - **Health:** HTTP 200 op de homepage is voldoende; er is geen aparte readiness‑DB.
 
-## Toekomst (als je weer backend toevoegt)
+## Uploads / bestanden (optioneel)
 
-Dan kun je Postgres, auth en uploads opnieuw introduceren; houd deze README dan synchroon met `package.json` en je schema. De huidige `main`-branch beschrijft bewust alleen de **statische GLXY‑Radio‑UI**.
+Voor schrijven naar `Website/` op schijf: zie `WEBSITE_FILES_ROOT` in code (`src/lib/websiteDisk.ts`). Dit staat los van de database; gebruik geen vast volume-pad voor Postgres — alleen `DATABASE_URL`.
