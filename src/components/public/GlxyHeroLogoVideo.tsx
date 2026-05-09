@@ -26,8 +26,8 @@ function GlxyHeroLogo({ src }: { src: string }) {
 }
 
 /**
- * Logo links, video rechts; op lg wordt video naar links gezet zodat de rechterrand
- * uitlijnt met het einde van het laatste menulink (niet met de social-iconen).
+ * Logo met linkerkant onder HOME, video met rechterkant onder het laatste item (Frequenties).
+ * Padding op de hero-rij = verschil tussen deze bak en de eerste/laatste nav-link in de viewport.
  */
 export function GlxyHeroLogoVideo({
   heroLogoSrc,
@@ -37,24 +37,29 @@ export function GlxyHeroLogoVideo({
   homeHlsSrc: string | null;
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
-  const [videoMarginRight, setVideoMarginRight] = useState(0);
+  const [navPads, setNavPads] = useState({ left: 0, right: 0 });
 
   const measure = useCallback(() => {
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(min-width: 1024px)").matches) {
-      setVideoMarginRight(0);
+      setNavPads({ left: 0, right: 0 });
       return;
     }
     const row = rowRef.current;
     const nav = document.querySelector(".kiss-public-site-header nav");
+    const firstLink = nav?.querySelector("a:first-of-type") as HTMLElement | undefined;
     const lastLink = nav?.querySelector("a:last-of-type") as HTMLElement | undefined;
-    if (!row || !lastLink) {
-      setVideoMarginRight(0);
+    if (!row || !firstLink || !lastLink) {
+      setNavPads({ left: 0, right: 0 });
       return;
     }
-    const rowR = row.getBoundingClientRect().right;
-    const navR = lastLink.getBoundingClientRect().right;
-    setVideoMarginRight(Math.max(0, Math.round(rowR - navR)));
+    const rowRect = row.getBoundingClientRect();
+    const firstL = firstLink.getBoundingClientRect().left;
+    const lastR = lastLink.getBoundingClientRect().right;
+    setNavPads({
+      left: Math.max(0, Math.round(firstL - rowRect.left)),
+      right: Math.max(0, Math.round(rowRect.right - lastR)),
+    });
   }, []);
 
   useEffect(() => {
@@ -83,9 +88,18 @@ export function GlxyHeroLogoVideo({
     };
   }, [measure]);
 
+  const padStyle: CSSProperties | undefined =
+    navPads.left > 0 || navPads.right > 0
+      ? { paddingLeft: navPads.left, paddingRight: navPads.right }
+      : undefined;
+
   return (
-    <div ref={rowRef} className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-center lg:gap-3 xl:gap-4">
-      <div className="flex min-w-0 justify-start lg:justify-end">
+    <div
+      ref={rowRef}
+      className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-4 xl:gap-6"
+      style={padStyle}
+    >
+      <div className="flex min-w-0 shrink justify-start">
         <div className="flex w-full max-w-[min(100%,520px)] flex-col items-start text-left lg:max-w-[min(52vw,520px)]">
           <div className="relative w-full">
             <GlxyHeroLogo src={heroLogoSrc} />
@@ -94,10 +108,7 @@ export function GlxyHeroLogoVideo({
       </div>
 
       {homeHlsSrc ? (
-        <div
-          className="flex min-w-0 justify-start lg:justify-start"
-          style={videoMarginRight > 0 ? ({ marginRight: videoMarginRight } satisfies CSSProperties) : undefined}
-        >
+        <div className="flex min-w-0 shrink-0 justify-end lg:max-w-[min(100%,880px)] lg:flex-1 lg:justify-end">
           <div className="pointer-events-none w-full max-w-[min(100%,880px)] rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
             <div className="pointer-events-auto aspect-video w-full overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
               <HomeHlsEmbed
