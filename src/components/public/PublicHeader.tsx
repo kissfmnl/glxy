@@ -88,7 +88,7 @@ export function PublicHeader({
                       : "border border-transparent text-white/90 hover:text-[var(--brand-primary)]"
                   }`}
                 >
-                  <span>{item.label}</span>
+                  <span className="uppercase tracking-[0.18em]">{item.label}</span>
                 </Link>
               ))}
             </div>
@@ -176,7 +176,7 @@ export function PublicHeader({
                       : "border-white/10 bg-white/5 text-white active:bg-white/10"
                   }`}
                 >
-                  <span className="flex-1 text-left text-sm">{item.label}</span>
+                  <span className="flex-1 text-left text-sm uppercase tracking-[0.18em]">{item.label}</span>
                 </Link>
               ))}
             </nav>

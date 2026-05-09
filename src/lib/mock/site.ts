@@ -28,7 +28,6 @@ export const MOCK_NAV = [
   { href: "/passdeaux", label: "Passdeaux" },
   { href: "/airplay-top-20", label: "Airplay Top 20" },
   { href: "/frequenties", label: "Frequenties" },
-  { href: "/radioplayer", label: "Radioplayer" },
   { href: "/press", label: "Press" },
 ] as const;
 

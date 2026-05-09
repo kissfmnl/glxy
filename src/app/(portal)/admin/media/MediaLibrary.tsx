@@ -36,29 +36,37 @@ export function MediaLibrary({ initial, listError }: { initial: MediaRow[]; list
     if (!file) return;
     setUploading(true);
     setUploadMsg(null);
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await uploadMediaAssetAction(fd);
-    setUploading(false);
-    if (res.error) {
-      setUploadMsg(res.error);
-      return;
-    }
-    if (res.ok && res.url && res.id) {
-      const url = res.url;
-      setItems((prev) => [
-        {
-          id: res.id as string,
-          filename: file.name,
-          publicUrl: url,
-          mimeType: file.type || "image/*",
-          sizeBytes: file.size,
-          createdAt: new Date().toISOString(),
-        },
-        ...prev,
-      ]);
-      setUploadMsg("Geüpload.");
-      router.refresh();
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await uploadMediaAssetAction(fd);
+      if (res?.error) {
+        setUploadMsg(res.error);
+        return;
+      }
+      if (res?.ok && res.url && res.id) {
+        const url = res.url;
+        setItems((prev) => [
+          {
+            id: res.id as string,
+            filename: file.name,
+            publicUrl: url,
+            mimeType: file.type || "image/*",
+            sizeBytes: file.size,
+            createdAt: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
+        setUploadMsg("Geüpload.");
+        router.refresh();
+        return;
+      }
+      setUploadMsg("Upload mislukt (geen resultaat teruggekregen).");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setUploadMsg(msg || "Upload mislukt.");
+    } finally {
+      setUploading(false);
     }
   }
 

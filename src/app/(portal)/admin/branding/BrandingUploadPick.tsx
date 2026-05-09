@@ -27,15 +27,22 @@ export function BrandingUploadPick({
             if (!f) return;
             setBusy(true);
             setErr(null);
-            const fd = new FormData();
-            fd.set("file", f);
-            const res = await uploadMediaAssetAction(fd);
-            setBusy(false);
-            if (res.error) {
-              setErr(res.error);
-              return;
+            try {
+              const fd = new FormData();
+              fd.set("file", f);
+              const res = await uploadMediaAssetAction(fd);
+              if (res?.error) {
+                setErr(res.error);
+                return;
+              }
+              if (res?.url) onUploaded(res.url);
+              else setErr("Upload mislukt (geen URL teruggekregen).");
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : String(err);
+              setErr(msg || "Upload mislukt.");
+            } finally {
+              setBusy(false);
             }
-            if (res.url) onUploaded(res.url);
           }}
         />
         {busy ? "Uploaden…" : label}
