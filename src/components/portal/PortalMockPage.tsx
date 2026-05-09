@@ -48,11 +48,10 @@ export function PortalMockPage() {
   return (
     <PortalPageShell width="wide" className="space-y-6">
       <div className="rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] p-8 shadow-[0_10px_40px_rgba(15,23,42,0.08)]">
-        <p className="text-xs font-black uppercase tracking-[0.25em] text-[var(--brand-primary)]/80">GLXY Radio · statische demo</p>
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-[var(--brand-primary)]/80">GLXY Radio · portaal</p>
         <h1 className="mt-2 text-2xl font-black text-[var(--text-main)] md:text-3xl">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-[var(--text-muted)]">
-          Deze omgeving draait zonder database, authenticatie en achterliggende APIs. Alle voormalige formulieren en workflows zijn hier
-          weggelaten; focust op de frontend / UI van GLXY Radio.
+          Deze pagina is nog in aanbouw. De onderdelen die al werken vind je in het menu (bijv. Huisstijl, Mediabibliotheek, Gebruikers).
         </p>
       </div>
     </PortalPageShell>
