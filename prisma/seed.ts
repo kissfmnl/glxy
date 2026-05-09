@@ -4,38 +4,40 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.branding.upsert({
-    where: { id: 1 },
-    create: {
-      id: 1,
-      primaryHex: "#0b7557",
-      accentHex: "#6d6d6d",
-      navyHex: "#363636",
-      yellowHex: "#ffe200",
-      navItems: [
-        { href: "/", label: "Home" },
-        { href: "/glxy-tv", label: "GLXY TV" },
-        { href: "/playlist", label: "Playlist" },
-        { href: "/adverteren", label: "Adverteren" },
-        { href: "/drop-n-demo", label: "Drop 'n Demo" },
-        { href: "/passdeaux", label: "Passdeaux" },
-        { href: "/airplay-top-20", label: "Airplay Top 20" },
-        { href: "/frequenties", label: "Frequenties" },
-        { href: "/press", label: "Press" },
-      ],
-      instagramUrl: "https://instagram.com",
-      tiktokUrl: "https://www.tiktok.com",
-      menuBarHex: "#0b7557",
-      stationColors: {
-        z1: "#e11d48",
-        z2: "#84cc16",
-        z3: "#facc15",
-        z4: "#7dd3fc",
+  /** Alleen aanmaken als er nog geen branding is — zo overschrijft elke `db seed` géén logo/URLs meer in productie. */
+  const existingBranding = await prisma.branding.findUnique({ where: { id: 1 } });
+  if (!existingBranding) {
+    await prisma.branding.create({
+      data: {
+        id: 1,
+        primaryHex: "#0b7557",
+        accentHex: "#6d6d6d",
+        navyHex: "#363636",
+        yellowHex: "#ffe200",
+        navItems: [
+          { href: "/", label: "Home" },
+          { href: "/glxy-tv", label: "GLXY TV" },
+          { href: "/playlist", label: "Playlist" },
+          { href: "/adverteren", label: "Adverteren" },
+          { href: "/drop-n-demo", label: "Drop 'n Demo" },
+          { href: "/passdeaux", label: "Passdeaux" },
+          { href: "/airplay-top-20", label: "Airplay Top 20" },
+          { href: "/frequenties", label: "Frequenties" },
+          { href: "/press", label: "Press" },
+        ],
+        instagramUrl: "https://instagram.com",
+        tiktokUrl: "https://www.tiktok.com",
+        menuBarHex: "#0b7557",
+        stationColors: {
+          z1: "#e11d48",
+          z2: "#84cc16",
+          z3: "#facc15",
+          z4: "#7dd3fc",
+        },
+        homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
       },
-      homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
-    },
-    update: {},
-  });
+    });
+  }
 
   const email = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD;

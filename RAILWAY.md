@@ -52,7 +52,7 @@ Na de eerste geslaagde seed kun je deze twee verwijderen of leeg laten (veiliger
 
 | Variable | Uitleg |
 |----------|--------|
-| `WEBSITE_FILES_ROOT` | **Aanbevolen voor uploads** (`/admin/media`, logo’s): absoluut pad op de container waar `Website/media/` bewaard blijft (bijv. een Railway **Volume**-mountpunt). Zonder dit blokkeert de app schrijven in productie, tenzij je `ALLOW_EPHEMERAL_WEBSITE_FILES=1` zet (uploads kunnen bij elke deploy/restart weg). |
+| `WEBSITE_FILES_ROOT` | **Aanbevolen voor uploads** (`/admin/media`, logo’s): absoluut pad op de container waar `Website/media/` bewaard blijft (bijv. een Railway **Volume**-mountpunt). Zonder dit blokkeert de app schrijven in productie, tenzij je `ALLOW_EPHEMERAL_WEBSITE_FILES=1` zet (uploads kunnen bij elke deploy/restart weg). Logo-URL’s zoals `/api/media/...` verwijzen naar die bestanden: als ze verdwijnen na een deploy, ontbreekt een **persistent volume** of moet je het logo opnieuw uploaden / een externe URL gebruiken. |
 | `ALLOW_EPHEMERAL_WEBSITE_FILES` | `1` — sta upload toe naar de tijdelijke schijf (niet persistent). Alleen handig om snel te testen. |
 | `NEXT_PUBLIC_GLXY_HLS_URL` | Fallback HLS-URL als branding in de DB niet bereikbaar is. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Uitnodigingsmail; zonder SMTP blijft de **invite-link** in `/admin/gebruikers` kopieerbaar. |
