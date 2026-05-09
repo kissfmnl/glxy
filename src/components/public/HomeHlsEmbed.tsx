@@ -73,11 +73,11 @@ export function HomeHlsEmbed({
   if (!src) return null;
 
   const shell =
-    "relative overflow-hidden rounded-2xl border bg-black/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10";
+    "relative overflow-hidden rounded-lg border bg-black/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10";
   const borderAccent = "border-[var(--brand-primary)]/35";
 
   return (
-    <div className={`${shell} ${borderAccent} ${compact ? "rounded-2xl" : "rounded-3xl"} ${className ?? ""}`}>
+    <div className={`${shell} ${borderAccent} ${compact ? "rounded-lg" : "rounded-xl"} ${className ?? ""}`}>
       <div className="absolute left-3 top-2.5 z-[1] flex flex-wrap items-center gap-1.5 md:left-4 md:top-3">
         <span className="rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm md:text-[10px]">
           Live

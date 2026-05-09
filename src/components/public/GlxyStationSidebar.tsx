@@ -40,7 +40,7 @@ function StationCard({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl px-3 py-2.5 shadow-[0_6px_20px_rgba(0,0,0,0.18)] transition-transform duration-150 hover:scale-[1.01] active:scale-[0.99] ${station.cardClass}`}
+      className={`relative overflow-hidden rounded-md px-3 py-2.5 shadow-[0_6px_20px_rgba(0,0,0,0.18)] transition-transform duration-150 hover:scale-[1.01] active:scale-[0.99] ${station.cardClass}`}
       style={
         station.zebraPattern
           ? {
@@ -60,7 +60,7 @@ function StationCard({
           type="button"
           onClick={onToggle}
           aria-label={playing ? `Pauzeer ${station.line1}` : `Speel ${station.line1}`}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-md ring-2 ring-black/10 transition hover:bg-white/95"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white shadow-md ring-2 ring-black/10 transition hover:bg-white/95"
         >
           {playing ? (
             <span className="flex h-3.5 w-3.5 gap-0.5">
@@ -127,7 +127,7 @@ export function GlxyStationSidebar() {
       </ul>
       <Link
         href="/frequenties"
-        className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#363636] py-3 text-center text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-[#2a2a2a] md:text-xs"
+        className="mt-4 flex w-full items-center justify-center rounded-md bg-[#363636] py-3 text-center text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-[#2a2a2a] md:text-xs"
       >
         Alle zenders
       </Link>

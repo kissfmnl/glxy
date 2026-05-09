@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
-import { NowNextCard } from "@/components/public/NowNextCard";
 import { CurrentShowPanel } from "@/components/public/CurrentShowPanel";
 import { RecentTracksPanel } from "@/components/public/RecentTracksPanel";
 import { ConcertsPanel } from "@/components/public/ConcertsPanel";
@@ -177,7 +176,6 @@ export function HomeWaveLayout({
   /** HLS .m3u8 URL for homepage live embed */
   homeHlsSrc?: string | null;
 }) {
-  const polaroids = uniqueBySrc(trackCovers, 14);
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
 
@@ -257,21 +255,6 @@ export function HomeWaveLayout({
                 </aside>
               ) : null}
             </div>
-          </div>
-
-          {copy.showPolaroids ? <PolaroidStrip items={polaroids} /> : null}
-
-          <div className="mt-10 md:mt-12">
-            <NowNextCard
-              withPlayer
-              variant="hero"
-              disableCardHover
-              labels={{
-                nowPlaying: copy.nowLabel,
-                nextPlaying: copy.nextLabel,
-                live: copy.liveLabel,
-              }}
-            />
           </div>
         </div>
       </section>
