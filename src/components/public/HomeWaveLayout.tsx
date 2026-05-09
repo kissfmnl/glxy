@@ -103,42 +103,43 @@ export function HomeWaveLayout({
         />
 
         <div className="relative z-10 mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8 [isolation:isolate]">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12 xl:gap-14">
-              <div className="flex min-w-0 flex-1 flex-col items-start text-left lg:max-w-[46%]">
-                <div className="relative w-full max-w-[min(100%,420px)]">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center lg:gap-6 xl:gap-8">
+            <div className="flex min-w-0 justify-start lg:justify-end lg:pr-1">
+              <div className="flex w-full max-w-[min(100%,440px)] flex-col items-start text-left lg:max-w-[420px]">
+                <div className="relative w-full">
                   <AppImage
                     src={heroLogoSrc}
                     alt="GLXY"
                     width={720}
                     height={220}
                     priority
-                    className="h-auto w-full max-h-[min(48vw,260px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[220px]"
+                    className="h-auto w-full max-h-[min(44vw,240px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[200px]"
                   />
                 </div>
-                <p className="mt-5 max-w-md text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-white/60 md:text-sm">
+                <p className="mt-4 max-w-md text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-white/60 md:text-sm">
                   Radio. TV. Hits. GLXY.
                 </p>
               </div>
+            </div>
 
-              {homeHlsSrc ? (
-                <div className="w-full shrink-0 lg:w-[min(52%,560px)] lg:max-w-[560px]">
-                  <div className="relative rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
-                    <div className="overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
-                      <HomeHlsEmbed
-                        src={homeHlsSrc}
-                        title="GLXY TV live video"
-                        className="!rounded-none !border-0 !bg-transparent !shadow-none !ring-0"
-                      />
-                    </div>
+            {homeHlsSrc ? (
+              <div className="flex min-w-0 justify-start lg:justify-start lg:pl-1">
+                <div className="pointer-events-none w-full max-w-[800px] rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
+                  <div className="pointer-events-auto aspect-video w-full overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
+                    <HomeHlsEmbed
+                      hero
+                      src={homeHlsSrc}
+                      title="GLXY TV live video"
+                      className="h-full min-h-0 !rounded-none !border-0 !shadow-none !ring-0"
+                    />
                   </div>
                 </div>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
+          </div>
 
-            <div className="mt-14 border-t border-white/10 pt-10 sm:mt-16 sm:pt-12 md:mt-16 md:pt-14">
-              <GlxyStationListenStrip colorOverrides={stationColors} />
-            </div>
+          <div className="mt-20 border-t border-white/10 pt-14 sm:mt-24 sm:pt-16 md:mt-28 md:pt-20">
+            <GlxyStationListenStrip colorOverrides={stationColors} />
           </div>
         </div>
       </section>

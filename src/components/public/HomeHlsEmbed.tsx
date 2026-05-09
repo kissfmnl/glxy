@@ -8,6 +8,8 @@ export function HomeHlsEmbed({
   title,
   compact,
   className,
+  /** Vult een 16:9-frame (parent met aspect-video); video gebruikt object-cover; fullscreen op deze root. */
+  hero,
 }: {
   /** HLS playlist URL (.m3u8) */
   src: string;
@@ -15,8 +17,10 @@ export function HomeHlsEmbed({
   /** Small fixed column / hero sidebar */
   compact?: boolean;
   className?: string;
+  hero?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRootRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const volumeRef = useRef(0.7);
   const [status, setStatus] = useState<"idle" | "playing" | "error">("idle");
@@ -100,34 +104,38 @@ export function HomeHlsEmbed({
 
   if (!src) return null;
 
-  const shell =
-    "relative overflow-hidden rounded-lg border bg-black/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10";
-  const borderAccent = "border-[var(--brand-primary)]/35";
+  const shell = hero
+    ? `relative h-full min-h-0 w-full overflow-hidden rounded-xl bg-black/95 ring-1 ring-white/10 ${className ?? ""}`
+    : `relative overflow-hidden rounded-lg border bg-black/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10 border-[var(--brand-primary)]/35 ${compact ? "rounded-lg" : "rounded-xl"} ${className ?? ""}`;
+
+  const videoClassName = hero
+    ? "absolute inset-0 z-0 h-full w-full bg-black object-cover"
+    : `aspect-video z-0 w-full bg-black object-contain ${
+        compact ? "max-h-[min(42vh,380px)] md:max-h-[min(46vh,420px)]" : "max-h-[min(55vh,520px)]"
+      }`;
 
   return (
-    <div className={`${shell} ${borderAccent} ${compact ? "rounded-lg" : "rounded-xl"} ${className ?? ""}`}>
+    <div className={shell}>
       {status === "error" ? (
         <p className="px-6 py-10 text-center text-sm font-semibold text-white/65">
           De livestream kan in deze browser niet worden afgespeeld. Safari of een recente Chrome/Chromium-desktop helpt vaak het best voor HLS.
         </p>
       ) : (
-        <div className="relative">
+        <div ref={playerRootRef} className={hero ? "absolute inset-0 overflow-hidden" : "relative"}>
           <video
             ref={videoRef}
-            className={`aspect-video w-full bg-black object-contain ${
-              compact ? "max-h-[min(42vh,380px)] md:max-h-[min(46vh,420px)]" : "max-h-[min(55vh,520px)]"
-            }`}
+            className={videoClassName}
             muted={muted}
             autoPlay
             playsInline
             aria-label={title ?? "GLXY live video"}
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
-          <div className="absolute inset-x-3 bottom-3 flex items-center gap-3 md:inset-x-4">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-[2] flex items-center gap-3 md:inset-x-4 [&>*]:pointer-events-auto">
             <button
               type="button"
-              className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
               onClick={() => {
                 const v = videoRef.current;
                 if (!v) return;
@@ -150,7 +158,7 @@ export function HomeHlsEmbed({
               )}
             </button>
 
-            <div className="pointer-events-auto flex min-w-0 flex-1 items-center gap-2 rounded-md bg-white/10 px-3 py-2 ring-1 ring-white/15 backdrop-blur">
+            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md bg-white/10 px-3 py-2 ring-1 ring-white/15 backdrop-blur">
               <svg className="h-4 w-4 text-white/85" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zm0-9v2.06a9 9 0 0 1 0 13.88V21a11 11 0 0 0 0-18z" />
               </svg>
@@ -172,16 +180,32 @@ export function HomeHlsEmbed({
 
             <button
               type="button"
-              className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
               onClick={async () => {
-                const wrap = videoRef.current?.parentElement;
-                if (!wrap) return;
-                const doc: any = document;
-                if (doc.fullscreenElement) {
-                  await doc.exitFullscreen?.().catch(() => {});
-                  return;
+                const root = playerRootRef.current;
+                if (!root) return;
+                try {
+                  const doc = document as Document & {
+                    webkitFullscreenElement?: Element | null;
+                    webkitExitFullscreen?: () => Promise<void>;
+                  };
+                  const fsEl =
+                    document.fullscreenElement ??
+                    doc.webkitFullscreenElement ??
+                    (document as unknown as { mozFullScreenElement?: Element | null }).mozFullScreenElement;
+                  if (fsEl) {
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    else await doc.webkitExitFullscreen?.();
+                    return;
+                  }
+                  if (root.requestFullscreen) await root.requestFullscreen();
+                  else {
+                    const r = root as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> };
+                    await r.webkitRequestFullscreen?.();
+                  }
+                } catch {
+                  /* fullscreen niet beschikbaar */
                 }
-                await (wrap as any).requestFullscreen?.().catch(() => {});
               }}
               aria-label="Fullscreen"
             >
