@@ -9,7 +9,7 @@ import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
 import type { HomeWaveCopy } from "@/types/home-wave";
 import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
 import AppImage from "@/components/AppImage";
-import { GlxyStationSidebar } from "@/components/public/GlxyStationSidebar";
+import { GlxyStationListenStrip } from "@/components/public/GlxyStationListenStrip";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -102,50 +102,49 @@ export function HomeWaveLayout({
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto max-w-[1500px] px-3.5 sm:px-4 md:px-8 [isolation:isolate]">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-12">
-            <div
-              className={`order-1 flex flex-col items-center justify-center lg:justify-start ${
-                homeHlsSrc ? "lg:order-2 lg:col-span-4 lg:pt-2" : "lg:order-1 lg:col-span-7 lg:justify-center lg:pt-4"
-              }`}
-            >
-              <div className="relative w-full max-w-[min(92vw,480px)] lg:max-w-none">
-                <AppImage
-                  src={heroLogoSrc}
-                  alt="GLXY"
-                  width={720}
-                  height={220}
-                  priority
-                  className="mx-auto h-auto w-full max-h-[min(44vw,260px)] object-contain object-center lg:max-h-[min(28vw,240px)] [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))]"
-                />
+        <div className="relative z-10 mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8 [isolation:isolate]">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12 xl:gap-14">
+              <div className="flex min-w-0 flex-1 flex-col items-start text-left lg:max-w-[46%]">
+                <div className="relative w-full max-w-[min(100%,420px)]">
+                  <AppImage
+                    src={heroLogoSrc}
+                    alt="GLXY"
+                    width={720}
+                    height={220}
+                    priority
+                    className="h-auto w-full max-h-[min(48vw,260px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[220px]"
+                  />
+                </div>
+                <p className="mt-5 max-w-md text-left text-[13px] font-semibold uppercase tracking-[0.14em] text-white/60 md:text-sm">
+                  Radio. TV. Hits. GLXY.
+                </p>
               </div>
-            </div>
 
-            {homeHlsSrc ? (
-              <div className="order-2 w-full lg:order-3 lg:col-span-5 lg:sticky lg:top-[5rem] lg:z-20 xl:col-span-5">
-                <div className="relative rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
-                  <div className="overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
-                    <HomeHlsEmbed
-                      src={homeHlsSrc}
-                      title="GLXY TV live video"
-                      className="!rounded-none !border-0 !bg-transparent !shadow-none !ring-0"
-                    />
+              {homeHlsSrc ? (
+                <div className="w-full shrink-0 lg:w-[min(52%,560px)] lg:max-w-[560px]">
+                  <div className="relative rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
+                    <div className="overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
+                      <HomeHlsEmbed
+                        src={homeHlsSrc}
+                        title="GLXY TV live video"
+                        className="!rounded-none !border-0 !bg-transparent !shadow-none !ring-0"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
 
-            <div
-              className={`order-3 min-w-0 ${homeHlsSrc ? "lg:order-1 lg:col-span-3" : "lg:order-2 lg:col-span-5"}`}
-            >
-              <GlxyStationSidebar colorOverrides={stationColors} />
+            <div className="mt-14 border-t border-white/10 pt-10 sm:mt-16 sm:pt-12 md:mt-16 md:pt-14">
+              <GlxyStationListenStrip colorOverrides={stationColors} />
             </div>
           </div>
         </div>
       </section>
 
       <section className="relative flex-1 overflow-x-hidden bg-gradient-to-b from-[#dce6ef] via-[#d5e0ea] to-[#cad8e6] pt-8 md:pt-10 pb-12 md:pb-16">
-        <div className="max-w-6xl mx-auto px-3.5 sm:px-4 md:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
           <div className="grid lg:grid-cols-[1fr_290px] xl:grid-cols-[1fr_320px] gap-6 md:gap-8 xl:gap-8 items-start">
             <div className="min-w-0 flex flex-col gap-6 md:gap-8">
               {(copy.showCurrentShowPanel || copy.showRecentTracksPanel) ? (

@@ -21,21 +21,21 @@ export type GlxyStation = {
 export const GLXY_STATIONS: GlxyStation[] = [
   {
     id: "z1",
-    line1: "GLXY MAIN",
-    line2: "Live · jouw hits",
+    line1: "GLXY Main",
+    line2: "Live · Jouw hits",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     cardClass: "bg-[#e11d48] text-white",
   },
   {
     id: "z2",
-    line1: "GLXY NON-STOP",
+    line1: "GLXY Non-Stop",
     line2: "Non-stop muziek",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
     cardClass: "bg-[#84cc16] text-[#1e293b]",
   },
   {
     id: "z3",
-    line1: "GLXY GOLF",
+    line1: "GLXY Golf",
     line2: "Andere vibe",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
     /** Geel met subtiel patroon via component */
@@ -44,7 +44,7 @@ export const GLXY_STATIONS: GlxyStation[] = [
   },
   {
     id: "z4",
-    line1: "GLXY TOP 40",
+    line1: "GLXY Top 40",
     line2: "De grootste hits",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     cardClass: "bg-[#7dd3fc] text-[#0f172a]",
