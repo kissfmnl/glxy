@@ -54,7 +54,7 @@ export default function Sidebar() {
   function section(title: string, items: Nav[]) {
     return (
       <div className="space-y-1 px-3">
-        <p className="px-4 pt-4 pb-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{title}</p>
+        <p className="px-4 pt-4 pb-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">{title}</p>
         {items.map((item) => (
           <Link
             key={item.href}
@@ -63,7 +63,7 @@ export default function Sidebar() {
             className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${
               active(item.href)
                 ? "bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30"
-                : "text-white/70 hover:bg-white/5 hover:text-white"
+                : "text-[var(--text-main)]/80 hover:bg-black/5 hover:text-[var(--text-main)]"
             }`}
           >
             {item.label}
@@ -78,7 +78,7 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className={`fixed left-3 top-3 z-[70] flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/70 text-white shadow-lg backdrop-blur lg:hidden ${mobileOpen ? "hidden" : ""}`}
+        className={`fixed left-3 top-3 z-[70] flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white/85 text-[var(--text-main)] shadow-lg backdrop-blur lg:hidden ${mobileOpen ? "hidden" : ""}`}
         aria-label="Open menu"
       >
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,22 +87,27 @@ export default function Sidebar() {
       </button>
 
       {mobileOpen ? (
-        <button type="button" className="fixed inset-0 z-[48] bg-black/70 backdrop-blur-sm lg:hidden" aria-label="Close" onClick={() => setMobileOpen(false)} />
+        <button
+          type="button"
+          className="fixed inset-0 z-[48] bg-black/25 backdrop-blur-sm lg:hidden"
+          aria-label="Close"
+          onClick={() => setMobileOpen(false)}
+        />
       ) : null}
 
       <aside
-        className={`fixed left-0 top-0 z-[50] flex h-screen w-64 flex-col overflow-y-auto border-r border-white/10 bg-[#070b14]/95 backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-[50] flex h-screen w-64 flex-col overflow-y-auto border-r border-black/10 bg-[var(--bg-sidebar)] backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
-          <Link href="/dashboard" className="font-black tracking-tight text-white" onClick={() => setMobileOpen(false)}>
+        <div className="flex items-center justify-between border-b border-black/10 px-4 py-4">
+          <Link href="/dashboard" className="font-black tracking-tight text-[var(--text-main)]" onClick={() => setMobileOpen(false)}>
             <span className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] bg-clip-text text-lg text-transparent">GLXY</span>
-            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/50">Radio</span>
+            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">Radio</span>
           </Link>
           <button
             type="button"
-            className="rounded-lg border border-white/15 px-2 py-1 text-xs font-black text-white/80 lg:hidden"
+            className="rounded-lg border border-black/10 bg-white/60 px-2 py-1 text-xs font-black text-[var(--text-main)]/80 hover:bg-white/80 lg:hidden"
             onClick={() => setMobileOpen(false)}
           >
             ✕
@@ -115,16 +120,16 @@ export default function Sidebar() {
           {isAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
         </div>
 
-        <div className="border-t border-white/10 p-4 space-y-3">
+        <div className="border-t border-black/10 p-4 space-y-3">
           {status === "authenticated" ? (
             <div className="space-y-1">
-              <p className="text-[11px] font-black text-white/80 truncate" title={session?.user?.email ?? ""}>
+              <p className="text-[11px] font-black text-[var(--text-main)] truncate" title={session?.user?.email ?? ""}>
                 {session?.user?.email}
               </p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">{session?.user?.role ?? ""}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">{session?.user?.role ?? ""}</p>
               <button
                 type="button"
-                className="mt-2 w-full rounded-xl border border-white/15 py-2 text-xs font-black text-white/85 hover:bg-white/5"
+                className="mt-2 w-full rounded-xl border border-black/10 bg-white/70 py-2 text-xs font-black text-[var(--text-main)]/90 hover:bg-white"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
                 Uitloggen

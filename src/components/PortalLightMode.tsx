@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 
-/** Demo portal stays in dark neon (matches GLXY public). */
+/** Portal should default to light UI (public site has its own theme). */
 export function PortalLightMode() {
   useEffect(() => {
-    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("dark");
   }, []);
   return null;
 }

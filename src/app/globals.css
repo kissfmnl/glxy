@@ -47,6 +47,23 @@
   }
 }
 
+@layer base {
+  /* Portal/admin/dashboard: use a light surface, independent of public pages. */
+  .portal-main {
+    --bg-dark: #f4f7fb;
+    --bg-card: rgba(255, 255, 255, 0.92);
+    --bg-sidebar: rgba(255, 255, 255, 0.92);
+    --border-color: rgba(30, 55, 90, 0.14);
+    --text-main: #0f172a;
+    --text-muted: #475569;
+  }
+
+  .portal-main .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+  }
+}
+
 @layer components {
   /* ==========================================
      Kaart / Widget basisstijl
