@@ -80,7 +80,7 @@ export function PublicHeader({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`kiss-public-nav-link inline-flex items-center px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.22em] text-white/95 transition-colors ${
+                    className={`kiss-public-nav-link glxy-condensed inline-flex items-center px-2.5 py-1 text-[12px] text-white/95 transition-colors ${
                       isActive(item.href) ? "bg-white/15" : "hover:bg-white/10"
                     }`}
                   >

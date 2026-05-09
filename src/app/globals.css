@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -44,6 +44,16 @@
 
   * {
     box-sizing: border-box;
+  }
+}
+
+@layer base {
+  /* Condensed, bold display style (zoals GLXY “BANGERS”). */
+  .glxy-condensed {
+    font-family: 'Oswald', 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
   }
 }
 
