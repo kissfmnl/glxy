@@ -72,7 +72,7 @@ export function PublicHeader({
       <header className="kiss-public-site-header fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#070a14]/92 backdrop-blur-md">
         <div className="w-full">
           {/* Top menu bar (grijs) */}
-          <div className="hidden lg:block border-b border-black/15" style={{ backgroundColor: "var(--brand-accent)" }}>
+          <div className="hidden lg:block border-b border-black/15" style={{ backgroundColor: "var(--brand-primary)" }}>
             <div className="mx-auto grid w-full max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-2.5 sm:px-6 md:px-8">
               <div />
               <nav className="flex min-w-0 items-center justify-center gap-1.5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

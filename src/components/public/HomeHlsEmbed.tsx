@@ -78,17 +78,6 @@ export function HomeHlsEmbed({
 
   return (
     <div className={`${shell} ${borderAccent} ${compact ? "rounded-lg" : "rounded-xl"} ${className ?? ""}`}>
-      <div className="absolute left-3 top-2.5 z-[1] flex flex-wrap items-center gap-1.5 md:left-4 md:top-3">
-        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm md:text-[10px]">
-          Live
-        </span>
-        <span className="rounded-full bg-[var(--brand-navy)]/90 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--brand-yellow)] backdrop-blur md:text-[10px]">
-          GLXY TV
-        </span>
-        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white/90 backdrop-blur md:text-[10px]">
-          Geluid uit
-        </span>
-      </div>
       {status === "error" ? (
         <p className="px-6 py-10 text-center text-sm font-semibold text-white/65">
           De livestream kan in deze browser niet worden afgespeeld. Safari of een recente Chrome/Chromium-desktop helpt vaak het best voor HLS.
@@ -99,7 +88,6 @@ export function HomeHlsEmbed({
           className={`aspect-video w-full bg-black object-contain ${
             compact ? "max-h-[min(42vh,380px)] md:max-h-[min(46vh,420px)]" : "max-h-[min(55vh,520px)]"
           }`}
-          controls
           muted
           autoPlay
           playsInline

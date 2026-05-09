@@ -130,11 +130,8 @@ export function HomeWaveLayout({
               </div>
 
               {homeHlsSrc ? (
-                <aside className="order-1 w-full lg:order-3 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,420px)] lg:min-w-[300px] lg:max-w-[440px] lg:shrink-0 xl:top-[5.5rem]">
-                  <p className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.28em] text-[#7fe8e8]/95 lg:text-right">
-                    GLXY TV · Live meekijken
-                  </p>
-                  <HomeHlsEmbed compact src={homeHlsSrc} title="GLXY TV live video" className="shadow-[0_20px_60px_rgba(0,0,0,0.55)]" />
+                <aside className="order-1 w-full lg:order-3 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,560px)] lg:min-w-[380px] lg:max-w-[620px] lg:shrink-0 xl:top-[5.5rem]">
+                  <HomeHlsEmbed src={homeHlsSrc} title="GLXY TV live video" className="shadow-[0_20px_60px_rgba(0,0,0,0.55)]" />
                 </aside>
               ) : null}
             </div>

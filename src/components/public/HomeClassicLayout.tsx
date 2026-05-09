@@ -11,7 +11,6 @@ export function HomeClassicLayout({ homeHlsSrc }: { homeHlsSrc?: string | null }
         <div className="relative z-10 mx-auto w-full min-w-0 max-w-[1500px] px-4 pb-7 md:px-8 md:pb-10">
           {homeHlsSrc ? (
             <div className="mb-8 lg:hidden">
-              <p className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600/95">GLXY TV · Live</p>
               <HomeHlsEmbed compact src={homeHlsSrc} title="GLXY TV live video" />
             </div>
           ) : null}
@@ -24,9 +23,6 @@ export function HomeClassicLayout({ homeHlsSrc }: { homeHlsSrc?: string | null }
             <div className="relative z-30 hidden min-w-0 flex-col gap-8 lg:flex lg:sticky lg:top-28 lg:self-start xl:top-[7rem]">
               {homeHlsSrc ? (
                 <div>
-                  <p className="mb-2 text-right text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600/95">
-                    GLXY TV · Live meekijken
-                  </p>
                   <HomeHlsEmbed compact src={homeHlsSrc} title="GLXY TV live video" />
                 </div>
               ) : null}
