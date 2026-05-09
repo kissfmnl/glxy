@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
 import { CurrentShowPanel } from "@/components/public/CurrentShowPanel";
 import { RecentTracksPanel } from "@/components/public/RecentTracksPanel";
@@ -7,42 +6,12 @@ import { ActionsPanel } from "@/components/public/ActionsPanel";
 import { SocialProfilePanel } from "@/components/public/SocialProfilePanel";
 import { AppDownloadPopup } from "@/components/public/AppDownloadPopup";
 import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
-import { heroTitleColorStyle } from "@/lib/heroTitleColor";
-import type { HeroTitleLayout, HomeWaveCopy } from "@/types/home-wave";
-import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
+import type { HomeWaveCopy } from "@/types/home-wave";
 import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
 import AppImage from "@/components/AppImage";
 import { GlxyStationSidebar } from "@/components/public/GlxyStationSidebar";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
-
-function uniqueBySrc(tiles: HomeImageTile[], max: number): HomeImageTile[] {
-  const seen = new Set<string>();
-  const out: HomeImageTile[] = [];
-  for (const t of tiles) {
-    if (!t.src || seen.has(t.src)) continue;
-    seen.add(t.src);
-    out.push(t);
-    if (out.length >= max) break;
-  }
-  return out;
-}
-
-// Hero headline removed per design (cleaner hero: zenders + video).
-
-/** Alleen zachte fade rechts; volle dekking boven/onder (geen verticale uitfranje). */
-const POLAROID_FADE_MASK: CSSProperties = {
-  maskImage:
-    "linear-gradient(to right, black 0%, black 86%, rgba(0,0,0,0.28) 93%, rgba(0,0,0,0.06) 98%, transparent 100%)",
-  WebkitMaskImage:
-    "linear-gradient(to right, black 0%, black 86%, rgba(0,0,0,0.28) 93%, rgba(0,0,0,0.06) 98%, transparent 100%)",
-  maskRepeat: "no-repeat",
-  WebkitMaskRepeat: "no-repeat",
-  maskSize: "100% 100%",
-  WebkitMaskSize: "100% 100%",
-};
-
-// Polaroid strip removed per design.
 
 function VoicesSidebar({ title, djs, maxItems }: { title: string; djs: HomeImageTile[]; maxItems: number }) {
   const list = djs.filter((d) => d.src).slice(0, Math.max(4, maxItems));
@@ -86,6 +55,7 @@ export function HomeWaveLayout({
   djPhotos = [],
   homeHlsSrc,
   stationColors,
+  heroLogoUrl,
 }: {
   copy: HomeWaveCopy;
   heroBackdropSlides: { src: string }[];
@@ -94,46 +64,81 @@ export function HomeWaveLayout({
   /** HLS .m3u8 URL for homepage live embed */
   homeHlsSrc?: string | null;
   stationColors?: Record<string, string> | null;
+  /** Admin-uploaded logo; valt terug op `/glxy-hero-logo-fallback.svg` */
+  heroLogoUrl?: string | null;
 }) {
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
+  const heroLogoSrc = heroLogoUrl?.trim() ? heroLogoUrl.trim() : "/glxy-hero-logo-fallback.svg";
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 min-w-0 max-w-full w-full">
-      <section className="relative z-10 -mt-16 md:-mt-[4.5rem] overflow-visible bg-[#0c1f33] pb-6 pt-24 shadow-[0_12px_40px_rgba(12,31,51,0.22)] sm:pb-8 md:pb-14 md:pt-28">
+      <section className="relative z-10 -mt-16 md:-mt-[4.5rem] overflow-visible bg-[#060a14] pb-10 pt-[5.25rem] shadow-[0_24px_70px_rgba(4,8,20,0.5)] sm:pb-12 md:pb-16 md:pt-28 lg:pt-32">
         <div className="absolute inset-0 overflow-hidden">
           <HomeHeroBackdrop slides={heroBackdropSlides} motionEnabled={copy.heroBackdropMotion} />
         </div>
         <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-[#0c1f33]/40 sm:bg-[#0c1f33]/38"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[#050912]/58"
           style={{
-            WebkitBackdropFilter: "blur(10px)",
-            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(12px)",
+            backdropFilter: "blur(12px)",
           }}
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#0c1f33]/72 via-[#142a45]/50 to-[#1e375a]/58"
+          className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#050912]/94 via-[#071520]/82 to-[#0c2238]/90"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_70%_42%_at_50%_0%,rgba(55,191,191,0.07),transparent_50%)]"
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_95%_58%_at_72%_10%,rgba(11,117,87,0.32),transparent_58%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_52%_48%_at_10%_85%,rgba(34,211,238,0.15),transparent_56%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_55%_42%_at_48%_52%,rgba(192,132,252,0.08),transparent_62%)]"
           aria-hidden
         />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-3.5 sm:px-4 md:px-8 [isolation:isolate]">
-          <div className={`min-w-0 ${PUBLIC_PAGE_INTRO}`}>
-            {/* Mobiel: TV eerst (als aanwezig), dan zenders, dan kop. Desktop: zenders | kop | TV (sticky rechts). */}
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8 xl:gap-10">
-              <div className="order-2 min-w-0 shrink-0 lg:order-1 lg:max-w-[280px] xl:max-w-[288px]">
-                <GlxyStationSidebar colorOverrides={stationColors} />
+        <div className="relative z-10 mx-auto max-w-[1500px] px-3.5 sm:px-4 md:px-8 [isolation:isolate]">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-12">
+            <div
+              className={`order-1 flex flex-col items-center justify-center lg:justify-start ${
+                homeHlsSrc ? "lg:order-2 lg:col-span-4 lg:pt-2" : "lg:order-1 lg:col-span-7 lg:justify-center lg:pt-4"
+              }`}
+            >
+              <div className="relative w-full max-w-[min(92vw,480px)] lg:max-w-none">
+                <AppImage
+                  src={heroLogoSrc}
+                  alt="GLXY"
+                  width={720}
+                  height={220}
+                  priority
+                  className="mx-auto h-auto w-full max-h-[min(44vw,260px)] object-contain object-center lg:max-h-[min(28vw,240px)] [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))]"
+                />
               </div>
+            </div>
 
-              {homeHlsSrc ? (
-                <aside className="order-1 w-full lg:order-3 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,560px)] lg:min-w-[380px] lg:max-w-[620px] lg:shrink-0 xl:top-[5.5rem]">
-                  <HomeHlsEmbed src={homeHlsSrc} title="GLXY TV live video" className="shadow-[0_20px_60px_rgba(0,0,0,0.55)]" />
-                </aside>
-              ) : null}
+            {homeHlsSrc ? (
+              <div className="order-2 w-full lg:order-3 lg:col-span-5 lg:sticky lg:top-[5rem] lg:z-20 xl:col-span-5">
+                <div className="relative rounded-2xl bg-gradient-to-br from-cyan-300/50 via-emerald-700/45 to-fuchsia-400/38 p-[1px] shadow-[0_0_56px_rgba(11,117,87,0.34),0_28px_56px_rgba(0,0,0,0.38)]">
+                  <div className="overflow-hidden rounded-2xl bg-black/55 ring-1 ring-white/12">
+                    <HomeHlsEmbed
+                      src={homeHlsSrc}
+                      title="GLXY TV live video"
+                      className="!rounded-none !border-0 !bg-transparent !shadow-none !ring-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            <div
+              className={`order-3 min-w-0 ${homeHlsSrc ? "lg:order-1 lg:col-span-3" : "lg:order-2 lg:col-span-5"}`}
+            >
+              <GlxyStationSidebar colorOverrides={stationColors} />
             </div>
           </div>
         </div>

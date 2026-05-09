@@ -1,5 +1,6 @@
 import { PublicThemeGuard } from "@/components/public/PublicThemeGuard";
 import { PublicHeader } from "@/components/public/PublicHeader";
+import { PublicMain } from "@/components/public/PublicMain";
 import { PublicMiniPlayer } from "@/components/public/PublicMiniPlayer";
 import { CookieNotice } from "@/components/public/CookieNotice";
 import { PublicTabTitle } from "@/components/public/PublicTabTitle";
@@ -39,9 +40,7 @@ export default async function PublicLayout({ children }: { children: React.React
         navItems={navItems}
         logoUrl={branding.logoUrl}
       />
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pt-16 lg:pt-[6.75rem]">
-        {children}
-      </main>
+      <PublicMain>{children}</PublicMain>
       <CookieNotice enabled={ui.showCookieBanner} text={ui.cookieBannerText} cta={ui.cookieBannerCta} />
       <PublicMiniPlayer />
 

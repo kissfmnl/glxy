@@ -36,6 +36,7 @@ export default async function PublicHomePage() {
       djPhotos={djPhotos}
       homeHlsSrc={homeHlsSrc}
       stationColors={branding.stationColors as any}
+      heroLogoUrl={branding.logoUrl}
     />
   );
 }

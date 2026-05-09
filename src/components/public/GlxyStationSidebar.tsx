@@ -42,7 +42,7 @@ function StationCard({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-md px-3 py-2.5 shadow-[0_6px_20px_rgba(0,0,0,0.18)] transition-transform duration-150 hover:scale-[1.01] active:scale-[0.99] ${station.cardClass}`}
+      className={`group relative overflow-hidden rounded-md px-3 py-2.5 shadow-[0_6px_20px_rgba(0,0,0,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] hover:brightness-[1.06] hover:shadow-[0_14px_38px_rgba(11,117,87,0.38)] active:scale-[0.99] ${station.cardClass}`}
       style={
         station.zebraPattern
           ? {
@@ -119,7 +119,7 @@ export function GlxyStationSidebar({ colorOverrides }: { colorOverrides?: Record
 
   return (
     <aside className="w-full shrink-0 lg:w-[min(100%,268px)] xl:w-[280px]">
-      <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.25em] text-[#6d6d6d] md:text-[11px] lg:text-[#363636]">
+      <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 md:text-[11px]">
         Luister naar
       </p>
       <audio ref={audioRef} className="hidden" preload="none" playsInline />
@@ -137,7 +137,7 @@ export function GlxyStationSidebar({ colorOverrides }: { colorOverrides?: Record
       </ul>
       <Link
         href="/frequenties"
-        className="mt-4 flex w-full items-center justify-center rounded-md bg-[#363636] py-3 text-center text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-[#2a2a2a] md:text-xs"
+        className="mt-4 flex w-full items-center justify-center rounded-md border border-white/10 bg-[#363636]/90 py-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-white shadow-lg backdrop-blur-sm transition hover:border-[var(--brand-primary)]/40 hover:bg-[#2a2a2a] hover:brightness-110 md:text-xs"
       >
         Alle zenders
       </Link>

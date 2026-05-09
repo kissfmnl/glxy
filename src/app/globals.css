@@ -658,7 +658,7 @@ input[type="range"] {
 
 @media (hover: hover) {
   .kiss-public-top-nav-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-1.5px);
   }
 
   .kiss-public-top-nav-item:hover .kiss-public-top-nav-underline {

@@ -37,6 +37,7 @@ export function PublicHeader({
   logoUrl?: string | null;
 }) {
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuClosing, setMenuClosing] = useState(false);
 
@@ -73,10 +74,8 @@ export function PublicHeader({
         <div className="w-full">
           {/* Top menu bar: brandkleur + semi-transparante navy-laag */}
           <div
-            className="hidden lg:block border-b border-white/10 backdrop-blur-md"
-            style={{
-              backgroundImage: `linear-gradient(180deg, rgba(7, 12, 28, 0.58) 0%, rgba(6, 10, 22, 0.48) 100%), linear-gradient(180deg, var(--glxy-menu-bar, var(--brand-primary)), var(--glxy-menu-bar, var(--brand-primary)))`,
-            }}
+            className="hidden lg:block border-b border-black/10"
+            style={{ backgroundColor: "var(--glxy-menu-bar, var(--brand-primary))" }}
           >
             <div className="mx-auto grid w-full max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-2.5 sm:px-6 md:px-8">
               <div />
@@ -121,14 +120,20 @@ export function PublicHeader({
             </div>
           </div>
 
-          {/* Logo row */}
-          <div className="relative mx-auto flex h-16 w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 md:h-[4.5rem] md:gap-4 md:px-8">
-            <Link
-              href="/"
-              className="kiss-public-nav-logo relative z-[1] ml-3 flex min-w-0 shrink-0 touch-manipulation items-center outline-none md:ml-0"
-            >
-              <BrandLockup logoUrl={logoUrl} className="text-lg sm:text-xl md:text-2xl" />
-            </Link>
+          {/* Logo row: op homepage staat het merklogo in de hero — deze rij alleen mobiel / niet-home */}
+          <div
+            className={`relative mx-auto flex h-16 w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 md:h-[4.5rem] md:gap-4 md:px-8 ${isHome ? "lg:hidden" : ""}`}
+          >
+            {!isHome ? (
+              <Link
+                href="/"
+                className="kiss-public-nav-logo relative z-[1] ml-3 flex min-w-0 shrink-0 touch-manipulation items-center outline-none md:ml-0"
+              >
+                <BrandLockup logoUrl={logoUrl} className="text-lg sm:text-xl md:text-2xl" />
+              </Link>
+            ) : (
+              <span className="relative z-[1] ml-3 min-w-0 flex-1 md:ml-0 lg:hidden" aria-hidden />
+            )}
 
             <div className="relative z-[1] flex shrink-0 items-center justify-end gap-2">
               <button
