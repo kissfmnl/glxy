@@ -22,6 +22,14 @@ const FALLBACK = {
     { href: "/frequenties", label: "Frequenties" },
     { href: "/press", label: "Press" },
   ],
+  instagramUrl: "https://instagram.com",
+  tiktokUrl: "https://www.tiktok.com",
+  stationColors: {
+    z1: "#e11d48",
+    z2: "#84cc16",
+    z3: "#facc15",
+    z4: "#7dd3fc",
+  },
   homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
 };
 
@@ -50,6 +58,12 @@ export default async function AdminBrandingPage() {
         logoUrl: row.logoUrl ?? "",
         faviconUrl: row.faviconUrl ?? "",
         navItems,
+        instagramUrl: row.instagramUrl ?? FALLBACK.instagramUrl,
+        tiktokUrl: row.tiktokUrl ?? FALLBACK.tiktokUrl,
+        stationColors:
+          row.stationColors && typeof row.stationColors === "object" && !Array.isArray(row.stationColors)
+            ? (row.stationColors as any)
+            : FALLBACK.stationColors,
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,
       };
     }

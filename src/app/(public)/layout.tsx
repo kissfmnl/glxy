@@ -19,6 +19,8 @@ export default async function PublicLayout({ children }: { children: React.React
   const ui = MOCK_PUBLIC_UI;
   const branding = await getBranding();
   const navItems = (branding.navItems?.length ? branding.navItems : [...MOCK_NAV]) as Array<{ href: string; label: string }>;
+  const instagramUrl = branding.instagramUrl || MOCK_SOCIAL.instagramUrl;
+  const tiktokUrl = branding.tiktokUrl || MOCK_SOCIAL.tiktokUrl;
 
   return (
     <div
@@ -32,8 +34,8 @@ export default async function PublicLayout({ children }: { children: React.React
       <PublicTabTitle title={ui.tabTitle} />
       <PublicThemeGuard />
       <PublicHeader
-        instagramUrl={MOCK_SOCIAL.instagramUrl}
-        tiktokUrl={MOCK_SOCIAL.tiktokUrl}
+        instagramUrl={instagramUrl}
+        tiktokUrl={tiktokUrl}
         navItems={navItems}
         logoUrl={branding.logoUrl}
       />

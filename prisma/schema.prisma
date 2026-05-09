@@ -47,6 +47,11 @@ model Branding {
   faviconUrl String?
   /// Publiek menu items (volgorde/editable)
   navItems   Json?
+  /// Social links voor header icons
+  instagramUrl String?
+  tiktokUrl    String?
+  /// Zenderkleuren override (id -> bgHex of {bgHex,textHex})
+  stationColors Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

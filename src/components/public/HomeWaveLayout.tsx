@@ -85,6 +85,7 @@ export function HomeWaveLayout({
   trackCovers = [],
   djPhotos = [],
   homeHlsSrc,
+  stationColors,
 }: {
   copy: HomeWaveCopy;
   heroBackdropSlides: { src: string }[];
@@ -92,6 +93,7 @@ export function HomeWaveLayout({
   djPhotos?: HomeImageTile[];
   /** HLS .m3u8 URL for homepage live embed */
   homeHlsSrc?: string | null;
+  stationColors?: Record<string, string> | null;
 }) {
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
@@ -124,7 +126,7 @@ export function HomeWaveLayout({
             {/* Mobiel: TV eerst (als aanwezig), dan zenders, dan kop. Desktop: zenders | kop | TV (sticky rechts). */}
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8 xl:gap-10">
               <div className="order-2 min-w-0 shrink-0 lg:order-1 lg:max-w-[280px] xl:max-w-[288px]">
-                <GlxyStationSidebar />
+                <GlxyStationSidebar colorOverrides={stationColors} />
               </div>
 
               {homeHlsSrc ? (

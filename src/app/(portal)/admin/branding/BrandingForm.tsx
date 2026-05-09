@@ -12,6 +12,9 @@ type Defaults = {
   logoUrl: string;
   faviconUrl: string;
   navItems: Array<{ href: string; label: string }>;
+  instagramUrl: string;
+  tiktokUrl: string;
+  stationColors: Record<string, string>;
   homeHlsUrl: string;
 };
 
@@ -28,6 +31,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [logoUrl, setLogoUrl] = useState(defaults.logoUrl);
   const [faviconUrl, setFaviconUrl] = useState(defaults.faviconUrl);
   const [navItems, setNavItems] = useState<Array<{ href: string; label: string }>>(defaults.navItems ?? []);
+  const [instagramUrl, setInstagramUrl] = useState(defaults.instagramUrl ?? "");
+  const [tiktokUrl, setTiktokUrl] = useState(defaults.tiktokUrl ?? "");
+  const [stationColors, setStationColors] = useState<Record<string, string>>(defaults.stationColors ?? {});
 
   return (
     <form
@@ -37,6 +43,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         fd.set("logoUrl", logoUrl);
         fd.set("faviconUrl", faviconUrl);
         fd.set("navItemsJson", JSON.stringify(navItems));
+        fd.set("instagramUrl", instagramUrl);
+        fd.set("tiktokUrl", tiktokUrl);
+        fd.set("stationColorsJson", JSON.stringify(stationColors));
         setBusy(true);
         setMsg(null);
         const res = await updateBrandingAction(fd);
@@ -139,6 +148,31 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       </div>
 
       <div className="border-t border-white/10 pt-5">
+        <h2 className="text-lg font-black text-[var(--text-main)]">Social icons</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">Deze links worden gebruikt voor de iconen in de header.</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="block text-xs font-semibold text-[var(--text-muted)]">
+          Instagram URL
+          <input
+            value={instagramUrl}
+            onChange={(e) => setInstagramUrl(e.target.value)}
+            placeholder="https://instagram.com/…"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+        <label className="block text-xs font-semibold text-[var(--text-muted)]">
+          TikTok URL
+          <input
+            value={tiktokUrl}
+            onChange={(e) => setTiktokUrl(e.target.value)}
+            placeholder="https://tiktok.com/…"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+      </div>
+
+      <div className="border-t border-white/10 pt-5">
         <h2 className="text-lg font-black text-[var(--text-main)]">Homepage livestream (HLS)</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">Standaard geluid uit, video speelt gemute mee waar de browser het toelaat.</p>
       </div>
@@ -150,6 +184,26 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
           className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
         />
       </label>
+
+      <div className="border-t border-white/10 pt-5">
+        <h2 className="text-lg font-black text-[var(--text-main)]">Zenders (kleuren)</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Alleen kleuren voor de zenderkaarten links op de homepage. Gebruik hex (bijv. <code className="text-[var(--brand-yellow)]">#e11d48</code>).
+        </p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {["z1", "z2", "z3", "z4"].map((id) => (
+          <label key={id} className="block text-xs font-semibold text-[var(--text-muted)]">
+            {id.toUpperCase()} kleur
+            <input
+              value={stationColors[id] ?? ""}
+              onChange={(e) => setStationColors((prev) => ({ ...prev, [id]: e.target.value }))}
+              placeholder="#000000"
+              className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+            />
+          </label>
+        ))}
+      </div>
 
       <div className="border-t border-white/10 pt-5">
         <h2 className="text-lg font-black text-[var(--text-main)]">Publiek menu</h2>

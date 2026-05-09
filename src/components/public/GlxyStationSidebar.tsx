@@ -33,10 +33,12 @@ function StationCard({
   station,
   playing,
   onToggle,
+  bgOverride,
 }: {
   station: GlxyStation;
   playing: boolean;
   onToggle: () => void;
+  bgOverride?: string | null;
 }) {
   return (
     <div
@@ -46,8 +48,11 @@ function StationCard({
           ? {
               backgroundImage:
                 "repeating-linear-gradient(-52deg, rgba(0,0,0,0.06) 0 10px, transparent 10px 20px), linear-gradient(#facc15, #facc15)",
+              ...(bgOverride ? { backgroundColor: bgOverride } : {}),
             }
-          : undefined
+          : bgOverride
+            ? { backgroundColor: bgOverride }
+            : undefined
       }
     >
       <div className="flex items-center gap-3">
@@ -76,7 +81,7 @@ function StationCard({
   );
 }
 
-export function GlxyStationSidebar() {
+export function GlxyStationSidebar({ colorOverrides }: { colorOverrides?: Record<string, string> | null } = {}) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
 
@@ -121,7 +126,12 @@ export function GlxyStationSidebar() {
       <ul className="flex flex-col gap-2 md:gap-2.5">
         {GLXY_STATIONS.map((s) => (
           <li key={s.id}>
-            <StationCard station={s} playing={playingId === s.id} onToggle={() => toggle(s)} />
+            <StationCard
+              station={s}
+              playing={playingId === s.id}
+              onToggle={() => toggle(s)}
+              bgOverride={colorOverrides?.[s.id] ?? null}
+            />
           </li>
         ))}
       </ul>

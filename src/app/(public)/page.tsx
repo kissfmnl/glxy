@@ -35,6 +35,7 @@ export default async function PublicHomePage() {
       trackCovers={trackCovers}
       djPhotos={djPhotos}
       homeHlsSrc={homeHlsSrc}
+      stationColors={branding.stationColors as any}
     />
   );
 }

@@ -36,6 +36,20 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const yellowHex = normalizeHex(String(formData.get("yellowHex")), "#ffe200");
   const logoUrl = normalizeUrl(String(formData.get("logoUrl") ?? ""));
   const faviconUrl = normalizeUrl(String(formData.get("faviconUrl") ?? ""));
+  const instagramUrl = normalizeUrl(String(formData.get("instagramUrl") ?? ""));
+  const tiktokUrl = normalizeUrl(String(formData.get("tiktokUrl") ?? ""));
+  let stationColors: Record<string, any> | null = null;
+  try {
+    const raw = String(formData.get("stationColorsJson") ?? "").trim();
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        stationColors = parsed as Record<string, any>;
+      }
+    }
+  } catch {
+    stationColors = null;
+  }
   let navItems: Array<{ href: string; label: string }> | null = null;
   try {
     const raw = String(formData.get("navItemsJson") ?? "").trim();
@@ -67,7 +81,10 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       yellowHex,
       logoUrl,
       faviconUrl,
+      instagramUrl,
+      tiktokUrl,
       navItems: navItems ?? undefined,
+      stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,
     },
     update: {
@@ -77,7 +94,10 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       yellowHex,
       logoUrl,
       faviconUrl,
+      instagramUrl,
+      tiktokUrl,
       navItems: navItems ?? undefined,
+      stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,
     },
   });

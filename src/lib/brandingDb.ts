@@ -12,6 +12,9 @@ export type PublicBranding = {
   faviconUrl: string | null;
   homeHlsUrl: string;
   navItems: Array<{ href: string; label: string }> | null;
+  instagramUrl: string | null;
+  tiktokUrl: string | null;
+  stationColors: Record<string, any> | null;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
@@ -23,6 +26,10 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         row.navItems.every((x: any) => x && typeof x.href === "string" && typeof x.label === "string")
           ? (row.navItems as Array<{ href: string; label: string }>)
           : null;
+      const stationColors =
+        row.stationColors && typeof row.stationColors === "object" && !Array.isArray(row.stationColors)
+          ? (row.stationColors as Record<string, any>)
+          : null;
       return {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
@@ -32,6 +39,9 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         faviconUrl: row.faviconUrl,
         homeHlsUrl: row.homeHlsUrl || DEFAULT_HLS,
         navItems,
+        instagramUrl: row.instagramUrl ?? null,
+        tiktokUrl: row.tiktokUrl ?? null,
+        stationColors,
       };
     }
   } catch {
@@ -46,5 +56,8 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     faviconUrl: null,
     homeHlsUrl: process.env.NEXT_PUBLIC_GLXY_HLS_URL || DEFAULT_HLS,
     navItems: null,
+    instagramUrl: null,
+    tiktokUrl: null,
+    stationColors: null,
   };
 });

@@ -14,7 +14,14 @@ function BrandLockup({ logoUrl, className }: { logoUrl?: string | null; classNam
       </span>
     );
   }
-  return <GlxyWordmark className={className} />;
+  return (
+    <span className={`relative inline-flex h-9 max-h-9 min-w-0 items-center sm:h-10 sm:max-h-10 ${className ?? ""}`}>
+      <AppImage src="/glxy-favicon.svg" alt="GLXY" width={40} height={40} className="h-full w-auto object-contain" />
+      <span className="ml-2 hidden sm:inline">
+        <GlxyWordmark />
+      </span>
+    </span>
+  );
 }
 
 export function PublicHeader({
@@ -66,8 +73,9 @@ export function PublicHeader({
         <div className="w-full">
           {/* Top menu bar (grijs) */}
           <div className="hidden lg:block border-b border-black/15" style={{ backgroundColor: "var(--brand-accent)" }}>
-            <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 md:px-8">
-              <nav className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mx-auto grid w-full max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-2.5 sm:px-6 md:px-8">
+              <div />
+              <nav className="flex min-w-0 items-center justify-center gap-1.5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
@@ -80,7 +88,7 @@ export function PublicHeader({
                   </Link>
                 ))}
               </nav>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 items-center justify-end gap-2">
                 <a
                   href={instagramUrl}
                   target="_blank"

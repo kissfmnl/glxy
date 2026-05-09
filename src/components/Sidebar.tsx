@@ -60,7 +60,7 @@ export default function Sidebar() {
             key={item.href}
             href={item.href}
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${
+            className={`flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold transition-colors ${
               active(item.href)
                 ? "bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30"
                 : "text-[var(--text-main)]/80 hover:bg-black/5 hover:text-[var(--text-main)]"
@@ -100,14 +100,14 @@ export default function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-black/10 px-4 py-4">
-          <Link href="/dashboard" className="font-black tracking-tight text-[var(--text-main)]" onClick={() => setMobileOpen(false)}>
-            <span className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] bg-clip-text text-lg text-transparent">GLXY</span>
-            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">Radio</span>
+        <div className="flex items-center justify-between border-b border-black/10 px-4 py-4 text-white" style={{ backgroundColor: "#22d3ee" }}>
+          <Link href="/dashboard" className="font-black tracking-tight text-white" onClick={() => setMobileOpen(false)}>
+            <span className="text-lg">GLXY</span>
+            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/95">Radio</span>
           </Link>
           <button
             type="button"
-            className="rounded-lg border border-black/10 bg-white/60 px-2 py-1 text-xs font-black text-[var(--text-main)]/80 hover:bg-white/80 lg:hidden"
+            className="rounded-lg border border-white/30 bg-white/15 px-2 py-1 text-xs font-black text-white/95 hover:bg-white/25 lg:hidden"
             onClick={() => setMobileOpen(false)}
           >
             ✕
