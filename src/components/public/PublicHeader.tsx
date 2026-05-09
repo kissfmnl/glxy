@@ -172,7 +172,7 @@ export function PublicHeader({
                   onClick={closeMenu}
                   className={`flex items-center rounded-2xl border px-4 py-3.5 font-black transition-[background-color,border-color] duration-150 ${
                     isActive(item.href)
-                      ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-200"
+                      ? "border-[var(--brand-primary)]/45 bg-[var(--brand-primary)]/15 text-[var(--brand-primary)]"
                       : "border-white/10 bg-white/5 text-white active:bg-white/10"
                   }`}
                 >

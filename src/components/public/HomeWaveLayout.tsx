@@ -15,6 +15,7 @@ import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
 import AppImage from "@/components/AppImage";
 import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
+import { GlxyStationSidebar } from "@/components/public/GlxyStationSidebar";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -205,9 +206,12 @@ export function HomeWaveLayout({
 
         <div className="relative z-10 max-w-6xl mx-auto px-3.5 sm:px-4 md:px-8 [isolation:isolate]">
           <div className={`min-w-0 ${PUBLIC_PAGE_INTRO}`}>
-            {/* Mobiel: GLXY TV eerst (direct zichtbaar). Desktop: koptekst links, TV rechtsboven (sticky). */}
+            {/* Mobiel: TV eerst (als aanwezig), dan zenders, dan kop. Desktop: zenders | kop | TV (sticky rechts). */}
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8 xl:gap-10">
-              <div className="order-2 min-w-0 flex-1 lg:order-1">
+              <div className="order-2 min-w-0 shrink-0 lg:order-1 lg:max-w-[280px] xl:max-w-[288px]">
+                <GlxyStationSidebar />
+              </div>
+              <div className={`min-w-0 flex-1 ${homeHlsSrc ? "order-3 lg:order-2" : "order-1 lg:order-2"}`}>
                 <div className="flex flex-row items-start gap-4 sm:gap-5 md:items-center md:gap-8">
                   <div className="min-w-0 flex-1 flex flex-col">
                     {copy.showHeroKicker ? (
@@ -245,7 +249,7 @@ export function HomeWaveLayout({
               </div>
 
               {homeHlsSrc ? (
-                <aside className="order-1 w-full lg:order-2 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,420px)] lg:min-w-[300px] lg:max-w-[440px] lg:shrink-0 xl:top-[5.5rem]">
+                <aside className="order-1 w-full lg:order-3 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,420px)] lg:min-w-[300px] lg:max-w-[440px] lg:shrink-0 xl:top-[5.5rem]">
                   <p className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.28em] text-[#7fe8e8]/95 lg:text-right">
                     GLXY TV · Live meekijken
                   </p>

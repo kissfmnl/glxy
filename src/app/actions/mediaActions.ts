@@ -2,6 +2,7 @@
 
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
+import path from "path";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
@@ -21,17 +22,38 @@ const MIME_EXT: Record<string, string> = {
   "image/svg+xml": ".svg",
 };
 
-async function requireAdmin() {
+/** Als de browser geen type meestuurt (sommige OS/browsers), afleiden uit extensie. */
+const EXT_TO_MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".svg": "image/svg+xml",
+};
+
+async function requireAdmin(): Promise<{ ok: true } | { error: string }> {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") {
-    throw new Error("Geen rechten.");
+    return { error: "Geen rechten." };
   }
+  return { ok: true };
+}
+
+function resolveImageMime(file: File): string | null {
+  const fromType = file.type?.trim();
+  if (fromType && MIME_EXT[fromType]) return fromType;
+  const ext = path.extname(file.name || "").toLowerCase();
+  const guessed = EXT_TO_MIME[ext];
+  return guessed ?? null;
 }
 
 export async function uploadMediaAssetAction(
   formData: FormData,
 ): Promise<{ ok?: true; url?: string; id?: string; error?: string }> {
-  await requireAdmin();
+  const auth = await requireAdmin();
+  if ("error" in auth) return { error: auth.error };
+
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
     return { error: "Kies een bestand." };
@@ -39,9 +61,9 @@ export async function uploadMediaAssetAction(
   if (file.size > MAX_BYTES) {
     return { error: "Bestand te groot (max. 10 MB)." };
   }
-  const mimeType = file.type || "application/octet-stream";
-  const ext = MIME_EXT[mimeType];
-  if (!ext) {
+  const mimeType = resolveImageMime(file);
+  const ext = mimeType ? MIME_EXT[mimeType] : null;
+  if (!mimeType || !ext) {
     return { error: "Alleen afbeeldingen (jpg, png, gif, webp, svg)." };
   }
 
@@ -68,14 +90,29 @@ export async function uploadMediaAssetAction(
     return { error: msg || "Schrijven mislukt." };
   }
 
-  const row = await prisma.mediaAsset.create({
-    data: {
-      filename: file.name || base,
-      storagePath,
-      mimeType,
-      sizeBytes: buf.length,
-    },
-  });
+  let row;
+  try {
+    row = await prisma.mediaAsset.create({
+      data: {
+        filename: file.name || base,
+        storagePath,
+        mimeType,
+        sizeBytes: buf.length,
+      },
+    });
+  } catch (e) {
+    try {
+      const abs = absoluteWebsitePath(storagePath);
+      await fs.unlink(abs).catch(() => {});
+    } catch {
+      /* ignore */
+    }
+    console.error("[uploadMediaAssetAction]", e);
+    return {
+      error:
+        "Opslaan in de database mislukt. Voer lokaal/server `npx prisma db push` uit zodat het model MediaAsset bestaat.",
+    };
+  }
 
   const url = publicMediaUrlFromStoragePath(storagePath);
   revalidatePath("/admin/media");
@@ -94,7 +131,8 @@ export async function listMediaAssetsAction(): Promise<
     publicUrl: string;
   }>
 > {
-  await requireAdmin();
+  const auth = await requireAdmin();
+  if ("error" in auth) throw new Error(auth.error);
   const rows = await prisma.mediaAsset.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
@@ -106,7 +144,9 @@ export async function listMediaAssetsAction(): Promise<
 }
 
 export async function deleteMediaAssetAction(id: string): Promise<{ ok?: true; error?: string }> {
-  await requireAdmin();
+  const auth = await requireAdmin();
+  if ("error" in auth) return { error: auth.error };
+
   const row = await prisma.mediaAsset.findUnique({ where: { id } });
   if (!row) return { error: "Niet gevonden." };
 
@@ -117,7 +157,12 @@ export async function deleteMediaAssetAction(id: string): Promise<{ ok?: true; e
     /* bestand weg — DB nog opruimen */
   }
 
-  await prisma.mediaAsset.delete({ where: { id } });
+  try {
+    await prisma.mediaAsset.delete({ where: { id } });
+  } catch (e) {
+    console.error("[deleteMediaAssetAction]", e);
+    return { error: "Verwijderen mislukt." };
+  }
   revalidatePath("/admin/media");
   return { ok: true };
 }
@@ -127,28 +172,28 @@ export async function applyMediaToBrandingAction(
   mediaId: string,
   field: "logo" | "favicon",
 ): Promise<{ ok?: true; error?: string }> {
-  await requireAdmin();
+  const auth = await requireAdmin();
+  if ("error" in auth) return { error: auth.error };
+
   const row = await prisma.mediaAsset.findUnique({ where: { id: mediaId } });
   if (!row) return { error: "Media niet gevonden." };
   const url = publicMediaUrlFromStoragePath(row.storagePath);
   if (!url) return { error: "Ongeldig mediapad." };
 
-  const homeHlsUrl = "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8";
-  await prisma.branding.upsert({
-    where: { id: 1 },
-    create: {
-      id: 1,
-      primaryHex: "#0b7557",
-      accentHex: "#6d6d6d",
-      navyHex: "#363636",
-      yellowHex: "#ffe200",
-      logoUrl: field === "logo" ? url : null,
-      faviconUrl: field === "favicon" ? url : null,
-      homeHlsUrl,
-    },
-    update:
-      field === "logo" ? { logoUrl: url } : { faviconUrl: url },
-  });
+  try {
+    await prisma.branding.upsert({
+      where: { id: 1 },
+      create: {
+        id: 1,
+        ...(field === "logo" ? { logoUrl: url } : {}),
+        ...(field === "favicon" ? { faviconUrl: url } : {}),
+      },
+      update: field === "logo" ? { logoUrl: url } : { faviconUrl: url },
+    });
+  } catch (e) {
+    console.error("[applyMediaToBrandingAction]", e);
+    return { error: "Branding bijwerken mislukt." };
+  }
 
   revalidatePath("/");
   revalidatePath("/admin/branding");

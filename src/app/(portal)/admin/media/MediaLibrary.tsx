@@ -24,7 +24,7 @@ function fmtSize(n: number) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function MediaLibrary({ initial }: { initial: MediaRow[] }) {
+export function MediaLibrary({ initial, listError }: { initial: MediaRow[]; listError?: string | null }) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -97,13 +97,28 @@ export function MediaLibrary({ initial }: { initial: MediaRow[] }) {
 
   return (
     <div className="space-y-8">
+      {listError ? (
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">{listError}</div>
+      ) : null}
       <section className="card border border-white/10 bg-white/[0.04] backdrop-blur">
         <h2 className="text-lg font-black text-[var(--text-main)]">Upload</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           Afbeeldingen tot 10 MB (jpg, png, gif, webp, svg). Bestanden staan op de server onder{" "}
           <code className="text-[var(--brand-yellow)]">Website/media/</code>.
         </p>
-        <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-black/20 px-6 py-10 transition-colors hover:border-[var(--brand-primary)]/60">
+        <label
+          className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-black/20 px-6 py-10 transition-colors hover:border-[var(--brand-primary)]/60"
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (uploading) return;
+            onUpload(e.dataTransfer.files);
+          }}
+        >
           <input
             type="file"
             accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"

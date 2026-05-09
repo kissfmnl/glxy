@@ -14,13 +14,17 @@ export default async function AdminMediaPage() {
   if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
 
   let rows: Awaited<ReturnType<typeof prisma.mediaAsset.findMany>> = [];
+  let listError: string | null = null;
   try {
     rows = await prisma.mediaAsset.findMany({
       orderBy: { createdAt: "desc" },
       take: 200,
     });
-  } catch {
+  } catch (e) {
     rows = [];
+    console.error("[AdminMediaPage] mediaAsset.findMany", e);
+    listError =
+      "De mediabibliotheek kan niet worden geladen. Controleer DATABASE_URL en voer op de server `npx prisma db push` uit (model MediaAsset).";
   }
 
   const initial = rows.map((r) => ({
@@ -40,7 +44,7 @@ export default async function AdminMediaPage() {
           Upload afbeeldingen voor o.a. logo en favicon. Gebruik “→ Logo” / “→ Favicon” om direct de publieke site bij te werken, of kopieer de URL naar Huisstijl.
         </p>
       </header>
-      <MediaLibrary initial={initial} />
+      <MediaLibrary initial={initial} listError={listError} />
     </div>
   );
 }
