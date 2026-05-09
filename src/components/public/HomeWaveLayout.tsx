@@ -6,14 +6,12 @@ import { ConcertsPanel } from "@/components/public/ConcertsPanel";
 import { ActionsPanel } from "@/components/public/ActionsPanel";
 import { SocialProfilePanel } from "@/components/public/SocialProfilePanel";
 import { AppDownloadPopup } from "@/components/public/AppDownloadPopup";
-import { HomeHeroSubtitle } from "@/components/public/HomeHeroSubtitle";
 import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
 import { heroTitleColorStyle } from "@/lib/heroTitleColor";
 import type { HeroTitleLayout, HomeWaveCopy } from "@/types/home-wave";
 import { PUBLIC_PAGE_INTRO } from "@/lib/publicPageLayout";
-import AppImage from "@/components/AppImage";
-import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 import { HomeHlsEmbed } from "@/components/public/HomeHlsEmbed";
+import AppImage from "@/components/AppImage";
 import { GlxyStationSidebar } from "@/components/public/GlxyStationSidebar";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
@@ -30,54 +28,7 @@ function uniqueBySrc(tiles: HomeImageTile[], max: number): HomeImageTile[] {
   return out;
 }
 
-function HeroHeadline({
-  part1,
-  part1Color,
-  part2,
-  part2Color,
-  layout,
-  hasKickerAbove,
-}: {
-  part1: string;
-  part1Color: string;
-  part2: string;
-  part2Color: string;
-  layout: HeroTitleLayout;
-  hasKickerAbove: boolean;
-}) {
-  const c1 = heroTitleColorStyle(part1Color);
-  const c2 = heroTitleColorStyle(part2Color);
-  const top = hasKickerAbove ? "mt-3" : "mt-0";
-  if (layout === "stacked") {
-    return (
-      <h1 className={`${top} text-3xl sm:text-4xl md:text-5xl font-black leading-[1.08] tracking-tight drop-shadow-sm`}>
-        <span className="block whitespace-pre-line" style={c1.style}>
-          {part1}
-        </span>
-        {part2 ? (
-          <span className="block mt-1 sm:mt-1.5 whitespace-pre-line" style={c2.style}>
-            {part2}
-          </span>
-        ) : null}
-      </h1>
-    );
-  }
-  return (
-    <h1 className={`${top} text-3xl sm:text-4xl md:text-5xl font-black leading-[1.08] tracking-tight drop-shadow-sm`}>
-      <span className="whitespace-pre-line" style={c1.style}>
-        {part1}
-      </span>
-      {part2 ? (
-        <>
-          {" "}
-          <span className="whitespace-pre-line" style={c2.style}>
-            {part2}
-          </span>
-        </>
-      ) : null}
-    </h1>
-  );
-}
+// Hero headline removed per design (cleaner hero: zenders + video).
 
 /** Alleen zachte fade rechts; volle dekking boven/onder (geen verticale uitfranje). */
 const POLAROID_FADE_MASK: CSSProperties = {
@@ -91,41 +42,7 @@ const POLAROID_FADE_MASK: CSSProperties = {
   WebkitMaskSize: "100% 100%",
 };
 
-function PolaroidStrip({ items }: { items: HomeImageTile[] }) {
-  if (items.length === 0) return null;
-  const rotations = [-5, 3, -2, 4, -3, 2, -4, 3, -2, 5, -3, 2, -4, 3];
-  return (
-    <div className="relative my-5 md:my-7 w-screen max-w-[100vw] left-1/2 -translate-x-1/2">
-      <div
-        className="touch-pan-x overflow-x-auto overflow-y-visible overscroll-x-contain py-5 md:py-6 pl-10 pr-16 scroll-pl-4 snap-x snap-mandatory [scrollbar-color:rgba(255,255,255,0.28)_transparent] scrollbar-thin md:pl-24 md:pr-32 lg:pl-32 lg:pr-40 [-webkit-overflow-scrolling:touch]"
-        style={POLAROID_FADE_MASK}
-      >
-        <div className="flex w-max gap-4 md:gap-6">
-          {items.map((t, i) => (
-            <div
-              key={`${t.src}-p-${i}`}
-              className="snap-center shrink-0 first:ml-0.5"
-              style={{ transform: `rotate(${rotations[i % rotations.length]}deg)` }}
-            >
-              <div className="w-[154px] sm:w-[172px] md:w-[180px] bg-white p-2.5 pb-6 rounded-[2px] shadow-[0_14px_40px_rgba(0,0,0,0.45)] border border-white/90 hover:rotate-0 hover:scale-[1.02] transition-transform duration-300">
-                <div className="aspect-square overflow-hidden rounded-[1px] bg-white">
-                  <AppImage
-                    src={t.src}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    style={{ objectPosition: `${t.focalX ?? 50}% ${t.focalY ?? 50}%` }}
-                    loading="lazy"
-                  />
-                </div>
-                <p className="mt-2.5 text-[11px] font-black text-center text-[#1e375a] leading-tight line-clamp-2 px-0.5">{t.alt}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+// Polaroid strip removed per design.
 
 function VoicesSidebar({ title, djs, maxItems }: { title: string; djs: HomeImageTile[]; maxItems: number }) {
   const list = djs.filter((d) => d.src).slice(0, Math.max(4, maxItems));
@@ -208,42 +125,6 @@ export function HomeWaveLayout({
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8 xl:gap-10">
               <div className="order-2 min-w-0 shrink-0 lg:order-1 lg:max-w-[280px] xl:max-w-[288px]">
                 <GlxyStationSidebar />
-              </div>
-              <div className={`min-w-0 flex-1 ${homeHlsSrc ? "order-3 lg:order-2" : "order-1 lg:order-2"}`}>
-                <div className="flex flex-row items-start gap-4 sm:gap-5 md:items-center md:gap-8">
-                  <div className="min-w-0 flex-1 flex flex-col">
-                    {copy.showHeroKicker ? (
-                      <p
-                        className={`text-[11px] font-black tracking-[0.35em] uppercase ${
-                          copy.heroKicker.trim() ? "text-[#7fe8e8]" : "text-transparent pointer-events-none select-none"
-                        }`}
-                        aria-hidden={!copy.heroKicker.trim()}
-                      >
-                        {copy.heroKicker.trim() ? copy.heroKicker : "\u00a0"}
-                      </p>
-                    ) : null}
-                    <HeroHeadline
-                      hasKickerAbove={copy.showHeroKicker}
-                      part1={copy.heroTitle1}
-                      part1Color={copy.heroTitle1Color}
-                      part2={copy.heroTitle2}
-                      part2Color={copy.heroTitle2Color}
-                      layout={copy.heroTitleLayout}
-                    />
-                    <HomeHeroSubtitle text={copy.heroSubtitle} />
-                  </div>
-                  {copy.showLipsLogo ? (
-                    <div className="shrink-0 flex translate-y-1 items-center justify-center self-start max-md:-translate-y-0.5 max-md:-mr-2 sm:translate-y-1.5 md:mr-0">
-                      <AppImage
-                        src={MOCK_COVER_FALLBACK}
-                        alt=""
-                        className="h-14 w-auto sm:h-[4.5rem] md:h-28 lg:h-[7.75rem] object-contain drop-shadow-lg opacity-95"
-                        loading="lazy"
-                        draggable={false}
-                      />
-                    </div>
-                  ) : null}
-                </div>
               </div>
 
               {homeHlsSrc ? (

@@ -115,7 +115,7 @@ export function GlxyStationSidebar() {
   return (
     <aside className="w-full shrink-0 lg:w-[min(100%,268px)] xl:w-[280px]">
       <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.25em] text-[#6d6d6d] md:text-[11px] lg:text-[#363636]">
-        Of luister naar
+        Luister naar
       </p>
       <audio ref={audioRef} className="hidden" preload="none" playsInline />
       <ul className="flex flex-col gap-2 md:gap-2.5">

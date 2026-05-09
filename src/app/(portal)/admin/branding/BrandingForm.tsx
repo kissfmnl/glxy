@@ -11,6 +11,7 @@ type Defaults = {
   yellowHex: string;
   logoUrl: string;
   faviconUrl: string;
+  navItems: Array<{ href: string; label: string }>;
   homeHlsUrl: string;
 };
 
@@ -26,6 +27,7 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [busy, setBusy] = useState(false);
   const [logoUrl, setLogoUrl] = useState(defaults.logoUrl);
   const [faviconUrl, setFaviconUrl] = useState(defaults.faviconUrl);
+  const [navItems, setNavItems] = useState<Array<{ href: string; label: string }>>(defaults.navItems ?? []);
 
   return (
     <form
@@ -34,6 +36,7 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         const fd = new FormData(e.currentTarget);
         fd.set("logoUrl", logoUrl);
         fd.set("faviconUrl", faviconUrl);
+        fd.set("navItemsJson", JSON.stringify(navItems));
         setBusy(true);
         setMsg(null);
         const res = await updateBrandingAction(fd);
@@ -147,6 +150,91 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
           className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
         />
       </label>
+
+      <div className="border-t border-white/10 pt-5">
+        <h2 className="text-lg font-black text-[var(--text-main)]">Publiek menu</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Bepaal zelf de volgorde. Dit menu wordt bovenaan de publieke site getoond.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <div className="grid gap-2">
+          {navItems.map((it, idx) => (
+            <div key={`${it.href}-${idx}`} className="grid gap-2 rounded-lg border border-white/10 bg-black/20 p-3 md:grid-cols-[1fr_1.2fr_auto] md:items-center">
+              <label className="block text-[11px] font-black uppercase tracking-wider text-white/60">
+                Label
+                <input
+                  value={it.label}
+                  onChange={(e) =>
+                    setNavItems((prev) => prev.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-sm font-black text-white outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/30"
+                />
+              </label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-white/60">
+                Link (href)
+                <input
+                  value={it.href}
+                  onChange={(e) =>
+                    setNavItems((prev) => prev.map((x, i) => (i === idx ? { ...x, href: e.target.value } : x)))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/30"
+                />
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-black text-white/85 hover:bg-white/10 disabled:opacity-40"
+                  disabled={idx === 0}
+                  onClick={() =>
+                    setNavItems((prev) => {
+                      const copy = [...prev];
+                      const tmp = copy[idx - 1]!;
+                      copy[idx - 1] = copy[idx]!;
+                      copy[idx] = tmp;
+                      return copy;
+                    })
+                  }
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-black text-white/85 hover:bg-white/10 disabled:opacity-40"
+                  disabled={idx === navItems.length - 1}
+                  onClick={() =>
+                    setNavItems((prev) => {
+                      const copy = [...prev];
+                      const tmp = copy[idx + 1]!;
+                      copy[idx + 1] = copy[idx]!;
+                      copy[idx] = tmp;
+                      return copy;
+                    })
+                  }
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-red-500/35 bg-red-500/10 px-3 py-2 text-xs font-black text-red-200 hover:bg-red-500/15"
+                  onClick={() => setNavItems((prev) => prev.filter((_, i) => i !== idx))}
+                >
+                  Verwijder
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="rounded-xl bg-[var(--brand-primary)]/20 px-4 py-2.5 text-xs font-black text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30 hover:bg-[var(--brand-primary)]/28"
+          onClick={() => setNavItems((prev) => [...prev, { href: "/", label: "Nieuw" }])}
+        >
+          + Menu-item toevoegen
+        </button>
+      </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={busy} className="btn-primary rounded-xl px-5 py-2.5 text-sm font-black disabled:opacity-50">

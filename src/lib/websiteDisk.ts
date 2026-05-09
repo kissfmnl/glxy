@@ -16,8 +16,11 @@ function ensureWritableWebsiteRootConfigured() {
   const configured = process.env.WEBSITE_FILES_ROOT?.trim();
   const allowEphemeral = process.env.ALLOW_EPHEMERAL_WEBSITE_FILES === "1";
   if (!configured && process.env.NODE_ENV === "production" && !allowEphemeral) {
-    throw new Error(
-      "WEBSITE_FILES_ROOT ontbreekt in productie. Uploads worden geblokkeerd om reset/verlies te voorkomen."
+    // In productie willen we liever een volume, maar blokkeren is te frustrerend tijdens setup.
+    // Railway/Nixpacks heeft wel een schrijfbare ephemeral disk; die kan bij deploy/restart leeg raken.
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[websiteDisk] WEBSITE_FILES_ROOT ontbreekt in productie; uploads gaan naar ephemeral disk. Zet WEBSITE_FILES_ROOT of ALLOW_EPHEMERAL_WEBSITE_FILES=1."
     );
   }
 }

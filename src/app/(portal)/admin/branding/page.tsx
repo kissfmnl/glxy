@@ -11,6 +11,17 @@ const FALLBACK = {
   yellowHex: "#ffe200",
   logoUrl: "",
   faviconUrl: "",
+  navItems: [
+    { href: "/", label: "Home" },
+    { href: "/glxy-tv", label: "GLXY TV" },
+    { href: "/playlist", label: "Playlist" },
+    { href: "/adverteren", label: "Adverteren" },
+    { href: "/drop-n-demo", label: "Drop 'n Demo" },
+    { href: "/passdeaux", label: "Passdeaux" },
+    { href: "/airplay-top-20", label: "Airplay Top 20" },
+    { href: "/frequenties", label: "Frequenties" },
+    { href: "/press", label: "Press" },
+  ],
   homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
 };
 
@@ -26,6 +37,11 @@ export default async function AdminBrandingPage() {
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 } });
     if (row) {
+      const navItems =
+        Array.isArray(row.navItems) &&
+        row.navItems.every((x: any) => x && typeof x.href === "string" && typeof x.label === "string")
+          ? (row.navItems as Array<{ href: string; label: string }>)
+          : FALLBACK.navItems;
       defaults = {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
@@ -33,6 +49,7 @@ export default async function AdminBrandingPage() {
         yellowHex: row.yellowHex ?? FALLBACK.yellowHex,
         logoUrl: row.logoUrl ?? "",
         faviconUrl: row.faviconUrl ?? "",
+        navItems,
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,
       };
     }

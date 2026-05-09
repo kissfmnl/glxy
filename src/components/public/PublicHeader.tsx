@@ -62,73 +62,72 @@ export function PublicHeader({
 
   return (
     <>
-      <header
-        className="kiss-public-site-header fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#070a14]/92 backdrop-blur-md"
-      >
-        <div className="relative mx-auto flex h-16 w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 md:h-[4.5rem] md:gap-4 md:px-8">
-          <Link
-            href="/"
-            className="kiss-public-nav-logo relative z-[1] ml-3 flex min-w-0 shrink-0 touch-manipulation items-center outline-none md:ml-0"
-          >
-            <BrandLockup logoUrl={logoUrl} className="text-lg sm:text-xl md:text-2xl" />
-          </Link>
-
-          <nav
-            className="pointer-events-none absolute left-1/2 top-1/2 hidden max-w-[min(94vw,920px)] -translate-x-1/2 -translate-y-1/2 lg:flex lg:items-center lg:justify-center"
-            aria-label="Hoofdmenu"
-          >
-            <div className="pointer-events-auto flex max-w-full items-center gap-0.5 overflow-x-auto overflow-y-visible whitespace-nowrap px-1 py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] xl:gap-1 [&::-webkit-scrollbar]:hidden">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`kiss-public-nav-link inline-flex touch-manipulation items-center whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-black outline-none xl:rounded-xl xl:px-2.5 xl:py-2 xl:text-xs 2xl:text-sm ${
-                    isActive(item.href)
-                      ? "border border-[var(--brand-primary)]/45 bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] shadow-[0_0_20px_rgba(11,117,87,0.2)]"
-                      : "border border-transparent text-white/90 hover:text-[var(--brand-primary)]"
-                  }`}
+      <header className="kiss-public-site-header fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#070a14]/92 backdrop-blur-md">
+        <div className="w-full">
+          {/* Top menu bar (grijs) */}
+          <div className="hidden lg:block border-b border-black/15" style={{ backgroundColor: "var(--brand-accent)" }}>
+            <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 md:px-8">
+              <nav className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`kiss-public-nav-link inline-flex items-center px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.22em] text-white/95 transition-colors ${
+                      isActive(item.href) ? "bg-white/15" : "hover:bg-white/10"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+              <div className="flex shrink-0 items-center gap-2">
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="kiss-public-nav-link flex h-9 w-9 items-center justify-center text-white/95 hover:bg-white/10"
+                  aria-label="Instagram"
                 >
-                  <span className="uppercase tracking-[0.18em]">{item.label}</span>
-                </Link>
-              ))}
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                    <path d="M7.2 2h9.6A5.2 5.2 0 0 1 22 7.2v9.6a5.2 5.2 0 0 1-5.2 5.2H7.2A5.2 5.2 0 0 1 2 16.8V7.2A5.2 5.2 0 0 1 7.2 2zm0 1.9A3.3 3.3 0 0 0 3.9 7.2v9.6a3.3 3.3 0 0 0 3.3 3.3h9.6a3.3 3.3 0 0 0 3.3-3.3V7.2a3.3 3.3 0 0 0-3.3-3.3H7.2zm10.1 1.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.9a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2z" />
+                  </svg>
+                </a>
+                <a
+                  href={tiktokUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="kiss-public-nav-link flex h-9 w-9 items-center justify-center text-white/95 hover:bg-white/10"
+                  aria-label="TikTok"
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                    <path d="M21 8.09a6.93 6.93 0 0 1-4.06-1.31v9.62a6.94 6.94 0 1 1-6.93-6.93c.14 0 .28.01.41.03v3.82a3.08 3.08 0 1 0 2.07 2.9V2h3.73a6.93 6.93 0 0 0 4.78 6.09z" />
+                  </svg>
+                </a>
+              </div>
             </div>
-          </nav>
+          </div>
 
-          <div className="relative z-[1] flex shrink-0 items-center justify-end gap-2">
-            <div className="hidden items-center gap-2 pr-1 lg:flex">
-              <a
-                href={instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="kiss-public-nav-link kiss-public-social-icon flex h-10 w-10 items-center justify-center rounded-xl text-white/90"
-                aria-label="Instagram"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
-                  <path d="M7.2 2h9.6A5.2 5.2 0 0 1 22 7.2v9.6a5.2 5.2 0 0 1-5.2 5.2H7.2A5.2 5.2 0 0 1 2 16.8V7.2A5.2 5.2 0 0 1 7.2 2zm0 1.9A3.3 3.3 0 0 0 3.9 7.2v9.6a3.3 3.3 0 0 0 3.3 3.3h9.6a3.3 3.3 0 0 0 3.3-3.3V7.2a3.3 3.3 0 0 0-3.3-3.3H7.2zm10.1 1.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.9a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2z" />
-                </svg>
-              </a>
-              <a
-                href={tiktokUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="kiss-public-nav-link kiss-public-social-icon flex h-10 w-10 items-center justify-center rounded-xl text-white/90"
-                aria-label="TikTok"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
-                  <path d="M21 8.09a6.93 6.93 0 0 1-4.06-1.31v9.62a6.94 6.94 0 1 1-6.93-6.93c.14 0 .28.01.41.03v3.82a3.08 3.08 0 1 0 2.07 2.9V2h3.73a6.93 6.93 0 0 0 4.78 6.09z" />
-                </svg>
-              </a>
-            </div>
-            <button
-              type="button"
-              className="kiss-public-nav-link flex h-11 w-11 shrink-0 touch-manipulation items-center justify-center rounded-xl outline-none transition-colors hover:bg-white/10 lg:hidden"
-              aria-label="Menu"
-              onClick={openMenu}
+          {/* Logo row */}
+          <div className="relative mx-auto flex h-16 w-full max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 md:h-[4.5rem] md:gap-4 md:px-8">
+            <Link
+              href="/"
+              className="kiss-public-nav-logo relative z-[1] ml-3 flex min-w-0 shrink-0 touch-manipulation items-center outline-none md:ml-0"
             >
-              <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+              <BrandLockup logoUrl={logoUrl} className="text-lg sm:text-xl md:text-2xl" />
+            </Link>
+
+            <div className="relative z-[1] flex shrink-0 items-center justify-end gap-2">
+              <button
+                type="button"
+                className="kiss-public-nav-link flex h-11 w-11 shrink-0 touch-manipulation items-center justify-center rounded-xl outline-none transition-colors hover:bg-white/10 lg:hidden"
+                aria-label="Menu"
+                onClick={openMenu}
+              >
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </header>

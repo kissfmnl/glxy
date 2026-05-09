@@ -11,12 +11,18 @@ export type PublicBranding = {
   logoUrl: string | null;
   faviconUrl: string | null;
   homeHlsUrl: string;
+  navItems: Array<{ href: string; label: string }> | null;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 } });
     if (row) {
+      const navItems =
+        Array.isArray(row.navItems) &&
+        row.navItems.every((x: any) => x && typeof x.href === "string" && typeof x.label === "string")
+          ? (row.navItems as Array<{ href: string; label: string }>)
+          : null;
       return {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
@@ -25,6 +31,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         logoUrl: row.logoUrl,
         faviconUrl: row.faviconUrl,
         homeHlsUrl: row.homeHlsUrl || DEFAULT_HLS,
+        navItems,
       };
     }
   } catch {
@@ -38,5 +45,6 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     logoUrl: null,
     faviconUrl: null,
     homeHlsUrl: process.env.NEXT_PUBLIC_GLXY_HLS_URL || DEFAULT_HLS,
+    navItems: null,
   };
 });

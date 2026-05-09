@@ -36,6 +36,21 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const yellowHex = normalizeHex(String(formData.get("yellowHex")), "#ffe200");
   const logoUrl = normalizeUrl(String(formData.get("logoUrl") ?? ""));
   const faviconUrl = normalizeUrl(String(formData.get("faviconUrl") ?? ""));
+  let navItems: Array<{ href: string; label: string }> | null = null;
+  try {
+    const raw = String(formData.get("navItemsJson") ?? "").trim();
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        navItems = parsed
+          .filter((x) => x && typeof x.href === "string" && typeof x.label === "string")
+          .map((x) => ({ href: String(x.href).trim(), label: String(x.label).trim() }))
+          .filter((x) => x.href && x.label);
+      }
+    }
+  } catch {
+    navItems = null;
+  }
   const homeHlsUrl = String(formData.get("homeHlsUrl") ?? "").trim();
   const defaultM3 =
     "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8";
@@ -52,6 +67,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       yellowHex,
       logoUrl,
       faviconUrl,
+      navItems: navItems ?? undefined,
       homeHlsUrl: hlsFinal,
     },
     update: {
@@ -61,6 +77,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       yellowHex,
       logoUrl,
       faviconUrl,
+      navItems: navItems ?? undefined,
       homeHlsUrl: hlsFinal,
     },
   });
