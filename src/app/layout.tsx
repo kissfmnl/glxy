@@ -35,6 +35,9 @@ export default async function RootLayout({
     "--brand-yellow": branding.yellowHex,
     "--glxy-panel-bg": "rgba(54, 54, 54, 0.96)",
     "--glxy-menu-bar": branding.menuBarHex || branding.primaryHex,
+    "--glxy-hero-video-frame": branding.heroVideoFrameHex || "#22d3ee",
+    "--glxy-listen-bar-bg": branding.listenBarBgHex || branding.primaryHex,
+    "--glxy-listen-bar-text": branding.listenBarTextHex || "#ffffff",
   };
 
   return (

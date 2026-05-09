@@ -52,6 +52,11 @@ model Branding {
   tiktokUrl    String?
   /// Kleur van de publieke menubalk bovenin
   menuBarHex   String?
+  /// Accent rond homepage-video (gradient rand/glow)
+  heroVideoFrameHex String?
+  /// Balkje “Luister naar”: achtergrond en tekst (hex)
+  listenBarBgHex   String?
+  listenBarTextHex String?
   /// Zenderkleuren override (id -> bgHex of {bgHex,textHex})
   stationColors Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")

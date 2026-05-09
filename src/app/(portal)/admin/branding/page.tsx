@@ -25,6 +25,9 @@ const FALLBACK = {
   instagramUrl: "https://instagram.com",
   tiktokUrl: "https://www.tiktok.com",
   menuBarHex: "#0b7557",
+  heroVideoFrameHex: "#22d3ee",
+  listenBarBgHex: "#0b7557",
+  listenBarTextHex: "#ffffff",
   stationColors: {
     z1: "#e11d48",
     z2: "#84cc16",
@@ -62,6 +65,9 @@ export default async function AdminBrandingPage() {
         instagramUrl: row.instagramUrl ?? FALLBACK.instagramUrl,
         tiktokUrl: row.tiktokUrl ?? FALLBACK.tiktokUrl,
         menuBarHex: row.menuBarHex ?? FALLBACK.menuBarHex,
+        heroVideoFrameHex: row.heroVideoFrameHex ?? FALLBACK.heroVideoFrameHex,
+        listenBarBgHex: row.listenBarBgHex ?? FALLBACK.listenBarBgHex,
+        listenBarTextHex: row.listenBarTextHex ?? FALLBACK.listenBarTextHex,
         stationColors:
           row.stationColors && typeof row.stationColors === "object" && !Array.isArray(row.stationColors)
             ? (row.stationColors as any)

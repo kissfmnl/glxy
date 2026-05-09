@@ -109,7 +109,15 @@ export function GlxyStationListenStrip({ colorOverrides }: { colorOverrides?: Re
 
   return (
     <section className="w-full" aria-label="GLXY zenders">
-      <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 md:text-[11px]">Luister naar</p>
+      <div
+        className="mb-3 w-full rounded-md px-4 py-2.5 shadow-inner ring-1 ring-black/15 md:px-5 md:py-3"
+        style={{
+          backgroundColor: "var(--glxy-listen-bar-bg)",
+          color: "var(--glxy-listen-bar-text)",
+        }}
+      >
+        <p className="text-center text-[10px] font-black uppercase tracking-[0.18em] md:text-left md:text-[11px]">Luister naar</p>
+      </div>
       <audio ref={audioRef} className="hidden" preload="none" playsInline />
       <ul className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-2 lg:gap-3">
         {GLXY_STATIONS.map((s) => (

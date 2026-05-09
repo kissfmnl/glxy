@@ -49,6 +49,9 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const instagramUrl = normalizeUrl(String(formData.get("instagramUrl") ?? ""));
   const tiktokUrl = normalizeUrl(String(formData.get("tiktokUrl") ?? ""));
   const menuBarHex = normalizeOptionalHex(String(formData.get("menuBarHex") ?? ""));
+  const heroVideoFrameHex = normalizeOptionalHex(String(formData.get("heroVideoFrameHex") ?? ""));
+  const listenBarBgHex = normalizeOptionalHex(String(formData.get("listenBarBgHex") ?? ""));
+  const listenBarTextHex = normalizeOptionalHex(String(formData.get("listenBarTextHex") ?? ""));
   let stationColors: Record<string, any> | null = null;
   try {
     const raw = String(formData.get("stationColorsJson") ?? "").trim();
@@ -95,6 +98,9 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       instagramUrl,
       tiktokUrl,
       menuBarHex,
+      heroVideoFrameHex,
+      listenBarBgHex,
+      listenBarTextHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,
@@ -109,6 +115,9 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       instagramUrl,
       tiktokUrl,
       menuBarHex,
+      heroVideoFrameHex,
+      listenBarBgHex,
+      listenBarTextHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,

@@ -15,6 +15,9 @@ type Defaults = {
   instagramUrl: string;
   tiktokUrl: string;
   menuBarHex: string;
+  heroVideoFrameHex: string;
+  listenBarBgHex: string;
+  listenBarTextHex: string;
   stationColors: Record<string, string>;
   homeHlsUrl: string;
 };
@@ -35,6 +38,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [instagramUrl, setInstagramUrl] = useState(defaults.instagramUrl ?? "");
   const [tiktokUrl, setTiktokUrl] = useState(defaults.tiktokUrl ?? "");
   const [menuBarHex, setMenuBarHex] = useState(defaults.menuBarHex ?? "");
+  const [heroVideoFrameHex, setHeroVideoFrameHex] = useState(defaults.heroVideoFrameHex ?? "");
+  const [listenBarBgHex, setListenBarBgHex] = useState(defaults.listenBarBgHex ?? "");
+  const [listenBarTextHex, setListenBarTextHex] = useState(defaults.listenBarTextHex ?? "");
   const [stationColors, setStationColors] = useState<Record<string, string>>(defaults.stationColors ?? {});
 
   return (
@@ -48,6 +54,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         fd.set("instagramUrl", instagramUrl);
         fd.set("tiktokUrl", tiktokUrl);
         fd.set("menuBarHex", menuBarHex);
+        fd.set("heroVideoFrameHex", heroVideoFrameHex);
+        fd.set("listenBarBgHex", listenBarBgHex);
+        fd.set("listenBarTextHex", listenBarTextHex);
         fd.set("stationColorsJson", JSON.stringify(stationColors));
         setBusy(true);
         setMsg(null);
@@ -196,6 +205,42 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
           className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
         />
       </label>
+
+      <div className="border-t border-white/10 pt-5">
+        <h2 className="text-lg font-black text-[var(--text-main)]">Homepage — video & luisterbalk</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Kleur rond de video (rand/glow) en het balkje met “Luister naar”. Leeg laten = defaults (video-accent cyan, balk primair groen, tekst wit).
+        </p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <label className="block text-xs font-semibold text-[var(--text-muted)]">
+          Video — accent / gloed (#hex)
+          <input
+            value={heroVideoFrameHex}
+            onChange={(e) => setHeroVideoFrameHex(e.target.value)}
+            placeholder="#22d3ee"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+        <label className="block text-xs font-semibold text-[var(--text-muted)]">
+          Balk “Luister naar” — achtergrond (#hex)
+          <input
+            value={listenBarBgHex}
+            onChange={(e) => setListenBarBgHex(e.target.value)}
+            placeholder={defaults.primaryHex}
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+        <label className="block text-xs font-semibold text-[var(--text-muted)]">
+          Balk — tekst (#hex)
+          <input
+            value={listenBarTextHex}
+            onChange={(e) => setListenBarTextHex(e.target.value)}
+            placeholder="#ffffff"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+      </div>
 
       <div className="border-t border-white/10 pt-5">
         <h2 className="text-lg font-black text-[var(--text-main)]">Zenders (kleuren)</h2>
