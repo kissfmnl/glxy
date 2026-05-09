@@ -8,6 +8,7 @@ export type PublicBranding = {
   accentHex: string;
   navyHex: string;
   yellowHex: string;
+  /** `logoDataUri` (ingesloten) of extern `/api`-pad / https */
   logoUrl: string | null;
   faviconUrl: string | null;
   homeHlsUrl: string;
@@ -19,6 +20,7 @@ export type PublicBranding = {
   listenBarBgHex: string | null;
   listenBarTextHex: string | null;
   stationColors: Record<string, any> | null;
+  stationsConfig: unknown | null;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
@@ -34,12 +36,13 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         row.stationColors && typeof row.stationColors === "object" && !Array.isArray(row.stationColors)
           ? (row.stationColors as Record<string, any>)
           : null;
+      const logoDisplay = row.logoDataUri ?? row.logoUrl ?? null;
       return {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
         navyHex: row.navyHex,
         yellowHex: row.yellowHex ?? "#ffe200",
-        logoUrl: row.logoUrl,
+        logoUrl: logoDisplay,
         faviconUrl: row.faviconUrl,
         homeHlsUrl: row.homeHlsUrl || DEFAULT_HLS,
         navItems,
@@ -50,6 +53,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         listenBarBgHex: row.listenBarBgHex ?? null,
         listenBarTextHex: row.listenBarTextHex ?? null,
         stationColors,
+        stationsConfig: row.stationsConfig ?? null,
       };
     }
   } catch {
@@ -71,5 +75,6 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     listenBarBgHex: null,
     listenBarTextHex: null,
     stationColors: null,
+    stationsConfig: null,
   };
 });

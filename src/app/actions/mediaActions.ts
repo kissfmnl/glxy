@@ -6,6 +6,7 @@ import path from "path";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
+import { inlineApiMediaUrlIfLocal } from "@/lib/inlineMediaFromApiUrl";
 import { publicMediaUrlFromStoragePath } from "@/lib/mediaPublicUrl";
 import { prisma } from "@/lib/prisma";
 import { absoluteWebsitePath } from "@/lib/websitePaths";
@@ -193,14 +194,28 @@ export async function applyMediaToBrandingAction(
   if (!url) return { error: "Ongeldig mediapad." };
 
   try {
+    const logoDataUri =
+      field === "logo" ? await inlineApiMediaUrlIfLocal(url) : null;
+    const inlinedLogo =
+      logoDataUri?.startsWith("data:image/") ? logoDataUri : null;
+
     await prisma.branding.upsert({
       where: { id: 1 },
       create: {
         id: 1,
-        ...(field === "logo" ? { logoUrl: url } : {}),
+        ...(field === "logo"
+          ? inlinedLogo
+            ? { logoDataUri: inlinedLogo, logoUrl: null }
+            : { logoUrl: url }
+          : {}),
         ...(field === "favicon" ? { faviconUrl: url } : {}),
       },
-      update: field === "logo" ? { logoUrl: url } : { faviconUrl: url },
+      update:
+        field === "logo"
+          ? inlinedLogo
+            ? { logoDataUri: inlinedLogo, logoUrl: null }
+            : { logoUrl: url, logoDataUri: null }
+          : { faviconUrl: url },
     });
   } catch (e) {
     console.error("[applyMediaToBrandingAction]", e);

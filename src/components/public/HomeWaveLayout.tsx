@@ -10,6 +10,7 @@ import type { HomeWaveCopy } from "@/types/home-wave";
 import AppImage from "@/components/AppImage";
 import { GlxyHeroLogoVideo } from "@/components/public/GlxyHeroLogoVideo";
 import { GlxyStationListenStrip } from "@/components/public/GlxyStationListenStrip";
+import type { GlxyStation } from "@/lib/glxyStations";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -55,6 +56,7 @@ export function HomeWaveLayout({
   djPhotos = [],
   homeHlsSrc,
   stationColors,
+  stations,
   heroLogoUrl,
 }: {
   copy: HomeWaveCopy;
@@ -64,6 +66,7 @@ export function HomeWaveLayout({
   /** HLS .m3u8 URL for homepage live embed */
   homeHlsSrc?: string | null;
   stationColors?: Record<string, string> | null;
+  stations: GlxyStation[];
   /** Admin-uploaded logo; valt terug op `/glxy-hero-logo-fallback.svg` */
   heroLogoUrl?: string | null;
 }) {
@@ -106,7 +109,7 @@ export function HomeWaveLayout({
           <GlxyHeroLogoVideo heroLogoSrc={heroLogoSrc} homeHlsSrc={homeHlsSrc ?? null} />
 
           <div className="mt-10 border-t border-white/10 pt-8 sm:mt-12 sm:pt-10 md:mt-14 md:pt-11">
-            <GlxyStationListenStrip colorOverrides={stationColors} />
+            <GlxyStationListenStrip stations={stations} colorOverrides={stationColors} />
           </div>
         </div>
       </section>

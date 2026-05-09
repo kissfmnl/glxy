@@ -3,19 +3,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import AppImage from "@/components/AppImage";
 import type { GlxyStation } from "@/lib/glxyStations";
-import { GLXY_STATIONS } from "@/lib/glxyStations";
 
 function StationLogoCompact({ station }: { station: GlxyStation }) {
   const initial = station.line1.charAt(0).toUpperCase();
   if (station.logoUrl) {
     return (
-      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md bg-white/20 shadow-inner ring-1 ring-black/10">
-        <AppImage src={station.logoUrl} alt="" width={32} height={32} className="h-full w-full object-cover" aria-hidden />
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-white/20 shadow-inner ring-1 ring-black/10 sm:h-12 sm:w-12">
+        <AppImage
+          src={station.logoUrl}
+          alt=""
+          width={1080}
+          height={1080}
+          className="h-full w-full object-cover object-center"
+          aria-hidden
+        />
       </div>
     );
   }
   return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-black/15 text-[10px] font-black uppercase tracking-tighter ring-1 ring-black/10">
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black/15 text-[11px] font-black uppercase tracking-tighter ring-1 ring-black/10 sm:h-12 sm:w-12">
       {initial}
     </div>
   );
@@ -71,7 +77,13 @@ function StationCardCompact({
   );
 }
 
-export function GlxyStationListenStrip({ colorOverrides }: { colorOverrides?: Record<string, string> | null } = {}) {
+export function GlxyStationListenStrip({
+  stations,
+  colorOverrides,
+}: {
+  stations: GlxyStation[];
+  colorOverrides?: Record<string, string> | null;
+}) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
 
@@ -111,7 +123,7 @@ export function GlxyStationListenStrip({ colorOverrides }: { colorOverrides?: Re
     <section className="w-full" aria-label="GLXY zenders">
       <audio ref={audioRef} className="hidden" preload="none" playsInline />
       <ul className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-2 lg:gap-3">
-        {GLXY_STATIONS.map((s) => (
+        {stations.map((s) => (
           <li key={s.id} className="min-w-0">
             <StationCardCompact station={s} playing={playingId === s.id} onToggle={() => toggle(s)} bgOverride={colorOverrides?.[s.id] ?? null} />
           </li>

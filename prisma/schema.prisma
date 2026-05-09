@@ -44,6 +44,8 @@ model Branding {
   navyHex    String   @default("#363636")
   yellowHex  String   @default("#ffe200")
   logoUrl    String?
+  /// Hero/header-logo als data-URI (overleeft deploy zonder schijf-volume)
+  logoDataUri String? @db.Text
   faviconUrl String?
   /// Publiek menu items (volgorde/editable)
   navItems   Json?
@@ -59,6 +61,8 @@ model Branding {
   listenBarTextHex String?
   /// Zenderkleuren override (id -> bgHex of {bgHex,textHex})
   stationColors Json?
+  /// Zenders: naam, subtitel, stream, logo (JSON-array; logo mag data-URI)
+  stationsConfig Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

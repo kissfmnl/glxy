@@ -3,6 +3,8 @@
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
+import { KEEP_STATION_LOGO } from "@/lib/glxyStations";
+import { MAX_IMAGE_DATA_URI_CHARS, inlineApiMediaUrlIfLocal } from "@/lib/inlineMediaFromApiUrl";
 import { prisma } from "@/lib/prisma";
 
 async function requireAdmin() {
@@ -37,6 +39,81 @@ function normalizeOptionalHex(raw: string | null | undefined): string | null {
   return `#${m[1]!.length === 3 ? m[1]!.split("").map((c) => c + c).join("") : m[1]!}`.toLowerCase();
 }
 
+async function resolveLogoFields(
+  formData: FormData,
+  prev: { logoUrl: string | null; logoDataUri: string | null } | null,
+): Promise<{ logoUrl: string | null; logoDataUri: string | null }> {
+  const logoEmbeddedMarker = formData.get("logoEmbeddedMarker") === "1";
+  const clearMainLogo = formData.get("clearMainLogo") === "1";
+  const logoUrlRaw = String(formData.get("logoUrl") ?? "").trim();
+
+  if (clearMainLogo) {
+    return { logoUrl: null, logoDataUri: null };
+  }
+  if (logoEmbeddedMarker && !logoUrlRaw) {
+    return {
+      logoUrl: prev?.logoUrl ?? null,
+      logoDataUri: prev?.logoDataUri ?? null,
+    };
+  }
+  if (!logoUrlRaw) {
+    return { logoUrl: null, logoDataUri: null };
+  }
+  if (logoUrlRaw.startsWith("/api/media/")) {
+    const inlined = await inlineApiMediaUrlIfLocal(logoUrlRaw);
+    if (inlined?.startsWith("data:image/")) {
+      return { logoUrl: null, logoDataUri: inlined };
+    }
+    return { logoUrl: logoUrlRaw, logoDataUri: null };
+  }
+  if (logoUrlRaw.startsWith("data:image/")) {
+    if (logoUrlRaw.length <= MAX_IMAGE_DATA_URI_CHARS) {
+      return { logoUrl: null, logoDataUri: logoUrlRaw };
+    }
+    return { logoUrl: prev?.logoUrl ?? null, logoDataUri: prev?.logoDataUri ?? null };
+  }
+  return { logoUrl: normalizeUrl(logoUrlRaw), logoDataUri: null };
+}
+
+async function mergeStationsConfig(raw: string, prevConfig: unknown): Promise<object[] | undefined> {
+  let incoming: unknown;
+  try {
+    incoming = JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+  if (!Array.isArray(incoming)) return undefined;
+  const prevArr = Array.isArray(prevConfig) ? prevConfig : [];
+  const prevById = new Map<string, { logoUrl?: string }>();
+  for (const p of prevArr) {
+    if (p && typeof p === "object" && typeof (p as { id?: string }).id === "string") {
+      prevById.set(String((p as { id: string }).id), p as { logoUrl?: string });
+    }
+  }
+  const out: object[] = [];
+  for (const inc of incoming) {
+    if (!inc || typeof inc !== "object") continue;
+    const id = String((inc as { id?: string }).id ?? "").trim();
+    if (!id) continue;
+    const prevSt = prevById.get(id);
+    let logoUrlStation = String((inc as { logoUrl?: string }).logoUrl ?? "").trim();
+    if (logoUrlStation === KEEP_STATION_LOGO) {
+      logoUrlStation = typeof prevSt?.logoUrl === "string" ? prevSt.logoUrl : "";
+    }
+    if (logoUrlStation.startsWith("/api/media/")) {
+      const inlined = await inlineApiMediaUrlIfLocal(logoUrlStation);
+      if (inlined?.startsWith("data:image/")) logoUrlStation = inlined;
+    }
+    const line1 = String((inc as { line1?: string }).line1 ?? "").trim();
+    const line2 = String((inc as { line2?: string }).line2 ?? "").trim();
+    const streamUrl = String((inc as { streamUrl?: string }).streamUrl ?? "").trim();
+    const row: Record<string, unknown> = { id, line1, line2, streamUrl };
+    if (logoUrlStation) row.logoUrl = logoUrlStation;
+    out.push(row);
+  }
+  return out;
+}
+
 export async function updateBrandingAction(formData: FormData): Promise<{ ok?: true; error?: string }> {
   await requireAdmin();
 
@@ -44,7 +121,6 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const accentHex = normalizeHex(String(formData.get("accentHex")), "#6d6d6d");
   const navyHex = normalizeHex(String(formData.get("navyHex")), "#363636");
   const yellowHex = normalizeHex(String(formData.get("yellowHex")), "#ffe200");
-  const logoUrl = normalizeUrl(String(formData.get("logoUrl") ?? ""));
   const faviconUrl = normalizeUrl(String(formData.get("faviconUrl") ?? ""));
   const instagramUrl = normalizeUrl(String(formData.get("instagramUrl") ?? ""));
   const tiktokUrl = normalizeUrl(String(formData.get("tiktokUrl") ?? ""));
@@ -80,10 +156,15 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
     navItems = null;
   }
   const homeHlsUrl = String(formData.get("homeHlsUrl") ?? "").trim();
-  const defaultM3 =
-    "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8";
+  const defaultM3 = "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8";
   const hlsFinal =
     !homeHlsUrl || homeHlsUrl.startsWith("https://") || homeHlsUrl.startsWith("http://") ? homeHlsUrl || defaultM3 : defaultM3;
+
+  const prev = await prisma.branding.findUnique({ where: { id: 1 } });
+  const { logoUrl, logoDataUri } = await resolveLogoFields(formData, prev);
+
+  const stationsRaw = String(formData.get("stationsJson") ?? "").trim();
+  const stationsMerged = stationsRaw ? await mergeStationsConfig(stationsRaw, prev?.stationsConfig) : undefined;
 
   await prisma.branding.upsert({
     where: { id: 1 },
@@ -94,6 +175,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       navyHex,
       yellowHex,
       logoUrl,
+      logoDataUri,
       faviconUrl,
       instagramUrl,
       tiktokUrl,
@@ -103,6 +185,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       listenBarTextHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
+      stationsConfig: stationsMerged ?? undefined,
       homeHlsUrl: hlsFinal,
     },
     update: {
@@ -111,6 +194,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       navyHex,
       yellowHex,
       logoUrl,
+      logoDataUri,
       faviconUrl,
       instagramUrl,
       tiktokUrl,
@@ -120,6 +204,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       listenBarTextHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
+      ...(stationsMerged !== undefined ? { stationsConfig: stationsMerged } : {}),
       homeHlsUrl: hlsFinal,
     },
   });

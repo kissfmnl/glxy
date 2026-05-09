@@ -145,9 +145,9 @@ export function HomeHlsEmbed({
             }`}
           />
           <div
-            className={`absolute z-[2] flex items-center md:inset-x-4 ${
+            className={`absolute z-[2] flex w-full items-center md:inset-x-4 ${
               hero
-                ? "pointer-events-none inset-x-2 bottom-2 gap-2 opacity-0 transition-opacity duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100"
+                ? "pointer-events-none inset-x-2 bottom-2 gap-2 px-1 opacity-0 transition-opacity duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100"
                 : "pointer-events-none inset-x-3 bottom-3 gap-3 [&>*]:pointer-events-auto"
             }`}
           >
@@ -181,7 +181,7 @@ export function HomeHlsEmbed({
             <div
               className={
                 hero
-                  ? "flex max-w-[min(32vw,118px)] shrink-0 items-center gap-1 rounded-md bg-white/[0.05] px-1.5 py-0.5 ring-1 ring-white/10 backdrop-blur-sm sm:max-w-[132px]"
+                  ? "flex min-w-0 flex-1 items-center gap-1 rounded-md bg-white/[0.05] px-1.5 py-0.5 ring-1 ring-white/10 backdrop-blur-sm"
                   : "flex min-w-0 max-w-[min(60vw,240px)] flex-1 items-center gap-1.5 rounded-md bg-white/[0.06] px-2 py-1 ring-1 ring-white/12 backdrop-blur"
               }
             >

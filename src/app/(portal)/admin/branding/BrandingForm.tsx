@@ -1,6 +1,8 @@
 "use client";
 
 import { updateBrandingAction } from "@/app/actions/glxyBrandingActions";
+import { KEEP_STATION_LOGO } from "@/lib/glxyStations";
+import type { GlxyStationInput } from "@/lib/glxyStations";
 import { BrandingUploadPick } from "./BrandingUploadPick";
 import { useState } from "react";
 
@@ -20,6 +22,9 @@ type Defaults = {
   listenBarTextHex: string;
   stationColors: Record<string, string>;
   homeHlsUrl: string;
+  stations: GlxyStationInput[];
+  stationsLogoEmbedded: Record<string, boolean>;
+  mainLogoEmbedded: boolean;
 };
 
 const PRESETS = {
@@ -32,7 +37,8 @@ const PRESETS = {
 export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [logoUrl, setLogoUrl] = useState(defaults.logoUrl);
+  const [logoUrl, setLogoUrl] = useState(defaults.mainLogoEmbedded ? "" : defaults.logoUrl);
+  const [clearMainLogo, setClearMainLogo] = useState(false);
   const [faviconUrl, setFaviconUrl] = useState(defaults.faviconUrl);
   const [navItems, setNavItems] = useState<Array<{ href: string; label: string }>>(defaults.navItems ?? []);
   const [instagramUrl, setInstagramUrl] = useState(defaults.instagramUrl ?? "");
@@ -42,6 +48,10 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [listenBarBgHex, setListenBarBgHex] = useState(defaults.listenBarBgHex ?? "");
   const [listenBarTextHex, setListenBarTextHex] = useState(defaults.listenBarTextHex ?? "");
   const [stationColors, setStationColors] = useState<Record<string, string>>(defaults.stationColors ?? {});
+  const [stations, setStations] = useState<GlxyStationInput[]>(defaults.stations ?? []);
+
+  const embeddedMarkerActive =
+    defaults.mainLogoEmbedded && !clearMainLogo && !logoUrl.trim();
 
   return (
     <form
@@ -58,6 +68,17 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         fd.set("listenBarBgHex", listenBarBgHex);
         fd.set("listenBarTextHex", listenBarTextHex);
         fd.set("stationColorsJson", JSON.stringify(stationColors));
+        fd.set(
+          "stationsJson",
+          JSON.stringify(
+            stations.map((s) => ({
+              ...s,
+              logoUrl:
+                s.logoUrl.trim() ||
+                (defaults.stationsLogoEmbedded[s.id] ? KEEP_STATION_LOGO : ""),
+            })),
+          ),
+        );
         setBusy(true);
         setMsg(null);
         const res = await updateBrandingAction(fd);
@@ -67,6 +88,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       }}
       className="card space-y-5 border border-white/10 bg-white/[0.04] backdrop-blur"
     >
+      <input type="hidden" name="clearMainLogo" value={clearMainLogo ? "1" : "0"} />
+      <input type="hidden" name="logoEmbeddedMarker" value={embeddedMarkerActive ? "1" : "0"} />
+
       <div>
         <h2 className="text-lg font-black text-[var(--text-main)]">Kleuren (GLXY)</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
@@ -136,16 +160,44 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <label className="block text-xs font-semibold text-[var(--text-muted)]">
-            Logo-URL (header)
+            Logo-URL (header + hero)
             <input
               name="logoUrl"
               value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
+              onChange={(e) => {
+                setLogoUrl(e.target.value);
+                setClearMainLogo(false);
+              }}
               placeholder="/api/media/… of https://…"
               className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
             />
           </label>
-          <BrandingUploadPick label="Upload logo" onUploaded={(url) => setLogoUrl(url)} />
+          {defaults.mainLogoEmbedded && !clearMainLogo && !logoUrl.trim() ? (
+            <p className="text-[11px] font-semibold text-[var(--brand-primary)]">
+              Hero-logo staat ingesloten in de database — blijft zichtbaar na een nieuwe deploy (geen afhankelijkheid van schijf-upload).
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            <BrandingUploadPick
+              label="Upload logo"
+              onUploaded={(url) => {
+                setLogoUrl(url);
+                setClearMainLogo(false);
+              }}
+            />
+            {(defaults.mainLogoEmbedded || logoUrl.trim()) && (
+              <button
+                type="button"
+                className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-black text-white/85 hover:bg-white/10"
+                onClick={() => {
+                  setLogoUrl("");
+                  setClearMainLogo(true);
+                }}
+              >
+                Verwijder logo
+              </button>
+            )}
+          </div>
         </div>
         <div className="space-y-2">
           <label className="block text-xs font-semibold text-[var(--text-muted)]">
@@ -246,9 +298,76 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       </div>
 
       <div className="border-t border-white/10 pt-5">
+        <h2 className="text-lg font-black text-[var(--text-main)]">Stations</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Zenders op de homepage (GLXY Main, Non-Stop, …): naam, subtitel, streamlink en optioneel een vierkant logo (bron bv. 1080×1080; wordt klein op de kaart getoond). Bij opslaan worden uploads vanaf <code className="text-[var(--brand-yellow)]">/api/media/</code> net als het hoofdlogo in de database ingesloten.
+        </p>
+      </div>
+      <div className="grid gap-4">
+        {stations.map((s, idx) => (
+          <div key={s.id} className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-3">
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--brand-yellow)]">{s.id}</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="block text-xs font-semibold text-[var(--text-muted)]">
+                Radionaam
+                <input
+                  value={s.line1}
+                  onChange={(e) =>
+                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, line1: e.target.value } : x)))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-sm font-black text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+                />
+              </label>
+              <label className="block text-xs font-semibold text-[var(--text-muted)]">
+                Subtitel
+                <input
+                  value={s.line2}
+                  onChange={(e) =>
+                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, line2: e.target.value } : x)))
+                  }
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+                />
+              </label>
+              <label className="block text-xs font-semibold text-[var(--text-muted)] md:col-span-2">
+                Stream-URL
+                <input
+                  value={s.streamUrl}
+                  onChange={(e) =>
+                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, streamUrl: e.target.value } : x)))
+                  }
+                  placeholder="https://…"
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+                />
+              </label>
+              <label className="block text-xs font-semibold text-[var(--text-muted)] md:col-span-2">
+                Logo-URL (optioneel)
+                <input
+                  value={s.logoUrl}
+                  onChange={(e) =>
+                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, logoUrl: e.target.value } : x)))
+                  }
+                  placeholder="/api/media/… of https://…"
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+                />
+              </label>
+            </div>
+            {defaults.stationsLogoEmbedded[s.id] && !s.logoUrl.trim() ? (
+              <p className="text-[11px] font-semibold text-[var(--brand-primary)]">Logo ingesloten — upload om te vervangen.</p>
+            ) : null}
+            <BrandingUploadPick
+              label={`Upload logo (${s.id})`}
+              onUploaded={(url) =>
+                setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, logoUrl: url } : x)))
+              }
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-white/10 pt-5">
         <h2 className="text-lg font-black text-[var(--text-main)]">Zenders (kleuren)</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Alleen kleuren voor de zenderkaarten links op de homepage. Gebruik hex (bijv. <code className="text-[var(--brand-yellow)]">#e11d48</code>).
+          Achtergrondkleuren voor de zenderkaarten. Gebruik hex (bijv. <code className="text-[var(--brand-yellow)]">#e11d48</code>).
         </p>
       </div>
       <div className="grid gap-3 md:grid-cols-2">

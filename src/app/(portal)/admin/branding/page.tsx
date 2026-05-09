@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth";
+import { stationsForAdminFormDefaults } from "@/lib/glxyStations";
 import { prisma } from "@/lib/prisma";
 import { BrandingForm } from "./BrandingForm";
 import { getServerSession } from "next-auth";
@@ -37,6 +38,8 @@ const FALLBACK = {
   homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
 };
 
+const FALLBACK_STATIONS = stationsForAdminFormDefaults(null);
+
 export const metadata = {
   title: "Huisstijl — GLXY",
 };
@@ -45,7 +48,11 @@ export default async function AdminBrandingPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
 
-  let defaults = { ...FALLBACK };
+  let defaults = {
+    ...FALLBACK,
+    ...FALLBACK_STATIONS,
+    mainLogoEmbedded: false,
+  };
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 } });
     if (row) {
@@ -54,6 +61,7 @@ export default async function AdminBrandingPage() {
         row.navItems.every((x: any) => x && typeof x.href === "string" && typeof x.label === "string")
           ? (row.navItems as Array<{ href: string; label: string }>)
           : FALLBACK.navItems;
+      const stationDefaults = stationsForAdminFormDefaults(row.stationsConfig ?? null);
       defaults = {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
@@ -73,6 +81,8 @@ export default async function AdminBrandingPage() {
             ? (row.stationColors as any)
             : FALLBACK.stationColors,
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,
+        ...stationDefaults,
+        mainLogoEmbedded: !!row.logoDataUri,
       };
     }
   } catch {
