@@ -51,73 +51,78 @@ function resolveImageMime(file: File): string | null {
 export async function uploadMediaAssetAction(
   formData: FormData,
 ): Promise<{ ok?: true; url?: string; id?: string; error?: string }> {
-  const auth = await requireAdmin();
-  if ("error" in auth) return { error: auth.error };
-
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: "Kies een bestand." };
-  }
-  if (file.size > MAX_BYTES) {
-    return { error: "Bestand te groot (max. 10 MB)." };
-  }
-  const mimeType = resolveImageMime(file);
-  const ext = mimeType ? MIME_EXT[mimeType] : null;
-  if (!mimeType || !ext) {
-    return { error: "Alleen afbeeldingen (jpg, png, gif, webp, svg)." };
-  }
-
-  let buf: Buffer;
   try {
-    buf = Buffer.from(await file.arrayBuffer());
-  } catch {
-    return { error: "Bestand kon niet worden gelezen." };
-  }
+    const auth = await requireAdmin();
+    if ("error" in auth) return { error: auth.error };
 
-  const safeName = file.name.replace(/[^\w.\-()\s]/g, "_").slice(0, 80);
-  const base = `${randomUUID()}-${safeName || "upload"}${ext}`;
-  let storagePath: string;
-  try {
-    storagePath = await writeUnderWebsite(["media", base], buf);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes("WEBSITE_FILES_ROOT")) {
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) {
+      return { error: "Kies een bestand." };
+    }
+    if (file.size > MAX_BYTES) {
+      return { error: "Bestand te groot (max. 10 MB)." };
+    }
+    const mimeType = resolveImageMime(file);
+    const ext = mimeType ? MIME_EXT[mimeType] : null;
+    if (!mimeType || !ext) {
+      return { error: "Alleen afbeeldingen (jpg, png, gif, webp, svg)." };
+    }
+
+    let buf: Buffer;
+    try {
+      buf = Buffer.from(await file.arrayBuffer());
+    } catch {
+      return { error: "Bestand kon niet worden gelezen." };
+    }
+
+    const safeName = file.name.replace(/[^\w.\-()\s]/g, "_").slice(0, 80);
+    const base = `${randomUUID()}-${safeName || "upload"}${ext}`;
+    let storagePath: string;
+    try {
+      storagePath = await writeUnderWebsite(["media", base], buf);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("WEBSITE_FILES_ROOT")) {
+        return {
+          error:
+            "Upload geblokkeerd: zet WEBSITE_FILES_ROOT op een persistent pad of ALLOW_EPHEMERAL_WEBSITE_FILES=1 op Railway (zie RAILWAY.md).",
+        };
+      }
+      return { error: msg || "Schrijven mislukt." };
+    }
+
+    let row;
+    try {
+      row = await prisma.mediaAsset.create({
+        data: {
+          filename: file.name || base,
+          storagePath,
+          mimeType,
+          sizeBytes: buf.length,
+        },
+      });
+    } catch (e) {
+      try {
+        const abs = absoluteWebsitePath(storagePath);
+        await fs.unlink(abs).catch(() => {});
+      } catch {
+        /* ignore */
+      }
+      console.error("[uploadMediaAssetAction]", e);
       return {
         error:
-          "Upload geblokkeerd: zet WEBSITE_FILES_ROOT op een persistent pad of ALLOW_EPHEMERAL_WEBSITE_FILES=1 op Railway (zie RAILWAY.md).",
+          "Opslaan in de database mislukt. Voer lokaal/server `npx prisma db push` uit zodat het model MediaAsset bestaat.",
       };
     }
-    return { error: msg || "Schrijven mislukt." };
-  }
 
-  let row;
-  try {
-    row = await prisma.mediaAsset.create({
-      data: {
-        filename: file.name || base,
-        storagePath,
-        mimeType,
-        sizeBytes: buf.length,
-      },
-    });
+    const url = publicMediaUrlFromStoragePath(storagePath);
+    revalidatePath("/admin/media");
+    revalidatePath("/admin/branding");
+    return { ok: true, url, id: row.id };
   } catch (e) {
-    try {
-      const abs = absoluteWebsitePath(storagePath);
-      await fs.unlink(abs).catch(() => {});
-    } catch {
-      /* ignore */
-    }
-    console.error("[uploadMediaAssetAction]", e);
-    return {
-      error:
-        "Opslaan in de database mislukt. Voer lokaal/server `npx prisma db push` uit zodat het model MediaAsset bestaat.",
-    };
+    console.error("[uploadMediaAssetAction] unexpected", e);
+    return { error: "Upload mislukt door een serverfout. Check server logs (digest) voor details." };
   }
-
-  const url = publicMediaUrlFromStoragePath(storagePath);
-  revalidatePath("/admin/media");
-  revalidatePath("/admin/branding");
-  return { ok: true, url, id: row.id };
 }
 
 export async function listMediaAssetsAction(): Promise<
