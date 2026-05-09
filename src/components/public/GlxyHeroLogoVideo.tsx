@@ -13,15 +13,22 @@ function GlxyHeroLogo({ src }: { src: string }) {
   }, [src]);
 
   return (
-    <AppImage
-      src={resolved}
-      alt="GLXY"
-      width={720}
-      height={220}
-      priority
-      onError={() => setResolved("/glxy-hero-logo-fallback.svg")}
-      className="h-auto w-full max-h-[min(56vw,320px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[min(40vw,300px)] xl:max-h-[340px]"
-    />
+    <div
+      className="select-none"
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
+    >
+      <AppImage
+        src={resolved}
+        alt="GLXY"
+        width={720}
+        height={220}
+        priority
+        draggable={false}
+        onError={() => setResolved("/glxy-hero-logo-fallback.svg")}
+        className="h-auto w-full max-h-[min(56vw,320px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[min(40vw,300px)] xl:max-h-[340px]"
+      />
+    </div>
   );
 }
 

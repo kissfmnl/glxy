@@ -22,11 +22,11 @@ export function HomeHlsEmbed({
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRootRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  const volumeRef = useRef(0.7);
+  const volumeRef = useRef(0);
   const [status, setStatus] = useState<"idle" | "playing" | "error">("idle");
   const [isPaused, setIsPaused] = useState(true);
-  const [volume, setVolume] = useState(0.7);
-  /** Start muted so autoplay is allowed; unmute when the user sets volume or presses play. */
+  const [volume, setVolume] = useState(0);
+  /** Start muted + volume 0 so autoplay is allowed and playback is still until the user raises volume. */
   const [muted, setMuted] = useState(true);
 
   volumeRef.current = volume;
@@ -121,7 +121,10 @@ export function HomeHlsEmbed({
           De livestream kan in deze browser niet worden afgespeeld. Safari of een recente Chrome/Chromium-desktop helpt vaak het best voor HLS.
         </p>
       ) : (
-        <div ref={playerRootRef} className={hero ? "absolute inset-0 overflow-hidden" : "relative"}>
+        <div
+          ref={playerRootRef}
+          className={hero ? "group absolute inset-0 overflow-hidden" : "relative"}
+        >
           <video
             ref={videoRef}
             className={videoClassName}
@@ -131,8 +134,18 @@ export function HomeHlsEmbed({
             aria-label={title ?? "GLXY live video"}
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-[2] flex items-center gap-3 md:inset-x-4 [&>*]:pointer-events-auto">
+          <div
+            className={`pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent ${
+              hero ? "opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100" : ""
+            }`}
+          />
+          <div
+            className={`absolute inset-x-3 bottom-3 z-[2] flex items-center gap-3 md:inset-x-4 ${
+              hero
+                ? "pointer-events-none opacity-0 transition-opacity duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100"
+                : "pointer-events-none [&>*]:pointer-events-auto"
+            }`}
+          >
             <button
               type="button"
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
@@ -209,8 +222,20 @@ export function HomeHlsEmbed({
               }}
               aria-label="Fullscreen"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 3H5a2 2 0 0 0-2 2v3m18-3v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3m11-5h3a2 2 0 0 0 2-2v-3" />
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
               </svg>
             </button>
           </div>
