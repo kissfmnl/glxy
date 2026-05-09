@@ -26,7 +26,7 @@ function GlxyHeroLogo({ src }: { src: string }) {
         priority
         draggable={false}
         onError={() => setResolved("/glxy-hero-logo-fallback.svg")}
-        className="h-auto w-full max-h-[min(56vw,320px)] object-contain object-left [filter:drop-shadow(0_10px_40px_rgba(34,211,238,0.42))_drop-shadow(0_6px_32px_rgba(11,117,87,0.45))] lg:max-h-[min(40vw,300px)] xl:max-h-[340px]"
+        className="h-auto w-full max-h-[min(56vw,320px)] object-contain object-left [filter:drop-shadow(0_2px_14px_rgba(0,0,0,0.45))_drop-shadow(0_0_28px_color-mix(in_srgb,var(--brand-yellow)_22%,transparent))] lg:max-h-[min(40vw,300px)] xl:max-h-[340px]"
       />
     </div>
   );

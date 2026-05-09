@@ -126,7 +126,10 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       <div className="border-t border-white/10 pt-5">
         <h2 className="text-lg font-black text-[var(--text-main)]">Logo & favicon</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Upload een bestand (komt in de mediabibliotheek) of plak een externe URL. Voor favicon werkt vierkante PNG of SVG het best.
+          Upload een bestand (mediabibliotheek) of plak een URL. <strong className="font-semibold text-[var(--text-main)]">Let op bij deploy:</strong> paden als{" "}
+          <code className="text-[var(--brand-yellow)]">/api/media/…</code> wijzen naar bestanden op de server. Zonder persistent schijf-volume (zoals Railway met{" "}
+          <code className="text-[var(--brand-yellow)]">WEBSITE_FILES_ROOT</code>) gaan die uploads bij een nieuwe deploy vaak verloren — dan zie je de fallback-placeholder in plaats van jouw logo. Gebruik een bestand in{" "}
+          <code className="text-[var(--brand-yellow)]">public/</code> (in git gecommit, bv. <code className="text-[var(--brand-yellow)]">/mijn-logo.png</code>) of een vaste externe CDN-URL voor een stabiel logo.
         </p>
       </div>
 
@@ -207,9 +210,9 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
       </label>
 
       <div className="border-t border-white/10 pt-5">
-        <h2 className="text-lg font-black text-[var(--text-main)]">Homepage — video & luisterbalk</h2>
+        <h2 className="text-lg font-black text-[var(--text-main)]">Homepage — videokader</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Kleur rond de video (rand/glow) en het balkje met “Luister naar”. Leeg laten = defaults (video-accent cyan, balk primair groen, tekst wit).
+          Accentkleur rond de homepage-video. Leeg laten = standaard GLXY-geel (#ffe200). Onderstaande balk-kleuren zijn optioneel (CSS-variabelen; het label “Luister naar” staat niet meer op de site).
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
@@ -218,7 +221,7 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
           <input
             value={heroVideoFrameHex}
             onChange={(e) => setHeroVideoFrameHex(e.target.value)}
-            placeholder="#22d3ee"
+            placeholder="#ffe200"
             className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
           />
         </label>

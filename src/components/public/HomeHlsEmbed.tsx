@@ -1,7 +1,12 @@
 "use client";
 
 import Hls from "hls.js";
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
+
+function volumeSliderStyle(volume: number): CSSProperties {
+  return { ["--kiss-vol-pct" as string]: `${Math.round(volume * 100)}%` };
+}
 
 export function HomeHlsEmbed({
   src,
@@ -140,15 +145,17 @@ export function HomeHlsEmbed({
             }`}
           />
           <div
-            className={`absolute inset-x-3 bottom-3 z-[2] flex items-center gap-3 md:inset-x-4 ${
+            className={`absolute z-[2] flex items-center md:inset-x-4 ${
               hero
-                ? "pointer-events-none opacity-0 transition-opacity duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100"
-                : "pointer-events-none [&>*]:pointer-events-auto"
+                ? "pointer-events-none inset-x-2 bottom-2 gap-2 opacity-0 transition-opacity duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100"
+                : "pointer-events-none inset-x-3 bottom-3 gap-3 [&>*]:pointer-events-auto"
             }`}
           >
             <button
               type="button"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
+              className={`inline-flex shrink-0 items-center justify-center rounded-md bg-white/12 text-white ring-1 ring-white/15 backdrop-blur hover:bg-white/18 ${
+                hero ? "h-8 w-8" : "h-10 w-10"
+              }`}
               onClick={() => {
                 const v = videoRef.current;
                 if (!v) return;
@@ -171,8 +178,19 @@ export function HomeHlsEmbed({
               )}
             </button>
 
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md bg-white/10 px-3 py-2 ring-1 ring-white/15 backdrop-blur">
-              <svg className="h-4 w-4 text-white/85" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <div
+              className={
+                hero
+                  ? "flex max-w-[min(32vw,118px)] shrink-0 items-center gap-1 rounded-md bg-white/[0.05] px-1.5 py-0.5 ring-1 ring-white/10 backdrop-blur-sm sm:max-w-[132px]"
+                  : "flex min-w-0 max-w-[min(60vw,240px)] flex-1 items-center gap-1.5 rounded-md bg-white/[0.06] px-2 py-1 ring-1 ring-white/12 backdrop-blur"
+              }
+            >
+              <svg
+                className={`shrink-0 text-white/60 ${hero ? "h-3 w-3" : "h-3.5 w-3.5 text-white/72"}`}
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
                 <path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zm0-9v2.06a9 9 0 0 1 0 13.88V21a11 11 0 0 0 0-18z" />
               </svg>
               <input
@@ -186,14 +204,17 @@ export function HomeHlsEmbed({
                   setVolume(val);
                   setMuted(val === 0);
                 }}
-                className="w-full"
+                className={`kiss-volume-slider-mini ${hero ? "h-3 min-w-[64px] flex-1" : "h-4 min-w-[80px] flex-1"}`}
+                style={volumeSliderStyle(volume)}
                 aria-label="Volume"
               />
             </div>
 
             <button
               type="button"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/15 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20"
+              className={`inline-flex shrink-0 items-center justify-center rounded-md bg-white/12 text-white ring-1 ring-white/15 backdrop-blur hover:bg-white/18 ${
+                hero ? "h-8 w-8" : "h-10 w-10"
+              }`}
               onClick={async () => {
                 const root = playerRootRef.current;
                 if (!root) return;
@@ -224,7 +245,7 @@ export function HomeHlsEmbed({
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-5 w-5 shrink-0"
+                className={`shrink-0 ${hero ? "h-4 w-4" : "h-5 w-5"}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
