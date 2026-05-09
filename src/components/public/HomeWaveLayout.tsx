@@ -205,51 +205,59 @@ export function HomeWaveLayout({
 
         <div className="relative z-10 max-w-6xl mx-auto px-3.5 sm:px-4 md:px-8 [isolation:isolate]">
           <div className={`min-w-0 ${PUBLIC_PAGE_INTRO}`}>
-            <div className="flex flex-row items-start gap-4 sm:gap-5 md:items-center md:gap-8">
-              <div className="min-w-0 flex-1 flex flex-col">
-                {copy.showHeroKicker ? (
-                  <p
-                    className={`text-[11px] font-black tracking-[0.35em] uppercase ${
-                      copy.heroKicker.trim() ? "text-[#7fe8e8]" : "text-transparent pointer-events-none select-none"
-                    }`}
-                    aria-hidden={!copy.heroKicker.trim()}
-                  >
-                    {copy.heroKicker.trim() ? copy.heroKicker : "\u00a0"}
-                  </p>
-                ) : null}
-                <HeroHeadline
-                  hasKickerAbove={copy.showHeroKicker}
-                  part1={copy.heroTitle1}
-                  part1Color={copy.heroTitle1Color}
-                  part2={copy.heroTitle2}
-                  part2Color={copy.heroTitle2Color}
-                  layout={copy.heroTitleLayout}
-                />
-                <HomeHeroSubtitle text={copy.heroSubtitle} />
-              </div>
-              {copy.showLipsLogo ? (
-                <div className="shrink-0 flex translate-y-1 items-center justify-center self-start max-md:-translate-y-0.5 max-md:-mr-2 sm:translate-y-1.5 md:mr-0">
-                  <AppImage
-                    src={MOCK_COVER_FALLBACK}
-                    alt=""
-                    className="h-14 w-auto sm:h-[4.5rem] md:h-28 lg:h-[7.75rem] object-contain drop-shadow-lg opacity-95"
-                    loading="lazy"
-                    draggable={false}
-                  />
+            {/* Mobiel: GLXY TV eerst (direct zichtbaar). Desktop: koptekst links, TV rechtsboven (sticky). */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8 xl:gap-10">
+              <div className="order-2 min-w-0 flex-1 lg:order-1">
+                <div className="flex flex-row items-start gap-4 sm:gap-5 md:items-center md:gap-8">
+                  <div className="min-w-0 flex-1 flex flex-col">
+                    {copy.showHeroKicker ? (
+                      <p
+                        className={`text-[11px] font-black tracking-[0.35em] uppercase ${
+                          copy.heroKicker.trim() ? "text-[#7fe8e8]" : "text-transparent pointer-events-none select-none"
+                        }`}
+                        aria-hidden={!copy.heroKicker.trim()}
+                      >
+                        {copy.heroKicker.trim() ? copy.heroKicker : "\u00a0"}
+                      </p>
+                    ) : null}
+                    <HeroHeadline
+                      hasKickerAbove={copy.showHeroKicker}
+                      part1={copy.heroTitle1}
+                      part1Color={copy.heroTitle1Color}
+                      part2={copy.heroTitle2}
+                      part2Color={copy.heroTitle2Color}
+                      layout={copy.heroTitleLayout}
+                    />
+                    <HomeHeroSubtitle text={copy.heroSubtitle} />
+                  </div>
+                  {copy.showLipsLogo ? (
+                    <div className="shrink-0 flex translate-y-1 items-center justify-center self-start max-md:-translate-y-0.5 max-md:-mr-2 sm:translate-y-1.5 md:mr-0">
+                      <AppImage
+                        src={MOCK_COVER_FALLBACK}
+                        alt=""
+                        className="h-14 w-auto sm:h-[4.5rem] md:h-28 lg:h-[7.75rem] object-contain drop-shadow-lg opacity-95"
+                        loading="lazy"
+                        draggable={false}
+                      />
+                    </div>
+                  ) : null}
                 </div>
+              </div>
+
+              {homeHlsSrc ? (
+                <aside className="order-1 w-full lg:order-2 lg:sticky lg:top-[5.25rem] lg:z-20 lg:w-[min(100%,420px)] lg:min-w-[300px] lg:max-w-[440px] lg:shrink-0 xl:top-[5.5rem]">
+                  <p className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.28em] text-[#7fe8e8]/95 lg:text-right">
+                    GLXY TV · Live meekijken
+                  </p>
+                  <HomeHlsEmbed compact src={homeHlsSrc} title="GLXY TV live video" className="shadow-[0_20px_60px_rgba(0,0,0,0.55)]" />
+                </aside>
               ) : null}
             </div>
           </div>
 
           {copy.showPolaroids ? <PolaroidStrip items={polaroids} /> : null}
 
-          <div className="mt-10 md:mt-12 space-y-6 md:space-y-8">
-            {homeHlsSrc ? (
-              <div>
-                <p className="mb-3 text-[11px] font-black uppercase tracking-[0.28em] text-[#7fe8e8]/90">Live beeld</p>
-                <HomeHlsEmbed src={homeHlsSrc} title="GLXY live video" />
-              </div>
-            ) : null}
+          <div className="mt-10 md:mt-12">
             <NowNextCard
               withPlayer
               variant="hero"

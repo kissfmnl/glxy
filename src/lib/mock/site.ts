@@ -21,13 +21,15 @@ export const MOCK_PUBLIC_UI = {
 
 export const MOCK_NAV = [
   { href: "/", label: "Home" },
+  { href: "/glxy-tv", label: "GLXY TV" },
   { href: "/playlist", label: "Playlist" },
-  { href: "/programmering", label: "Programmering" },
-  { href: "/djs", label: "Hosts" },
-  { href: "/kiss40", label: "GLXY40" },
+  { href: "/adverteren", label: "Adverteren" },
+  { href: "/drop-n-demo", label: "Drop 'n Demo" },
+  { href: "/passdeaux", label: "Passdeaux" },
+  { href: "/airplay-top-20", label: "Airplay Top 20" },
   { href: "/frequenties", label: "Frequenties" },
-  { href: "/join-kiss", label: "Word host" },
-  { href: "/acties", label: "Acties" },
+  { href: "/radioplayer", label: "Radioplayer" },
+  { href: "/press", label: "Press" },
 ] as const;
 
 export const MOCK_HOME_WAVE_COPY: HomeWaveCopy = {

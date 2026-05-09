@@ -74,18 +74,18 @@ export function PublicHeader({
           </Link>
 
           <nav
-            className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex lg:items-center lg:justify-center lg:gap-1 xl:gap-1.5"
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden max-w-[min(94vw,920px)] -translate-x-1/2 -translate-y-1/2 lg:flex lg:items-center lg:justify-center"
             aria-label="Hoofdmenu"
           >
-            <div className="pointer-events-auto flex items-center gap-1 xl:gap-1.5">
+            <div className="pointer-events-auto flex max-w-full items-center gap-0.5 overflow-x-auto overflow-y-visible whitespace-nowrap px-1 py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] xl:gap-1 [&::-webkit-scrollbar]:hidden">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`kiss-public-nav-link inline-flex touch-manipulation items-center whitespace-nowrap rounded-xl px-3 py-2 text-sm font-black outline-none ${
+                  className={`kiss-public-nav-link inline-flex touch-manipulation items-center whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-black outline-none xl:rounded-xl xl:px-2.5 xl:py-2 xl:text-xs 2xl:text-sm ${
                     isActive(item.href)
-                      ? "border border-cyan-400/40 bg-white/10 text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.15)]"
-                      : "border border-transparent text-white/90 hover:text-cyan-100"
+                      ? "border border-[var(--brand-primary)]/45 bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] shadow-[0_0_20px_rgba(11,117,87,0.2)]"
+                      : "border border-transparent text-white/90 hover:text-[var(--brand-primary)]"
                   }`}
                 >
                   <span>{item.label}</span>

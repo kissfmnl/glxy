@@ -6,10 +6,15 @@ import { useEffect, useRef, useState } from "react";
 export function HomeHlsEmbed({
   src,
   title,
+  compact,
+  className,
 }: {
   /** HLS playlist URL (.m3u8) */
   src: string;
   title?: string;
+  /** Small fixed column / hero sidebar */
+  compact?: boolean;
+  className?: string;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -67,12 +72,21 @@ export function HomeHlsEmbed({
 
   if (!src) return null;
 
+  const shell =
+    "relative overflow-hidden rounded-2xl border bg-black/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10";
+  const borderAccent = "border-[var(--brand-primary)]/35";
+
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-[#1e375a]/20 bg-black/85 shadow-[0_14px_50px_rgba(12,31,51,0.35)]">
-      <div className="absolute left-4 top-3 z-[1] flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm">Live</span>
-        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white/90 backdrop-blur">
-          Geluid standaard uit
+    <div className={`${shell} ${borderAccent} ${compact ? "rounded-2xl" : "rounded-3xl"} ${className ?? ""}`}>
+      <div className="absolute left-3 top-2.5 z-[1] flex flex-wrap items-center gap-1.5 md:left-4 md:top-3">
+        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm md:text-[10px]">
+          Live
+        </span>
+        <span className="rounded-full bg-[var(--brand-navy)]/90 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--brand-yellow)] backdrop-blur md:text-[10px]">
+          GLXY TV
+        </span>
+        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white/90 backdrop-blur md:text-[10px]">
+          Geluid uit
         </span>
       </div>
       {status === "error" ? (
@@ -82,7 +96,9 @@ export function HomeHlsEmbed({
       ) : (
         <video
           ref={videoRef}
-          className="aspect-video max-h-[min(55vh,520px)] w-full bg-black object-contain"
+          className={`aspect-video w-full bg-black object-contain ${
+            compact ? "max-h-[min(42vh,380px)] md:max-h-[min(46vh,420px)]" : "max-h-[min(55vh,520px)]"
+          }`}
           controls
           muted
           autoPlay
