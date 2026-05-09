@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { Providers } from "@/components/Providers";
 import { authOptions } from "@/lib/auth";
 import { getBranding } from "@/lib/brandingDb";
+import { mergePlayerUi, playerUiToCssVars } from "@/lib/playerUi";
 
 export async function generateMetadata(): Promise<Metadata> {
   const b = await getBranding();
@@ -27,6 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [session, branding] = await Promise.all([getServerSession(authOptions), getBranding()]);
+  const playerUiVars = playerUiToCssVars(mergePlayerUi(branding.playerUi));
 
   const htmlBrandingVars: CSSProperties & Record<string, string> = {
     "--brand-primary": branding.primaryHex,
@@ -38,6 +40,7 @@ export default async function RootLayout({
     "--glxy-hero-video-frame": branding.heroVideoFrameHex || "#ffe200",
     "--glxy-listen-bar-bg": branding.listenBarBgHex || branding.primaryHex,
     "--glxy-listen-bar-text": branding.listenBarTextHex || "#ffffff",
+    ...playerUiVars,
   };
 
   return (

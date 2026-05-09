@@ -21,6 +21,7 @@ export type PublicBranding = {
   listenBarTextHex: string | null;
   stationColors: Record<string, any> | null;
   stationsConfig: unknown | null;
+  playerUi: unknown | null;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
@@ -54,6 +55,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         listenBarTextHex: row.listenBarTextHex ?? null,
         stationColors,
         stationsConfig: row.stationsConfig ?? null,
+        playerUi: row.playerUi ?? null,
       };
     }
   } catch {
@@ -76,5 +78,6 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     listenBarTextHex: null,
     stationColors: null,
     stationsConfig: null,
+    playerUi: null,
   };
 });

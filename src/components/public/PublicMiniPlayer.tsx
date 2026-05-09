@@ -212,7 +212,6 @@ export function PublicMiniPlayer() {
   const radius = `${Math.round((1 - radiusPhase) * 16)}px`;
   const mixedShadowY = 12 - visualProgress * 20;
   const mixedShadowBlur = 40 - visualProgress * 10;
-  const mixedShadowAlpha = 0.45 - visualProgress * 0.09;
 
   return (
     <div
@@ -224,19 +223,25 @@ export function PublicMiniPlayer() {
       }}
     >
       <div
-        className="relative mx-auto overflow-hidden border border-cyan-500/25 bg-[linear-gradient(135deg,#0c1528_0%,#111b33_50%,#0a1020_100%)] px-4 py-3 text-white shadow-[0_0_40px_rgba(34,211,238,0.12)]"
+        className="kiss-mini-player-shell relative mx-auto overflow-hidden border px-4 py-3 shadow-lg"
         style={{
           width: "100%",
           maxWidth,
           borderRadius: radius,
-          boxShadow: `0 ${mixedShadowY.toFixed(2)}px ${mixedShadowBlur.toFixed(2)}px rgba(16,37,63,${mixedShadowAlpha.toFixed(4)})`,
+          boxShadow: `0 ${mixedShadowY.toFixed(2)}px ${mixedShadowBlur.toFixed(2)}px rgba(0,0,0,${(0.28 + visualProgress * 0.12).toFixed(3)})`,
+          backgroundColor: "var(--glxy-mini-bg)",
+          borderColor: "var(--glxy-mini-border)",
+          color: "var(--glxy-mini-text)",
         }}
       >
-        <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3">
+        <div className="relative z-10 grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
           <div className="min-w-0 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#28456e] shrink-0 shadow-sm">
+            <div
+              className="h-12 w-12 shrink-0 overflow-hidden rounded-xl shadow-sm"
+              style={{ backgroundColor: "var(--glxy-mini-muted)" }}
+            >
               {cover && !coverFailed ? (
-                <AppImage src={cover} alt="" className="w-full h-full object-cover" onError={() => setCoverFailed(true)} />
+                <AppImage src={cover} alt="" className="h-full w-full object-cover" onError={() => setCoverFailed(true)} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #1e375a)" }}>
                   <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
@@ -244,9 +249,15 @@ export function PublicMiniPlayer() {
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-black text-white/70">Nu live</p>
-              <p className="text-sm font-black truncate">{data?.current?.title || "GLXY Radio"}</p>
-              <p className="text-xs font-bold text-white/75 truncate">{data?.current?.artist || "Live stream"}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--glxy-mini-muted)" }}>
+                Nu live
+              </p>
+              <p className="truncate text-sm font-black" style={{ color: "var(--glxy-mini-text)" }}>
+                {data?.current?.title || "GLXY Radio"}
+              </p>
+              <p className="truncate text-xs font-bold" style={{ color: "var(--glxy-mini-muted)" }}>
+                {data?.current?.artist || "Live stream"}
+              </p>
             </div>
           </div>
 
@@ -256,22 +267,26 @@ export function PublicMiniPlayer() {
               if (audio.paused) void audio.play().catch(() => {});
               else audio.pause();
             }}
-            className="kiss-mini-player-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-cyan-400 font-black text-[#070a14]"
+            className="kiss-mini-player-btn flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-black shadow-md"
+            style={{
+              backgroundColor: "var(--glxy-mini-accent)",
+              color: "var(--glxy-mini-play-icon)",
+            }}
             aria-label={isPlaying ? "Pauzeer stream" : "Speel stream"}
           >
             {isPlaying ? (
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="6" y="5" width="4" height="14" rx="1.2" />
-                <rect x="14" y="5" width="4" height="14" rx="1.2" />
+              <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="5.5" y="4" width="5" height="16" rx="1.4" />
+                <rect x="13.5" y="4" width="5" height="16" rx="1.4" />
               </svg>
             ) : (
-              <svg className="w-6 h-6" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-                <path d="M9 6v12l10-6-10-6z" />
+              <svg className="h-8 w-8" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+                <path d="M7 4.5v15L21 12 7 4.5z" />
               </svg>
             )}
           </button>
 
-          <div className="flex items-center gap-2 justify-self-end py-1.5">
+          <div className="flex items-center justify-end gap-2 py-0.5 justify-self-end">
             <input
               type="range"
               min={0}
@@ -283,7 +298,7 @@ export function PublicMiniPlayer() {
                 setVolume(v);
                 audio.volume = v;
               }}
-              className="w-36 hidden sm:block kiss-volume-slider-mini"
+              className="kiss-volume-slider-mini hidden w-36 sm:block"
               style={kissVolumeSliderStyle(volume)}
               aria-label="Volume"
             />
@@ -300,13 +315,25 @@ export function PublicMiniPlayer() {
                   /* ignore */
                 }
               }}
-              className={`kiss-mini-player-btn w-11 h-11 rounded-full border flex items-center justify-center transition-all duration-300 ${
+              className={`kiss-mini-player-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
                 dockLockedByScroll
-                  ? "border-white/10 bg-white/10 text-white/35 cursor-not-allowed pointer-events-none"
-                  : pinned
-                    ? "border-cyan-400 bg-cyan-400/15 text-cyan-200"
-                    : "border-white/20 text-white/80 hover:text-white"
+                  ? "cursor-not-allowed border-white/10 bg-white/10 text-white/35 pointer-events-none"
+                  : ""
               }`}
+              style={
+                dockLockedByScroll
+                  ? undefined
+                  : pinned
+                    ? {
+                        borderColor: "var(--glxy-mini-accent)",
+                        backgroundColor: "color-mix(in srgb, var(--glxy-mini-accent) 18%, transparent)",
+                        color: "var(--glxy-mini-accent)",
+                      }
+                    : {
+                        borderColor: "var(--glxy-mini-border)",
+                        color: "var(--glxy-mini-text)",
+                      }
+              }
               aria-label={
                 dockLockedByScroll
                   ? "Miniplayer al automatisch volledig breed onderaan de pagina"
@@ -316,7 +343,7 @@ export function PublicMiniPlayer() {
               }
               title={dockLockedByScroll ? "Automatisch volledig breed onderaan pagina" : pinned ? "Losmaken" : "Vastzetten onderaan"}
             >
-              {pinned ? <IconUndock className="w-5 h-5" /> : <IconDockBottom className="w-5 h-5" />}
+              {pinned ? <IconUndock className="h-5 w-5" /> : <IconDockBottom className="h-5 w-5" />}
             </button>
           </div>
         </div>

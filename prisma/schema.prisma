@@ -63,6 +63,8 @@ model Branding {
   stationColors Json?
   /// Zenders: naam, subtitel, stream, logo (JSON-array; logo mag data-URI)
   stationsConfig Json?
+  /// Mini-player + zenderkaarten + hero-video controls (hex-kleuren JSON)
+  playerUi       Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

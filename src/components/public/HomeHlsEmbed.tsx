@@ -153,8 +153,12 @@ export function HomeHlsEmbed({
           >
             <button
               type="button"
-              className={`inline-flex shrink-0 items-center justify-center rounded-md bg-white/12 text-white ring-1 ring-white/15 backdrop-blur hover:bg-white/18 ${
-                hero ? "h-8 w-8" : "h-10 w-10"
+              style={{
+                backgroundColor: "var(--glxy-hero-control-surface)",
+                color: "var(--glxy-hero-control-icon)",
+              }}
+              className={`inline-flex shrink-0 items-center justify-center rounded-md ring-1 ring-white/12 backdrop-blur hover:brightness-110 ${
+                hero ? "h-9 w-9" : "h-10 w-10"
               }`}
               onClick={() => {
                 const v = videoRef.current;
@@ -169,24 +173,28 @@ export function HomeHlsEmbed({
               aria-label={isPaused ? "Afspelen" : "Pauze"}
             >
               {isPaused ? (
-                <span className="ml-0.5 border-y-[7px] border-l-[12px] border-y-transparent border-l-white" aria-hidden />
+                <svg className={hero ? "h-5 w-5" : "h-6 w-6"} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M8 5.5v13L18.5 12 8 5.5z" />
+                </svg>
               ) : (
-                <span className="flex h-4 w-4 gap-1" aria-hidden>
-                  <span className="h-full w-1.5 bg-white" />
-                  <span className="h-full w-1.5 bg-white" />
-                </span>
+                <svg className={hero ? "h-5 w-5" : "h-6 w-6"} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <rect x="6" y="5" width="4" height="14" rx="1.2" />
+                  <rect x="14" y="5" width="4" height="14" rx="1.2" />
+                </svg>
               )}
             </button>
 
             <div
+              style={{ backgroundColor: "var(--glxy-hero-control-surface)" }}
               className={
                 hero
-                  ? "flex min-w-0 flex-1 items-center gap-1 rounded-md bg-white/[0.05] px-1.5 py-0.5 ring-1 ring-white/10 backdrop-blur-sm"
-                  : "flex min-w-0 max-w-[min(60vw,240px)] flex-1 items-center gap-1.5 rounded-md bg-white/[0.06] px-2 py-1 ring-1 ring-white/12 backdrop-blur"
+                  ? "flex min-h-9 min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1 ring-1 ring-white/12 backdrop-blur-sm"
+                  : "flex min-h-10 min-w-0 max-w-[min(60vw,240px)] flex-1 items-center gap-1.5 rounded-md px-2 py-1 ring-1 ring-white/12 backdrop-blur"
               }
             >
               <svg
-                className={`shrink-0 text-white/60 ${hero ? "h-3 w-3" : "h-3.5 w-3.5 text-white/72"}`}
+                style={{ color: "var(--glxy-hero-control-icon)" }}
+                className={`shrink-0 opacity-90 ${hero ? "h-3.5 w-3.5" : "h-4 w-4"}`}
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 aria-hidden="true"
@@ -204,7 +212,7 @@ export function HomeHlsEmbed({
                   setVolume(val);
                   setMuted(val === 0);
                 }}
-                className={`kiss-volume-slider-mini ${hero ? "h-3 min-w-[64px] flex-1" : "h-4 min-w-[80px] flex-1"}`}
+                className={`kiss-hero-vol-slider ${hero ? "h-3 min-w-[64px] flex-1" : "h-4 min-w-[80px] flex-1"}`}
                 style={volumeSliderStyle(volume)}
                 aria-label="Volume"
               />
@@ -212,8 +220,12 @@ export function HomeHlsEmbed({
 
             <button
               type="button"
-              className={`inline-flex shrink-0 items-center justify-center rounded-md bg-white/12 text-white ring-1 ring-white/15 backdrop-blur hover:bg-white/18 ${
-                hero ? "h-8 w-8" : "h-10 w-10"
+              style={{
+                backgroundColor: "var(--glxy-hero-control-surface)",
+                color: "var(--glxy-hero-control-icon)",
+              }}
+              className={`inline-flex shrink-0 items-center justify-center rounded-md ring-1 ring-white/12 backdrop-blur hover:brightness-110 ${
+                hero ? "h-9 w-9" : "h-10 w-10"
               }`}
               onClick={async () => {
                 const root = playerRootRef.current;
