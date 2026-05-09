@@ -69,22 +69,28 @@ export function PublicHeader({
 
   return (
     <>
-      <header className="kiss-public-site-header fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#070a14]/92 backdrop-blur-md">
+      <header className="kiss-public-site-header fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-gradient-to-b from-[#070a14]/78 to-[#070a14]/62 backdrop-blur-xl">
         <div className="w-full">
-          {/* Top menu bar (grijs) */}
-          <div className="hidden lg:block border-b border-black/15" style={{ backgroundColor: "var(--glxy-menu-bar, var(--brand-primary))" }}>
+          {/* Top menu bar: brandkleur + semi-transparante navy-laag */}
+          <div
+            className="hidden lg:block border-b border-white/10 backdrop-blur-md"
+            style={{
+              backgroundImage: `linear-gradient(180deg, rgba(7, 12, 28, 0.58) 0%, rgba(6, 10, 22, 0.48) 100%), linear-gradient(180deg, var(--glxy-menu-bar, var(--brand-primary)), var(--glxy-menu-bar, var(--brand-primary)))`,
+            }}
+          >
             <div className="mx-auto grid w-full max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-2.5 sm:px-6 md:px-8">
               <div />
-              <nav className="flex min-w-0 items-center justify-center gap-1.5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <nav className="flex min-w-0 items-center justify-center gap-2 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`kiss-public-nav-link glxy-condensed inline-flex items-center px-2.5 py-1 text-[12px] text-white/95 transition-colors ${
-                      isActive(item.href) ? "bg-white/15" : "hover:bg-white/10"
+                    className={`kiss-public-top-nav-item ${
+                      isActive(item.href) ? "kiss-public-top-nav-item--active" : ""
                     }`}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <span className="kiss-public-top-nav-underline" aria-hidden />
                   </Link>
                 ))}
               </nav>

@@ -618,6 +618,68 @@ input[type="range"] {
   }
 }
 
+/* Desktop top menu: minder brede tracking, grotere letters, glow active, hover lift + underline */
+.kiss-public-top-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  font-family: 'Oswald', 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.2s ease,
+    text-shadow 0.25s ease;
+}
+
+.kiss-public-top-nav-item > span:first-child {
+  position: relative;
+  z-index: 1;
+}
+
+.kiss-public-top-nav-underline {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.2rem;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.88), transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .kiss-public-top-nav-item:hover {
+    transform: translateY(-3px);
+  }
+
+  .kiss-public-top-nav-item:hover .kiss-public-top-nav-underline {
+    transform: scaleX(1);
+  }
+}
+
+.kiss-public-top-nav-item--active {
+  color: rgba(255, 255, 255, 1);
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.5),
+    0 0 26px rgba(34, 211, 238, 0.42),
+    0 0 42px rgba(34, 211, 238, 0.18);
+}
+
+/* Active state: geen “blok” of vaste underline — alleen glow; underline verschijnt bij hover */
+.kiss-public-top-nav-item--active:not(:hover) .kiss-public-top-nav-underline {
+  transform: scaleX(0);
+  opacity: 0;
+}
+
 .kiss-public-social-icon {
   transition:
     transform 0.18s ease,

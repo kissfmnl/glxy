@@ -18,25 +18,29 @@ export function HomeHlsEmbed({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const volumeRef = useRef(0.7);
   const [status, setStatus] = useState<"idle" | "playing" | "error">("idle");
   const [isPaused, setIsPaused] = useState(true);
   const [volume, setVolume] = useState(0.7);
+  /** Start muted so autoplay is allowed; unmute when the user sets volume or presses play. */
+  const [muted, setMuted] = useState(true);
+
+  volumeRef.current = volume;
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return undefined;
 
-    video.muted = true;
-    video.defaultMuted = true;
-    video.volume = volume;
     video.playsInline = true;
     video.setAttribute("playsinline", "");
+    video.volume = volumeRef.current;
 
     const tryPlay = () => video.play().catch(() => {});
 
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       const onReady = () => {
+        video.volume = volumeRef.current;
         setStatus("playing");
         tryPlay();
       };
@@ -57,6 +61,7 @@ export function HomeHlsEmbed({
       hls.loadSource(src);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.volume = volumeRef.current;
         setStatus("playing");
         tryPlay();
       });
@@ -71,13 +76,14 @@ export function HomeHlsEmbed({
 
     setStatus("error");
     return undefined;
-  }, [src, volume]);
+  }, [src]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     v.volume = volume;
-  }, [volume]);
+    v.muted = muted;
+  }, [volume, muted]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -111,7 +117,7 @@ export function HomeHlsEmbed({
             className={`aspect-video w-full bg-black object-contain ${
               compact ? "max-h-[min(42vh,380px)] md:max-h-[min(46vh,420px)]" : "max-h-[min(55vh,520px)]"
             }`}
-            muted
+            muted={muted}
             autoPlay
             playsInline
             aria-label={title ?? "GLXY live video"}
@@ -125,8 +131,12 @@ export function HomeHlsEmbed({
               onClick={() => {
                 const v = videoRef.current;
                 if (!v) return;
-                if (v.paused) v.play().catch(() => {});
-                else v.pause();
+                if (v.paused) {
+                  if (volume > 0) setMuted(false);
+                  v.play().catch(() => {});
+                } else {
+                  v.pause();
+                }
               }}
               aria-label={isPaused ? "Afspelen" : "Pauze"}
             >
@@ -150,7 +160,11 @@ export function HomeHlsEmbed({
                 max={1}
                 step={0.01}
                 value={volume}
-                onChange={(e) => setVolume(Number(e.target.value))}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  setVolume(val);
+                  setMuted(val === 0);
+                }}
                 className="w-full"
                 aria-label="Volume"
               />
