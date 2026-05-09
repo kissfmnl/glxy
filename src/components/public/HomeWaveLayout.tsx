@@ -73,7 +73,7 @@ export function HomeWaveLayout({
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 min-w-0 max-w-full w-full">
-      <section className="relative z-10 -mt-16 md:-mt-[4.5rem] overflow-visible bg-[#060a14] pb-10 pt-[5.25rem] shadow-[0_24px_70px_rgba(4,8,20,0.5)] sm:pb-12 md:pb-16 md:pt-28 lg:pt-32">
+      <section className="relative z-10 -mt-16 md:-mt-[4.5rem] overflow-visible bg-[#060a14] pb-8 pt-[5.25rem] shadow-[0_24px_70px_rgba(4,8,20,0.5)] sm:pb-10 md:pb-12 md:pt-28 lg:pt-32">
         <div className="absolute inset-0 overflow-hidden">
           <HomeHeroBackdrop slides={heroBackdropSlides} motionEnabled={copy.heroBackdropMotion} />
         </div>
@@ -105,7 +105,7 @@ export function HomeWaveLayout({
         <div className="relative z-10 mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8 [isolation:isolate]">
           <GlxyHeroLogoVideo heroLogoSrc={heroLogoSrc} homeHlsSrc={homeHlsSrc ?? null} />
 
-          <div className="mt-20 border-t border-white/10 pt-14 sm:mt-24 sm:pt-16 md:mt-28 md:pt-20">
+          <div className="mt-10 border-t border-white/10 pt-8 sm:mt-12 sm:pt-10 md:mt-14 md:pt-11">
             <GlxyStationListenStrip colorOverrides={stationColors} />
           </div>
         </div>

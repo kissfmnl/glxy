@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AppImage from "@/components/AppImage";
 import type { GlxyStation } from "@/lib/glxyStations";
@@ -110,23 +109,15 @@ export function GlxyStationListenStrip({ colorOverrides }: { colorOverrides?: Re
 
   return (
     <section className="w-full" aria-label="GLXY zenders">
-      <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 md:text-[11px]">Luister naar</p>
+      <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 md:text-[11px]">Luister naar</p>
       <audio ref={audioRef} className="hidden" preload="none" playsInline />
-      <ul className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 md:gap-3 lg:gap-4">
+      <ul className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-2 lg:gap-3">
         {GLXY_STATIONS.map((s) => (
           <li key={s.id} className="min-w-0">
             <StationCardCompact station={s} playing={playingId === s.id} onToggle={() => toggle(s)} bgOverride={colorOverrides?.[s.id] ?? null} />
           </li>
         ))}
       </ul>
-      <div className="mt-5 flex justify-center md:mt-6">
-        <Link
-          href="/frequenties"
-          className="inline-flex items-center justify-center rounded-md border border-white/15 bg-[#363636]/90 px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg backdrop-blur-sm transition hover:border-[var(--brand-primary)]/45 hover:bg-[#2a2a2a] hover:brightness-110 md:text-[11px]"
-        >
-          Alle zenders
-        </Link>
-      </div>
     </section>
   );
 }
