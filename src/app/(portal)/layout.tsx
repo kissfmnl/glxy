@@ -10,7 +10,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       <Sidebar />
       <main
         className="portal-main min-h-screen px-4 pb-8 pt-16 transition-all duration-300 sm:px-6 lg:ml-64 lg:pb-10 lg:pt-6"
-        style={{ backgroundColor: "var(--bg-dark)" }}
       >
         {children}
       </main>
