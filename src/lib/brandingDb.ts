@@ -14,6 +14,7 @@ export type PublicBranding = {
   navItems: Array<{ href: string; label: string }> | null;
   instagramUrl: string | null;
   tiktokUrl: string | null;
+  menuBarHex: string | null;
   stationColors: Record<string, any> | null;
 };
 
@@ -41,6 +42,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         navItems,
         instagramUrl: row.instagramUrl ?? null,
         tiktokUrl: row.tiktokUrl ?? null,
+        menuBarHex: row.menuBarHex ?? null,
         stationColors,
       };
     }
@@ -58,6 +60,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     navItems: null,
     instagramUrl: null,
     tiktokUrl: null,
+    menuBarHex: null,
     stationColors: null,
   };
 });

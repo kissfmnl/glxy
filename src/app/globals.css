@@ -213,6 +213,11 @@
   cursor: pointer;
 }
 
+/* Custom mini player volume (portal hero/TV) */
+input[type="range"] {
+  accent-color: var(--brand-primary);
+}
+
 .kiss-volume-slider:hover {
   --kiss-vol-fill: rgba(30, 55, 90, 0.58);
   --kiss-vol-empty: rgba(30, 55, 90, 0.24);

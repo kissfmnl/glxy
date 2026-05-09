@@ -50,6 +50,8 @@ model Branding {
   /// Social links voor header icons
   instagramUrl String?
   tiktokUrl    String?
+  /// Kleur van de publieke menubalk bovenin
+  menuBarHex   String?
   /// Zenderkleuren override (id -> bgHex of {bgHex,textHex})
   stationColors Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")

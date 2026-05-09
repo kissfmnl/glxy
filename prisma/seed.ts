@@ -25,6 +25,7 @@ async function main() {
       ],
       instagramUrl: "https://instagram.com",
       tiktokUrl: "https://www.tiktok.com",
+      menuBarHex: "#0b7557",
       stationColors: {
         z1: "#e11d48",
         z2: "#84cc16",

@@ -14,6 +14,7 @@ type Defaults = {
   navItems: Array<{ href: string; label: string }>;
   instagramUrl: string;
   tiktokUrl: string;
+  menuBarHex: string;
   stationColors: Record<string, string>;
   homeHlsUrl: string;
 };
@@ -33,6 +34,7 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [navItems, setNavItems] = useState<Array<{ href: string; label: string }>>(defaults.navItems ?? []);
   const [instagramUrl, setInstagramUrl] = useState(defaults.instagramUrl ?? "");
   const [tiktokUrl, setTiktokUrl] = useState(defaults.tiktokUrl ?? "");
+  const [menuBarHex, setMenuBarHex] = useState(defaults.menuBarHex ?? "");
   const [stationColors, setStationColors] = useState<Record<string, string>>(defaults.stationColors ?? {});
 
   return (
@@ -45,6 +47,7 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         fd.set("navItemsJson", JSON.stringify(navItems));
         fd.set("instagramUrl", instagramUrl);
         fd.set("tiktokUrl", tiktokUrl);
+        fd.set("menuBarHex", menuBarHex);
         fd.set("stationColorsJson", JSON.stringify(stationColors));
         setBusy(true);
         setMsg(null);
@@ -168,6 +171,15 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
             onChange={(e) => setTiktokUrl(e.target.value)}
             placeholder="https://tiktok.com/…"
             className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+          />
+        </label>
+        <label className="block text-xs font-semibold text-[var(--text-muted)] md:col-span-2">
+          Menubalk kleur (#hex)
+          <input
+            value={menuBarHex}
+            onChange={(e) => setMenuBarHex(e.target.value)}
+            placeholder={defaults.primaryHex}
+            className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
           />
         </label>
       </div>

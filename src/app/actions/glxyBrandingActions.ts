@@ -27,6 +27,16 @@ function normalizeUrl(raw: string | null | undefined): string | null {
   return null;
 }
 
+function normalizeOptionalHex(raw: string | null | undefined): string | null {
+  const s = (raw ?? "").trim();
+  if (!s) return null;
+  let t = s;
+  if (t && !t.startsWith("#")) t = `#${t}`;
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(t);
+  if (!m) return null;
+  return `#${m[1]!.length === 3 ? m[1]!.split("").map((c) => c + c).join("") : m[1]!}`.toLowerCase();
+}
+
 export async function updateBrandingAction(formData: FormData): Promise<{ ok?: true; error?: string }> {
   await requireAdmin();
 
@@ -38,6 +48,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const faviconUrl = normalizeUrl(String(formData.get("faviconUrl") ?? ""));
   const instagramUrl = normalizeUrl(String(formData.get("instagramUrl") ?? ""));
   const tiktokUrl = normalizeUrl(String(formData.get("tiktokUrl") ?? ""));
+  const menuBarHex = normalizeOptionalHex(String(formData.get("menuBarHex") ?? ""));
   let stationColors: Record<string, any> | null = null;
   try {
     const raw = String(formData.get("stationColorsJson") ?? "").trim();
@@ -83,6 +94,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       faviconUrl,
       instagramUrl,
       tiktokUrl,
+      menuBarHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,
@@ -96,6 +108,7 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       faviconUrl,
       instagramUrl,
       tiktokUrl,
+      menuBarHex,
       navItems: navItems ?? undefined,
       stationColors: stationColors ?? undefined,
       homeHlsUrl: hlsFinal,
