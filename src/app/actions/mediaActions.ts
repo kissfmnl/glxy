@@ -40,12 +40,16 @@ async function requireAdmin(): Promise<{ ok: true } | { error: string }> {
   return { ok: true };
 }
 
-function resolveImageMime(file: File): string | null {
-  const fromType = file.type?.trim();
+function resolveImageMime(file: { type?: string; name?: string }): string | null {
+  const fromType = file.type?.trim?.();
   if (fromType && MIME_EXT[fromType]) return fromType;
   const ext = path.extname(file.name || "").toLowerCase();
   const guessed = EXT_TO_MIME[ext];
   return guessed ?? null;
+}
+
+function isFileLike(v: unknown): v is Blob & { name?: string } {
+  return !!v && typeof v === "object" && typeof (v as Blob).arrayBuffer === "function" && typeof (v as Blob).size === "number";
 }
 
 export async function uploadMediaAssetAction(
@@ -55,10 +59,11 @@ export async function uploadMediaAssetAction(
     const auth = await requireAdmin();
     if ("error" in auth) return { error: auth.error };
 
-    const file = formData.get("file");
-    if (!(file instanceof File) || file.size === 0) {
+    const raw = formData.get("file");
+    if (!isFileLike(raw) || raw.size === 0) {
       return { error: "Kies een bestand." };
     }
+    const file = raw;
     if (file.size > MAX_BYTES) {
       return { error: "Bestand te groot (max. 10 MB)." };
     }
@@ -75,7 +80,8 @@ export async function uploadMediaAssetAction(
       return { error: "Bestand kon niet worden gelezen." };
     }
 
-    const safeName = file.name.replace(/[^\w.\-()\s]/g, "_").slice(0, 80);
+    const filename = typeof file.name === "string" && file.name.trim() ? file.name : "upload";
+    const safeName = filename.replace(/[^\w.\-()\s]/g, "_").slice(0, 80);
     const base = `${randomUUID()}-${safeName || "upload"}${ext}`;
     let storagePath: string;
     try {
@@ -95,7 +101,7 @@ export async function uploadMediaAssetAction(
     try {
       row = await prisma.mediaAsset.create({
         data: {
-          filename: file.name || base,
+          filename: filename || base,
           storagePath,
           mimeType,
           sizeBytes: buf.length,
@@ -121,7 +127,8 @@ export async function uploadMediaAssetAction(
     return { ok: true, url, id: row.id };
   } catch (e) {
     console.error("[uploadMediaAssetAction] unexpected", e);
-    return { error: "Upload mislukt door een serverfout. Check server logs (digest) voor details." };
+    const msg = e instanceof Error ? e.message : String(e);
+    return { error: msg ? `Upload serverfout: ${msg}` : "Upload mislukt door een serverfout." };
   }
 }
 
