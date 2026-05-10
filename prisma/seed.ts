@@ -60,6 +60,18 @@ async function main() {
     // eslint-disable-next-line no-console
     console.info(`Bootstrap admin created: ${email}`);
   }
+
+  /** Bestaand account promoveren naar super-admin (uitbreidbaar via env). */
+  const promoteEmail =
+    process.env.GLXY_PROMOTE_SUPER_ADMIN_EMAIL?.trim().toLowerCase() || "ferry.oomen@kissfm.nl";
+  const promoted = await prisma.user.updateMany({
+    where: { email: promoteEmail },
+    data: { role: Role.SUPER_ADMIN },
+  });
+  if (promoted.count > 0) {
+    // eslint-disable-next-line no-console
+    console.info(`Role SUPER_ADMIN applied to: ${promoteEmail}`);
+  }
 }
 
 main()

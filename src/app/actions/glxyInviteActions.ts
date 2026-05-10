@@ -9,7 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendInviteEmail } from "@/lib/mail";
 import { getPublicAppUrl } from "@/lib/publicAppUrl";
-import { isPortalAdmin } from "@/lib/authRoles";
+import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
 
 export async function createInviteAction(formData: FormData): Promise<{ ok?: true; inviteUrl?: string; error?: string }> {
   const session = await getServerSession(authOptions);
@@ -18,7 +18,14 @@ export async function createInviteAction(formData: FormData): Promise<{ ok?: tru
   }
   const rawEmail = String(formData.get("email") ?? "").trim().toLowerCase();
   const rawRole = String(formData.get("role") ?? "DJ").toUpperCase();
-  const role = rawRole === "ADMIN" ? Role.ADMIN : Role.DJ;
+  let role: Role = Role.DJ;
+  if (rawRole === "ADMIN") role = Role.ADMIN;
+  else if (rawRole === "SUPER_ADMIN") {
+    if (!isSuperAdmin(session.user.role)) {
+      return { error: "Alleen een super-admin kan een super-admin-uitnodiging maken." };
+    }
+    role = Role.SUPER_ADMIN;
+  }
 
   if (!rawEmail.includes("@")) {
     return { error: "Voer een geldig e-mailadres in." };

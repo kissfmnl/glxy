@@ -1,30 +1,16 @@
 "use client";
 
+import { getGlxySharedAudio, useGlxyRadio } from "@/components/public/GlxyRadioProvider";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import AppImage from "@/components/AppImage";
-import { MOCK_COVER_FALLBACK, MOCK_NOW_PLAYING_PAYLOAD, MOCK_SOCIAL } from "@/lib/mock/site";
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 
-const STREAM_URL = MOCK_SOCIAL.streamUrl;
 const PIN_KEY = "glxy_mini_player_pinned";
 
 function kissVolumeSliderStyle(volume: number): CSSProperties {
   return { ["--kiss-vol-pct" as string]: `${Math.round(volume * 100)}%` } as CSSProperties;
 }
 
-function getSharedAudio() {
-  if (typeof window === "undefined") return null;
-  const w = window as typeof window & { __glxyAudio?: HTMLAudioElement };
-  if (!w.__glxyAudio) {
-    const a = new Audio(STREAM_URL);
-    a.preload = "auto";
-    a.crossOrigin = "anonymous";
-    a.volume = 0.8;
-    w.__glxyAudio = a;
-  }
-  return w.__glxyAudio;
-}
-
-/** Vastzetten: pijl naar beneden richting onderlijn */
 function IconDockBottom({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -35,7 +21,6 @@ function IconDockBottom({ className }: { className?: string }) {
   );
 }
 
-/** Losmaken: pijl omhoog vanaf onderlijn */
 function IconUndock({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -47,18 +32,19 @@ function IconUndock({ className }: { className?: string }) {
 }
 
 export function PublicMiniPlayer() {
-  const data = MOCK_NOW_PLAYING_PAYLOAD;
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { activeStation, playing, togglePlay, volume, setVolume } = useGlxyRadio();
   const [pinned, setPinned] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [volume, setVolume] = useState(0.8);
   const [dockProgress, setDockProgress] = useState(0);
   const [dockLockedByScroll, setDockLockedByScroll] = useState(false);
-  const [coverFailed, setCoverFailed] = useState(false);
+  const [np, setNp] = useState({ title: "", artist: "" });
+  const [itunesCover, setItunesCover] = useState<string | null>(null);
+  const [coverTier, setCoverTier] = useState(0);
   const dockTargetRef = useRef(0);
   const dockCurrentRef = useRef(0);
   const animFrameRef = useRef<number | null>(null);
   const lastTsRef = useRef(0);
+
   useEffect(() => {
     try {
       setPinned(localStorage.getItem(PIN_KEY) === "1");
@@ -69,38 +55,69 @@ export function PublicMiniPlayer() {
   }, []);
 
   useEffect(() => {
-    const audio = getSharedAudio();
-    if (!audio) return;
-    setVolume(audio.volume);
-    setIsPlaying(!audio.paused);
-
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onVolume = () => setVolume(audio.volume);
-    audio.addEventListener("playing", onPlay);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("volumechange", onVolume);
-    return () => {
-      audio.removeEventListener("playing", onPlay);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("volumechange", onVolume);
+    if (!activeStation?.id) return;
+    const npUrl = activeStation.nowPlayingUrl?.trim();
+    const poll = async () => {
+      if (!npUrl) {
+        setNp({ title: "", artist: "" });
+        return;
+      }
+      try {
+        const r = await fetch(`/api/stations/now-playing?id=${encodeURIComponent(activeStation.id)}`);
+        const j = (await r.json()) as { title?: string; artist?: string };
+        setNp({
+          title: (j.title ?? "").trim(),
+          artist: (j.artist ?? "").trim(),
+        });
+      } catch {
+        setNp({ title: "", artist: "" });
+      }
     };
-  }, []);
+    poll();
+    const t = window.setInterval(poll, 12_000);
+    return () => window.clearInterval(t);
+  }, [activeStation?.id, activeStation?.nowPlayingUrl]);
+
+  useEffect(() => {
+    const hasNp = np.title || np.artist;
+    if (!hasNp) {
+      setItunesCover(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(
+          `/api/cover-art?artist=${encodeURIComponent(np.artist)}&title=${encodeURIComponent(np.title)}`,
+        );
+        const j = (await r.json()) as { url?: string };
+        if (cancelled) return;
+        const u = j.url?.trim();
+        setItunesCover(u || null);
+      } catch {
+        if (!cancelled) setItunesCover(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [np.title, np.artist]);
+
+  useEffect(() => {
+    setCoverTier(0);
+  }, [activeStation?.id, itunesCover, np.title, np.artist]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !hydrated) return;
 
     const ARM_SCROLL_Y = 56;
     const MORPH_WINDOW_PX = 420;
-    /** Tot deze scrollhoogte: morph lineair mee (Join KISS, korte pagina’s). */
     const SHORT_PAGE_MAX_SCROLL = 220;
 
     const computeScrollState = () => {
       const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       if (pinned) return { target: 1, lockedByScroll: false };
-      /* Geen scrollruimte: meteen volle breedte (o.a. korte playlist). */
       if (maxScroll <= 0) return { target: 1, lockedByScroll: false };
-      /* Korte pagina’s: breedte volgt scroll over de hele documenthoogte */
       if (maxScroll <= SHORT_PAGE_MAX_SCROLL) {
         const target = Math.max(0, Math.min(1, window.scrollY / maxScroll));
         const lockedByScroll = window.scrollY >= maxScroll - 1;
@@ -166,13 +183,9 @@ export function PublicMiniPlayer() {
     };
   }, [pinned, hydrated]);
 
-  /**
-   * Browsers pauzeren streams soms op achtergrond-tab. Als `pause` optreedt terwijl het tabblad verborgen is,
-   * markeren we dat en proberen bij terugkomst `play()` (niet bij een expliciete pauze op een zichtbaar tabblad).
-   */
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const a = getSharedAudio();
+    const a = getGlxySharedAudio();
     if (!a) return;
     let pausedWhileTabHidden = false;
     const onPause = () => {
@@ -197,14 +210,28 @@ export function PublicMiniPlayer() {
     };
   }, []);
 
-  const cover = data?.cover as string | undefined;
-  useEffect(() => {
-    setCoverFailed(false);
-  }, [cover]);
-  const audio = getSharedAudio();
-  if (!audio || !hydrated) return null;
-  const visualProgress = dockProgress;
+  if (!hydrated) return null;
 
+  const npArtist = (np.artist ?? "").trim();
+  const npTitle = (np.title ?? "").trim();
+  const npCombined =
+    npArtist && npTitle ? `${npArtist} — ${npTitle}` : npArtist || npTitle || "";
+  const titleLine = npCombined || activeStation?.line1 || "GLXY Radio";
+  const artistLine =
+    npArtist && npTitle
+      ? activeStation?.line2?.trim() || ""
+      : npArtist || npTitle
+        ? ""
+        : activeStation?.line2 || "Live stream";
+
+  const artworkSrc =
+    coverTier === 0 && itunesCover
+      ? itunesCover
+      : coverTier <= 1 && activeStation?.logoUrl?.trim()
+        ? activeStation.logoUrl.trim()
+        : MOCK_COVER_FALLBACK;
+
+  const visualProgress = dockProgress;
   const sideInsetPx = 12 * (1 - visualProgress);
   const bottomInset = `calc(${(1 - visualProgress) * 0.9}rem + env(safe-area-inset-bottom))`;
   const maxWidth = visualProgress >= 1 ? "100vw" : `calc(980px + ${visualProgress.toFixed(4)} * (100vw - 980px))`;
@@ -234,74 +261,67 @@ export function PublicMiniPlayer() {
           color: "var(--glxy-mini-text)",
         }}
       >
-        <div className="relative z-10 grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
-          <div className="min-w-0 flex items-center gap-3">
+        <div className="relative z-10 flex w-full flex-wrap items-center gap-3 sm:flex-nowrap">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <div
               className="h-12 w-12 shrink-0 overflow-hidden rounded-xl shadow-sm"
               style={{ backgroundColor: "var(--glxy-mini-muted)" }}
             >
-              {cover && !coverFailed ? (
-                <AppImage src={cover} alt="" className="h-full w-full object-cover" onError={() => setCoverFailed(true)} />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center p-[18%]" style={{ backgroundColor: "var(--fallback-album-bg, #1e375a)" }}>
-                  <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-full w-full max-h-[72%] object-contain opacity-95" loading="lazy" draggable={false} />
-                </div>
-              )}
+              <AppImage
+                src={artworkSrc}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setCoverTier((t) => Math.min(t + 1, 2))}
+              />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--glxy-mini-muted)" }}>
                 Nu live
               </p>
               <p className="truncate text-sm font-black" style={{ color: "var(--glxy-mini-text)" }}>
-                {data?.current?.title || "GLXY Radio"}
+                {titleLine}
               </p>
-              <p className="truncate text-xs font-bold" style={{ color: "var(--glxy-mini-muted)" }}>
-                {data?.current?.artist || "Live stream"}
-              </p>
+              {artistLine ? (
+                <p className="truncate text-xs font-bold" style={{ color: "var(--glxy-mini-muted)" }}>
+                  {artistLine}
+                </p>
+              ) : null}
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (audio.paused) void audio.play().catch(() => {});
-              else audio.pause();
-            }}
-            className="kiss-mini-player-btn flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-black shadow-md"
-            style={{
-              backgroundColor: "var(--glxy-mini-accent)",
-              color: "var(--glxy-mini-play-icon)",
-            }}
-            aria-label={isPlaying ? "Pauzeer stream" : "Speel stream"}
-          >
-            {isPlaying ? (
-              <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="5.5" y="4" width="5" height="16" rx="1.4" />
-                <rect x="13.5" y="4" width="5" height="16" rx="1.4" />
-              </svg>
-            ) : (
-              <svg className="h-8 w-8" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-                <path d="M7 4.5v15L21 12 7 4.5z" />
-              </svg>
-            )}
-          </button>
-
-          <div className="flex items-center justify-end gap-2 py-0.5 justify-self-end">
+          <div className="ml-auto flex shrink-0 items-center gap-2 py-0.5">
             <input
               type="range"
               min={0}
               max={1}
               step={0.01}
               value={volume}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                setVolume(v);
-                audio.volume = v;
-              }}
-              className="kiss-volume-slider-mini hidden w-36 sm:block"
+              onChange={(e) => setVolume(Number(e.target.value))}
+              className="kiss-volume-slider-mini hidden w-32 sm:block md:w-36"
               style={kissVolumeSliderStyle(volume)}
               aria-label="Volume"
             />
+            <button
+              type="button"
+              onClick={() => void togglePlay()}
+              className="kiss-mini-player-btn flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-black shadow-md"
+              style={{
+                backgroundColor: "var(--glxy-mini-accent)",
+                color: "var(--glxy-mini-play-icon)",
+              }}
+              aria-label={playing ? "Pauzeer stream" : "Speel stream"}
+            >
+              {playing ? (
+                <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5.5" y="4" width="5" height="16" rx="1.4" />
+                  <rect x="13.5" y="4" width="5" height="16" rx="1.4" />
+                </svg>
+              ) : (
+                <svg className="h-8 w-8" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+                  <path d="M7 4.5v15L21 12 7 4.5z" />
+                </svg>
+              )}
+            </button>
             <button
               type="button"
               disabled={dockLockedByScroll}
@@ -316,9 +336,7 @@ export function PublicMiniPlayer() {
                 }
               }}
               className={`kiss-mini-player-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
-                dockLockedByScroll
-                  ? "cursor-not-allowed border-white/10 bg-white/10 text-white/35 pointer-events-none"
-                  : ""
+                dockLockedByScroll ? "pointer-events-none cursor-not-allowed border-white/10 bg-white/10 text-white/35" : ""
               }`}
               style={
                 dockLockedByScroll
@@ -338,7 +356,7 @@ export function PublicMiniPlayer() {
                 dockLockedByScroll
                   ? "Miniplayer al automatisch volledig breed onderaan de pagina"
                   : pinned
-                    ? "Miniplayer losmaken (weer meeschuiven)"
+                    ? "Miniplayer losmaken"
                     : "Miniplayer vastzetten onderaan het scherm"
               }
               title={dockLockedByScroll ? "Automatisch volledig breed onderaan pagina" : pinned ? "Losmaken" : "Vastzetten onderaan"}

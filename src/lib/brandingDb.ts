@@ -22,6 +22,7 @@ export type PublicBranding = {
   stationColors: Record<string, any> | null;
   stationsConfig: unknown | null;
   playerUi: unknown | null;
+  stationNpSnapshot: unknown | null;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
@@ -56,6 +57,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         stationColors,
         stationsConfig: row.stationsConfig ?? null,
         playerUi: row.playerUi ?? null,
+        stationNpSnapshot: row.stationNpSnapshot ?? null,
       };
     }
   } catch {
@@ -79,5 +81,6 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     stationColors: null,
     stationsConfig: null,
     playerUi: null,
+    stationNpSnapshot: null,
   };
 });

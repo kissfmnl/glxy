@@ -37,10 +37,16 @@ export function StationsAdminForm({ defaults }: { defaults: Defaults }) {
             "stationsJson",
             JSON.stringify(
               stations.map((s) => ({
-                ...s,
+                id: s.id,
+                line1: s.line1,
+                line2: s.line2,
+                streamUrl: s.streamUrl,
                 logoUrl:
                   s.logoUrl.trim() ||
                   (defaults.stationsLogoEmbedded[s.id] ? KEEP_STATION_LOGO : ""),
+                nowPlayingUrl: s.nowPlayingUrl,
+                playButtonHex: s.playButtonHex,
+                ...(s.offAir ? { offAir: true } : {}),
               })),
             ),
           );
@@ -57,15 +63,38 @@ export function StationsAdminForm({ defaults }: { defaults: Defaults }) {
           <div>
             <h2 className="text-lg font-black text-[var(--text-main)]">Per kanaal</h2>
             <p className="mt-1 text-xs text-[var(--text-muted)]">
-              Stream, metadata-URL, fallbacks, logo, kaartkleur en playknopkleur staan bij elkaar.
+              Volgorde = homepage-volgorde. Off-air = verborgen op de site. Stream, metadata-URL, fallbacks, logo, kleuren.
             </p>
           </div>
-          <a
-            href="/admin/media"
-            className="text-xs font-black text-[var(--brand-yellow)] underline-offset-2 hover:underline"
-          >
-            Mediabibliotheek
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="rounded-xl bg-[var(--brand-primary)]/20 px-4 py-2 text-xs font-black text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30 hover:bg-[var(--brand-primary)]/28"
+              onClick={() =>
+                setStations((prev) => [
+                  ...prev,
+                  {
+                    id: `ch_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`,
+                    line1: "GLXY Radio",
+                    line2: "—",
+                    streamUrl: "",
+                    logoUrl: "",
+                    nowPlayingUrl: "",
+                    playButtonHex: "",
+                    offAir: false,
+                  },
+                ])
+              }
+            >
+              + Zender toevoegen
+            </button>
+            <a
+              href="/admin/media"
+              className="text-xs font-black text-[var(--brand-yellow)] underline-offset-2 hover:underline"
+            >
+              Mediabibliotheek
+            </a>
+          </div>
         </div>
 
         <div className="grid gap-8">
@@ -82,11 +111,74 @@ export function StationsAdminForm({ defaults }: { defaults: Defaults }) {
                 key={s.id}
                 className="rounded-2xl border border-white/12 bg-black/25 p-4 shadow-inner sm:p-5"
               >
-                <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 border-b border-white/10 pb-3">
-                  <h3 className="text-base font-black tracking-tight text-[var(--text-main)]">
-                    {glxyChannelHeading(s.id)}
-                  </h3>
-                  <span className="font-mono text-[10px] font-semibold uppercase text-[var(--text-muted)]">{s.id}</span>
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div className="min-w-0">
+                    <h3 className="text-base font-black tracking-tight text-[var(--text-main)]">
+                      {glxyChannelHeading(s.id, idx)}
+                    </h3>
+                    <span className="font-mono text-[10px] font-semibold uppercase text-[var(--text-muted)]">{s.id}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="flex cursor-pointer items-center gap-1.5 text-[11px] font-semibold text-[var(--text-muted)]">
+                      <input
+                        type="checkbox"
+                        checked={s.offAir === true}
+                        onChange={(e) =>
+                          setStations((prev) =>
+                            prev.map((x, i) => (i === idx ? { ...x, offAir: e.target.checked } : x)),
+                          )
+                        }
+                      />
+                      Off-air
+                    </label>
+                    <button
+                      type="button"
+                      className="rounded-lg border border-white/15 bg-white/10 px-2 py-1 text-xs font-black text-white hover:bg-white/15 disabled:opacity-35"
+                      disabled={idx === 0}
+                      onClick={() =>
+                        setStations((prev) => {
+                          const n = [...prev];
+                          const t = n[idx - 1]!;
+                          n[idx - 1] = n[idx]!;
+                          n[idx] = t;
+                          return n;
+                        })
+                      }
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg border border-white/15 bg-white/10 px-2 py-1 text-xs font-black text-white hover:bg-white/15 disabled:opacity-35"
+                      disabled={idx === stations.length - 1}
+                      onClick={() =>
+                        setStations((prev) => {
+                          const n = [...prev];
+                          const t = n[idx + 1]!;
+                          n[idx + 1] = n[idx]!;
+                          n[idx] = t;
+                          return n;
+                        })
+                      }
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg border border-red-500/35 bg-red-500/10 px-2 py-1 text-xs font-black text-red-200 hover:bg-red-500/15"
+                      onClick={() => {
+                        if (!confirm(`Zender ${s.id} verwijderen?`)) return;
+                        setStations((prev) => prev.filter((_, i) => i !== idx));
+                        setStationColors((prev) => {
+                          const n = { ...prev };
+                          delete n[s.id];
+                          return n;
+                        });
+                      }}
+                    >
+                      Verwijderen
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-[140px_1fr]">
@@ -120,8 +212,26 @@ export function StationsAdminForm({ defaults }: { defaults: Defaults }) {
                           setCrop({ stationId: s.id, src });
                         }}
                       />
-                      Bijsnijden…
+                      Nieuw bestand…
                     </label>
+                    {previewSrc ? (
+                      <button
+                        type="button"
+                        className="text-center text-[10px] font-black uppercase tracking-wide text-[var(--brand-yellow)] underline-offset-2 hover:underline"
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(previewSrc);
+                            const blob = await res.blob();
+                            const url = URL.createObjectURL(blob);
+                            setCrop({ stationId: s.id, src: url });
+                          } catch {
+                            /* CORS of netwerk — gebruik upload */
+                          }
+                        }}
+                      >
+                        Huidige logo bijsnijden
+                      </button>
+                    ) : null}
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -230,7 +340,7 @@ export function StationsAdminForm({ defaults }: { defaults: Defaults }) {
       {crop ? (
         <ImageCropModal
           imageSrc={crop.src}
-          title={`Logo bijsnijden — ${glxyChannelHeading(crop.stationId)}`}
+          title={`Logo bijsnijden — ${glxyChannelHeading(crop.stationId, stations.findIndex((x) => x.id === crop.stationId))}`}
           onClose={() => {
             if (crop.src.startsWith("blob:")) URL.revokeObjectURL(crop.src);
             setCrop(null);

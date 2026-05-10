@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
-import { isPortalAdmin } from "@/lib/authRoles";
+import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
+import { UserRoleRow } from "./UserRoleRow";
 import { prisma } from "@/lib/prisma";
 import { InviteCreateForm } from "./InviteCreateForm";
 import type { Invite, User } from "@prisma/client";
@@ -35,6 +36,9 @@ export default async function AdminGebruikersPage() {
     users = [];
   }
 
+  const canEditRoles = session.user.role ? isSuperAdmin(session.user.role) : false;
+  const allowSuperAdminInvite = canEditRoles;
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 py-2">
       <header>
@@ -44,7 +48,7 @@ export default async function AdminGebruikersPage() {
         </p>
       </header>
 
-      <InviteCreateForm />
+      <InviteCreateForm allowSuperAdminInvite={allowSuperAdminInvite} />
 
       <section className="card border border-white/10 bg-white/[0.04] backdrop-blur">
         <h2 className="text-lg font-black text-[var(--text-main)]">Accounts</h2>
@@ -70,7 +74,9 @@ export default async function AdminGebruikersPage() {
                   <tr key={u.id} className="border-b border-white/5 text-[var(--text-main)]">
                     <td className="py-2 pr-3 font-semibold">{u.email}</td>
                     <td className="py-2 pr-3 text-[var(--text-muted)]">{u.name ?? "—"}</td>
-                    <td className="py-2 pr-3 font-black text-cyan-200/90">{u.role}</td>
+                    <td className="py-2 pr-3">
+                      <UserRoleRow userId={u.id} role={u.role} canEditRoles={canEditRoles} />
+                    </td>
                     <td className="py-2 text-[var(--text-muted)]">{fmtDate(u.createdAt)}</td>
                   </tr>
                 ))

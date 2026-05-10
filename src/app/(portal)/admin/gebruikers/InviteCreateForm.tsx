@@ -3,7 +3,7 @@
 import { createInviteAction } from "@/app/actions/glxyInviteActions";
 import { useState } from "react";
 
-export function InviteCreateForm() {
+export function InviteCreateForm({ allowSuperAdminInvite = false }: { allowSuperAdminInvite?: boolean }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -52,6 +52,7 @@ export function InviteCreateForm() {
           >
             <option value="DJ">DJ / Host</option>
             <option value="ADMIN">Beheerder (admin)</option>
+            {allowSuperAdminInvite ? <option value="SUPER_ADMIN">Super-admin</option> : null}
           </select>
         </label>
       </div>

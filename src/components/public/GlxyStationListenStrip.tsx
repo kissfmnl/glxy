@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useGlxyRadio } from "@/components/public/GlxyRadioProvider";
+import { useEffect, useState } from "react";
 import AppImage from "@/components/AppImage";
 import type { GlxyStation } from "@/lib/glxyStations";
 
@@ -38,12 +39,12 @@ function StationCardCompact({
   onToggle: () => void;
   bgOverride?: string | null;
 }) {
-  const [np, setNp] = useState<{ title: string; artist: string }>({ title: "", artist: "" });
+  const [np, setNp] = useState({ title: "", artist: "" });
 
   const hasNpUrl = !!(station.nowPlayingUrl?.trim());
 
   useEffect(() => {
-    if (!playing || !hasNpUrl) {
+    if (!hasNpUrl) {
       setNp({ title: "", artist: "" });
       return;
     }
@@ -68,11 +69,10 @@ function StationCardCompact({
       cancelled = true;
       window.clearInterval(t);
     };
-  }, [playing, station.id, hasNpUrl]);
+  }, [station.id, hasNpUrl]);
 
-  const live = playing && hasNpUrl;
-  const titleLine = live ? np.title || station.line1 : station.line1;
-  const artistLine = live ? np.artist || station.line2 : station.line2;
+  const titleLine = hasNpUrl ? np.title || station.line1 : station.line1;
+  const artistLine = hasNpUrl ? np.artist || station.line2 : station.line2;
 
   const playColor = station.playButtonHex?.trim() || undefined;
 
@@ -138,48 +138,19 @@ export function GlxyStationListenStrip({
   stations: GlxyStation[];
   colorOverrides?: Record<string, string> | null;
 }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const el = audioRef.current;
-    if (!el) return;
-    const clear = () => setPlayingId(null);
-    el.addEventListener("ended", clear);
-    el.addEventListener("error", clear);
-    return () => {
-      el.removeEventListener("ended", clear);
-      el.removeEventListener("error", clear);
-    };
-  }, []);
-
-  const toggle = useCallback(
-    async (station: GlxyStation) => {
-      const el = audioRef.current;
-      if (!el) return;
-      if (playingId === station.id) {
-        el.pause();
-        setPlayingId(null);
-        return;
-      }
-      el.src = station.streamUrl;
-      try {
-        await el.play();
-        setPlayingId(station.id);
-      } catch {
-        setPlayingId(null);
-      }
-    },
-    [playingId],
-  );
+  const { playing, activeStationId, toggleStation } = useGlxyRadio();
 
   return (
     <section className="w-full" aria-label="GLXY zenders">
-      <audio ref={audioRef} className="hidden" preload="none" playsInline />
       <ul className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-2 lg:gap-3">
         {stations.map((s) => (
           <li key={s.id} className="min-w-0">
-            <StationCardCompact station={s} playing={playingId === s.id} onToggle={() => toggle(s)} bgOverride={colorOverrides?.[s.id] ?? null} />
+            <StationCardCompact
+              station={s}
+              playing={playing && activeStationId === s.id}
+              onToggle={() => void toggleStation(s)}
+              bgOverride={colorOverrides?.[s.id] ?? null}
+            />
           </li>
         ))}
       </ul>

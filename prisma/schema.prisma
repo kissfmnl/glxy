@@ -68,6 +68,8 @@ model Branding {
   playerUi       Json?
   /// Super-admin bewerkbare toelichtingen op admin-pagina’s (JSON)
   adminPortalCopy Json?
+  /// Laatste bekende nu-speelt per zender-id (server-side; voor programmering-pagina)
+  stationNpSnapshot Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

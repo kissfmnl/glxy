@@ -36,10 +36,12 @@ export async function mergeStationsConfig(raw: string, prevConfig: unknown): Pro
     const streamUrl = String((inc as { streamUrl?: string }).streamUrl ?? "").trim();
     const nowPlayingUrl = String((inc as { nowPlayingUrl?: string }).nowPlayingUrl ?? "").trim();
     const playButtonHex = String((inc as { playButtonHex?: string }).playButtonHex ?? "").trim();
+    const offAir = (inc as { offAir?: boolean }).offAir === true;
     const row: Record<string, unknown> = { id, line1, line2, streamUrl };
     if (logoUrlStation) row.logoUrl = logoUrlStation;
     if (nowPlayingUrl) row.nowPlayingUrl = nowPlayingUrl;
     if (playButtonHex) row.playButtonHex = playButtonHex;
+    if (offAir) row.offAir = true;
     out.push(row);
   }
   return out;

@@ -1,8 +1,6 @@
 import { PublicThemeGuard } from "@/components/public/PublicThemeGuard";
 import { PublicHeader } from "@/components/public/PublicHeader";
-import { PublicMain } from "@/components/public/PublicMain";
-import { PublicMiniPlayer } from "@/components/public/PublicMiniPlayer";
-import { CookieNotice } from "@/components/public/CookieNotice";
+import { PublicRadioShell } from "@/components/public/PublicRadioShell";
 import { PublicTabTitle } from "@/components/public/PublicTabTitle";
 import Link from "next/link";
 import { MOCK_NAV, MOCK_PUBLIC_UI, MOCK_SOCIAL } from "@/lib/mock/site";
@@ -40,9 +38,9 @@ export default async function PublicLayout({ children }: { children: React.React
         navItems={navItems}
         logoUrl={branding.logoUrl}
       />
-      <PublicMain>{children}</PublicMain>
-      <CookieNotice enabled={ui.showCookieBanner} text={ui.cookieBannerText} cta={ui.cookieBannerCta} />
-      <PublicMiniPlayer />
+      <PublicRadioShell enabled={ui.showCookieBanner} text={ui.cookieBannerText} cta={ui.cookieBannerCta}>
+        {children}
+      </PublicRadioShell>
 
       <footer
         id="kiss-public-footer"
