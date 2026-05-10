@@ -142,7 +142,7 @@ export function HomeWaveLayout({
                     limit={10}
                     panelTitle={copy.recentTracksTitle}
                     historyLinkLabel={copy.recentTracksCta}
-                    stations={stations.map((s) => ({ id: s.id, line1: s.line1 }))}
+                        stations={stations.map((s) => ({ id: s.id, line1: s.line1, logoUrl: s.logoUrl ?? null }))}
                     justPlayedUi={justPlayedUi}
                   />
                 </div>

@@ -78,7 +78,7 @@ model Branding {
   footerConfig Json?
   /// Homepage JUST PLAYED titelblok (hex-kleuren JSON)
   justPlayedConfig Json?
-  /// Nu-speelt: rules [{ phrase, scope: everywhere | live_np_only }] of legacy { phrases: string[] }
+  /// Nu-speelt: rules [{ phrase, mode: strip | hide_full }] of legacy phrases/scope
   npWordFilter Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt

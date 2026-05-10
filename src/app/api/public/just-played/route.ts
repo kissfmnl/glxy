@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import { buildGlxyStationsFromDb } from "@/lib/glxyStations";
-import { applyNpWordFilter, mergeNpWordFilter, phraseListEverywhere } from "@/lib/npWordFilter";
+import {
+  applyNpWordFilter,
+  hideFullPhrases,
+  matchesHideFull,
+  mergeNpWordFilter,
+  stripPhrases,
+} from "@/lib/npWordFilter";
 import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+const MAX_TRACKS_PER_STATION = 10;
 
 function isEntry(x: unknown): x is StationPlayEntry {
   if (!x || typeof x !== "object") return false;
@@ -17,9 +25,10 @@ function isEntry(x: unknown): x is StationPlayEntry {
   );
 }
 
-function scrubEntry(e: StationPlayEntry, phrases: string[]): StationPlayEntry {
-  if (phrases.length === 0) return e;
-  const { title, artist } = applyNpWordFilter(e.title, e.artist, phrases);
+function scrubEntry(e: StationPlayEntry, hidePhrases: string[], stripPs: string[]): StationPlayEntry | null {
+  if (matchesHideFull(e.title, e.artist, hidePhrases)) return null;
+  if (stripPs.length === 0) return e;
+  const { title, artist } = applyNpWordFilter(e.title, e.artist, stripPs);
   return { ...e, title, artist };
 }
 
@@ -29,16 +38,23 @@ export async function GET() {
       where: { id: 1 },
       select: { stationPlayHistory: true, stationsConfig: true, npWordFilter: true },
     });
-    const phrases = phraseListEverywhere(mergeNpWordFilter(row?.npWordFilter ?? null));
+    const f = mergeNpWordFilter(row?.npWordFilter ?? null);
+    const hidePhrases = hideFullPhrases(f);
+    const stripPs = stripPhrases(f);
     const stations = buildGlxyStationsFromDb(row?.stationsConfig ?? null);
-    const stationOptions = stations.map((s) => ({ id: s.id, label: s.line1 }));
+    const stationOptions = stations.map((s) => ({ id: s.id, label: s.line1, logoUrl: s.logoUrl ?? null }));
 
     const rawHist = row?.stationPlayHistory;
     const byStation: Record<string, StationPlayEntry[]> = {};
     if (rawHist && typeof rawHist === "object" && !Array.isArray(rawHist)) {
       for (const [k, v] of Object.entries(rawHist)) {
         if (Array.isArray(v)) {
-          byStation[k] = v.filter(isEntry).slice(0, 50).map((e) => scrubEntry(e, phrases));
+          const cleaned = v
+            .filter(isEntry)
+            .map((e) => scrubEntry(e, hidePhrases, stripPs))
+            .filter((x): x is StationPlayEntry => x !== null)
+            .slice(0, MAX_TRACKS_PER_STATION);
+          byStation[k] = cleaned;
         }
       }
     }

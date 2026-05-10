@@ -27,10 +27,10 @@ function SocialLink({
       aria-label={label}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-opacity hover:opacity-80 active:opacity-70 md:h-8 md:w-8"
       style={{ color: iconHex }}
     >
-      <span className="block h-[22px] w-[22px] [&>svg]:block [&>svg]:h-full [&>svg]:w-full">{children}</span>
+      <span className="block h-[18px] w-[18px] [&>svg]:block [&>svg]:h-full [&>svg]:w-full md:h-5 md:w-5">{children}</span>
     </a>
   );
 }
@@ -106,21 +106,21 @@ export function PublicFooter({ footer, siteLogoUrl }: Props) {
         className="pointer-events-none absolute inset-x-0 top-full"
         style={{ height: "calc(5.25rem + env(safe-area-inset-bottom))", backgroundColor: bgHex }}
       />
-      <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] items-center justify-between gap-3 px-4 py-2.5 md:gap-4 md:px-10 md:py-3">
+      <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] items-center justify-between gap-2 px-4 py-1.5 md:gap-3 md:px-10 md:py-2">
         <div className="flex min-w-0 shrink items-center">
           {logoSrc ? (
             <AppImage
               src={logoSrc}
               alt="GLXY"
-              width={180}
-              height={56}
-              className="h-7 w-auto max-w-[min(52vw,200px)] object-contain object-left md:h-8"
+              width={160}
+              height={48}
+              className="h-6 w-auto max-w-[min(48vw,180px)] object-contain object-left md:h-7"
             />
           ) : (
-            <GlxyWordmark variant="onLight" className="text-lg md:text-xl" />
+            <GlxyWordmark variant="onLight" className="text-base md:text-lg" />
           )}
         </div>
-        <nav className="flex shrink-0 flex-wrap items-center justify-end gap-0.5 sm:gap-1" aria-label="Social media">
+        <nav className="flex shrink-0 flex-wrap items-center justify-end gap-0 sm:gap-0.5" aria-label="Social media">
           {links.map(({ href, label, Icon }) => (
             <SocialLink key={label} href={href} label={label} iconHex={iconHex}>
               <Icon />

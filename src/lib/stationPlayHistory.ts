@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-const MAX_PER_STATION = 50;
+const MAX_PER_STATION = 10;
 
 export type StationPlayEntry = {
   id: string;

@@ -3,7 +3,7 @@ import { buildGlxyStationsFromDb, resolveStationNowPlayingUrl } from "@/lib/glxy
 import { prisma } from "@/lib/prisma";
 import { appendStationPlayHistory } from "@/lib/stationPlayHistory";
 import { fetchNowPlayingFromRemoteUrl, isAllowedNowPlayingUrl } from "@/lib/stationNowPlayingFetch";
-import { applyNpWordFilter, mergeNpWordFilter, phraseListEverywhere, phraseListForLiveNp } from "@/lib/npWordFilter";
+import { mergeNpWordFilter, processNowPlayingMetadata } from "@/lib/npWordFilter";
 import { persistNpSnapshotMerge } from "@/lib/stationNpSnapshotMerge";
 
 export const dynamic = "force-dynamic";
@@ -21,14 +21,11 @@ export async function GET(req: Request) {
   }
 
   let stationsConfig: unknown = null;
-  let phrasesLive: string[] = [];
-  let phrasesHistory: string[] = [];
+  let npFilter = mergeNpWordFilter(null);
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 }, select: { stationsConfig: true, npWordFilter: true } });
     stationsConfig = row?.stationsConfig ?? null;
-    const f = mergeNpWordFilter(row?.npWordFilter ?? null);
-    phrasesLive = phraseListForLiveNp(f);
-    phrasesHistory = phraseListEverywhere(f);
+    npFilter = mergeNpWordFilter(row?.npWordFilter ?? null);
   } catch {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
@@ -42,16 +39,13 @@ export async function GET(req: Request) {
   }
 
   const fetched = await fetchNowPlayingFromRemoteUrl(rawUrl);
-  const live =
-    phrasesLive.length > 0 ? applyNpWordFilter(fetched.title, fetched.artist, phrasesLive) : fetched;
-  const hist =
-    phrasesHistory.length > 0 ? applyNpWordFilter(fetched.title, fetched.artist, phrasesHistory) : fetched;
+  const live = processNowPlayingMetadata(fetched.title, fetched.artist, npFilter);
   const t = live.title;
   const a = live.artist;
   const coverUrl = fetched.coverUrl;
   const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
   persistNpSnapshot(id, t, a, coverUrl);
-  appendStationPlayHistory(id, hist.title, hist.artist, coverUrl);
+  appendStationPlayHistory(id, t, a, coverUrl);
   return NextResponse.json(
     { title: t, artist: a, text },
     { headers: { "Cache-Control": "public, s-maxage=8, stale-while-revalidate=20" } },

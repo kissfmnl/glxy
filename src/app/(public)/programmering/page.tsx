@@ -1,7 +1,7 @@
 import { ProgrammingAgenda } from "@/components/public/ProgrammingAgenda";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL_WIDE } from "@/lib/publicPageLayout";
 import { getBranding } from "@/lib/brandingDb";
-import { applyNpWordFilter, phraseListForLiveNp } from "@/lib/npWordFilter";
+import { processNowPlayingMetadata } from "@/lib/npWordFilter";
 import { getPublicProgrammingData } from "@/lib/publicProgramming";
 import { glxyChannelHeading } from "@/lib/glxyStations";
 
@@ -60,7 +60,7 @@ export default async function ProgrammeringPage() {
               const np = snap[row.id];
               const rawTitle = (np?.title ?? "").trim();
               const rawArtist = (np?.artist ?? "").trim();
-              const { title, artist } = applyNpWordFilter(rawTitle, rawArtist, phraseListForLiveNp(branding.npWordFilter));
+              const { title, artist } = processNowPlayingMetadata(rawTitle, rawArtist, branding.npWordFilter);
               const line =
                 artist && title ? `${artist} — ${title}` : title || artist || "—";
               const updated = fmtNlUpdated(np?.updatedAt);

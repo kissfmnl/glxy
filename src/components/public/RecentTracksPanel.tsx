@@ -6,25 +6,58 @@ import AppImage from "@/components/AppImage";
 import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
+import { GlxyHomePanelHeading } from "@/components/public/GlxyHomePanelHeading";
 
-function TrackThumb({ cover }: { cover: string | null | undefined }) {
-  const [failed, setFailed] = useState(false);
+function TrackThumb({ cover, stationLogo }: { cover: string | null | undefined; stationLogo?: string | null }) {
+  const [coverFailed, setCoverFailed] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
+
   useEffect(() => {
-    setFailed(false);
-  }, [cover]);
-  return (
-    <div className="flex h-full w-full items-center justify-center" style={{ backgroundColor: "var(--fallback-album-bg, #f2f8fb)" }}>
-      {cover && !failed ? (
-        <AppImage src={cover} alt="" className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />
-      ) : (
+    setCoverFailed(false);
+    setLogoFailed(false);
+  }, [cover, stationLogo]);
+
+  const bg = "var(--jp-fallback-bg, #0c1220)";
+
+  if (cover && String(cover).trim() && !coverFailed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center" style={{ backgroundColor: bg }}>
         <AppImage
-          src={MOCK_COVER_FALLBACK}
+          src={cover}
           alt=""
-          className="h-full w-full max-h-[70%] object-contain p-2 opacity-90"
+          className="h-full w-full object-cover"
           loading="lazy"
           draggable={false}
+          onError={() => setCoverFailed(true)}
         />
-      )}
+      </div>
+    );
+  }
+
+  if (stationLogo && String(stationLogo).trim() && !logoFailed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-1.5" style={{ backgroundColor: bg }}>
+        <AppImage
+          src={stationLogo}
+          alt=""
+          className="h-full w-full object-contain"
+          loading="lazy"
+          draggable={false}
+          onError={() => setLogoFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full w-full items-center justify-center" style={{ backgroundColor: bg }}>
+      <AppImage
+        src={MOCK_COVER_FALLBACK}
+        alt=""
+        className="h-full w-full max-h-[70%] object-contain p-2 opacity-75"
+        loading="lazy"
+        draggable={false}
+      />
     </div>
   );
 }
@@ -39,7 +72,7 @@ function formatTime(iso: string) {
 }
 
 type ApiPayload = {
-  stations: Array<{ id: string; label: string }>;
+  stations: Array<{ id: string; label: string; logoUrl?: string | null }>;
   byStation: Record<string, StationPlayEntry[]>;
   merged: (StationPlayEntry & { stationId: string })[];
 };
@@ -49,7 +82,7 @@ function trackKey(e: { artist: string; title: string }) {
 }
 
 export function RecentTracksPanel({
-  limit = 8,
+  limit = 10,
   className = "",
   panelTitle = "JUST PLAYED",
   historyLinkLabel = "Open playlist",
@@ -60,12 +93,10 @@ export function RecentTracksPanel({
   className?: string;
   panelTitle?: string;
   historyLinkLabel?: string;
-  /** Homepage-zenders voor filter (volgorde = zenderstrip). */
-  stations?: Array<{ id: string; line1: string }>;
-  /** Titelblok-kleuren (admin); default GLXY-geel / zwart. */
+  stations?: Array<{ id: string; line1: string; logoUrl?: string | null }>;
   justPlayedUi?: PublicJustPlayedConfig | null;
 }) {
-  const titlePalette = mergeJustPlayedConfig(justPlayedUi ?? null);
+  const theme = mergeJustPlayedConfig(justPlayedUi ?? null);
   const [data, setData] = useState<ApiPayload | null>(null);
   const [stationFilter, setStationFilter] = useState<string>("");
   const [extraCovers, setExtraCovers] = useState<Record<string, string>>({});
@@ -89,11 +120,11 @@ export function RecentTracksPanel({
   }, []);
 
   const stationTabs = useMemo(() => {
-    const fromStrip = stations.map((s) => ({ id: s.id, label: s.line1 }));
+    const fromStrip = stations.map((s) => ({ id: s.id, label: s.line1, logoUrl: s.logoUrl ?? null }));
     const ids = new Set(fromStrip.map((s) => s.id));
     if (data?.stations) {
       for (const s of data.stations) {
-        if (!ids.has(s.id)) fromStrip.push({ id: s.id, label: s.label });
+        if (!ids.has(s.id)) fromStrip.push({ id: s.id, label: s.label, logoUrl: s.logoUrl ?? null });
       }
     }
     return fromStrip;
@@ -106,6 +137,8 @@ export function RecentTracksPanel({
     const pick = preferred && stationTabs.some((s) => s.id === preferred) ? preferred : fallback;
     setStationFilter((prev) => (prev && stationTabs.some((s) => s.id === prev) ? prev : pick));
   }, [data, stations, stationTabs]);
+
+  const activeStationLogo = stationTabs.find((s) => s.id === stationFilter)?.logoUrl ?? null;
 
   const rows = useMemo(() => {
     if (!data?.stations?.length || !stationFilter) return [];
@@ -142,18 +175,16 @@ export function RecentTracksPanel({
 
   return (
     <div
-      className={`kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_12px_rgba(30,55,90,0.05)] ${className}`}
+      className={`kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border shadow-[0_8px_32px_rgba(0,0,0,0.25)] ${className}`}
+      style={{
+        backgroundColor: theme.panelSurfaceHex,
+        borderColor: theme.panelBorderHex,
+        ["--jp-fallback-bg" as string]: theme.panelSurfaceHex,
+      }}
     >
-      <div className="shrink-0 px-4 pb-2 pt-3">
-        <div
-          className="inline-flex max-w-full select-none rounded-md px-3 py-1.5"
-          style={{ backgroundColor: titlePalette.titleBgHex, color: titlePalette.titleTextHex }}
-        >
-          <span className="text-[11px] font-black uppercase leading-none tracking-[0.2em] antialiased">{panelTitle}</span>
-        </div>
-      </div>
+      <GlxyHomePanelHeading title={panelTitle} theme={theme} />
 
-      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col pt-0 !px-4 !pb-4`}>
+      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col pt-0 !px-3 !pb-3 sm:!px-4 sm:!pb-3.5`}>
         {stationTabs.length > 0 ? (
           <div className="mb-2 flex flex-wrap gap-1" role="tablist" aria-label="Zender">
             {stationTabs.map((s) => {
@@ -165,16 +196,21 @@ export function RecentTracksPanel({
                   role="tab"
                   aria-selected={selected}
                   onClick={() => setStationFilter(s.id)}
-                  className={`max-w-[min(100%,11rem)] truncate rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wide transition-colors sm:text-[10px] ${
-                    selected ? "shadow-sm" : "border border-[#1e375a]/15 bg-white/90 text-gray-600 hover:border-[var(--brand-primary)]/40"
-                  }`}
+                  className="max-w-[min(100%,10rem)] truncate rounded-md px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] transition-colors sm:text-[10px]"
                   style={
                     selected
                       ? {
-                          backgroundColor: titlePalette.stationTabSelectedBgHex,
-                          color: titlePalette.stationTabSelectedTextHex,
+                          backgroundColor: theme.stationTabSelectedBgHex,
+                          color: theme.stationTabSelectedTextHex,
+                          boxShadow: `inset 0 -2px 0 0 ${theme.sectionAccentHex}`,
                         }
-                      : undefined
+                      : {
+                          backgroundColor: theme.stationTabInactiveBgHex,
+                          color: "#94a3b8",
+                          borderWidth: 1,
+                          borderStyle: "solid",
+                          borderColor: theme.stationTabInactiveBorderHex,
+                        }
                   }
                 >
                   {s.label}
@@ -187,28 +223,29 @@ export function RecentTracksPanel({
         <div className="kiss-public-panel-scroll min-h-0 flex-1 overflow-y-auto pr-0.5 [-webkit-overflow-scrolling:touch]">
           <div className="flex flex-col gap-1">
             {rows.length === 0 ? (
-              <p className="py-3 text-center text-[11px] font-semibold text-gray-500">
-                Nog geen tracks gelogd — metadata verschijnt zodra listeners nu-speelt ophalen.
+              <p className="py-4 text-center text-[11px] font-medium text-slate-500">
+                Nog geen tracks gelogd — geschiedenis wordt server-side bijgewerkt (ongeveer elke minuut).
               </p>
             ) : (
               rows.map((t) => {
                 const entry = t as StationPlayEntry & { stationId?: string };
+                const resolvedCover = entry.coverUrl?.trim() || extraCovers[trackKey(entry)] || null;
                 return (
                   <div
                     key={`${entry.stationId ?? "x"}-${entry.id}-${entry.playedAt}`}
-                    className="kiss-public-track-row flex items-start gap-2 rounded-lg border border-[#1e375a]/08 bg-white/95 px-2 py-1"
+                    className="flex items-center gap-2.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 backdrop-blur-[2px]"
                   >
-                    <div className="w-[34px] shrink-0 pt-0.5 text-[9px] font-black tabular-nums leading-none text-gray-500 sm:text-[10px]">
+                    <div className="w-9 shrink-0 text-[9px] font-medium tabular-nums leading-none text-slate-500 sm:text-[10px]">
                       {formatTime(entry.playedAt)}
                     </div>
-                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-md border border-black/5 bg-black/5">
-                      <TrackThumb cover={entry.coverUrl?.trim() || extraCovers[trackKey(entry)] || null} />
+                    <div className="h-9 w-9 shrink-0 overflow-hidden rounded-md border border-white/[0.08] bg-black/20">
+                      <TrackThumb cover={resolvedCover} stationLogo={activeStationLogo} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="break-words text-[12px] font-black uppercase leading-snug tracking-wide text-gray-900 line-clamp-2">
+                      <p className="break-words text-[11px] font-semibold uppercase leading-snug tracking-wide text-slate-100 line-clamp-2 sm:text-xs">
                         {entry.title}
                       </p>
-                      <p className="mt-0.5 break-words text-[10px] font-semibold uppercase tracking-wide text-gray-600 line-clamp-2">
+                      <p className="mt-0.5 break-words text-[10px] font-medium uppercase tracking-wide text-slate-500 line-clamp-2">
                         {entry.artist}
                       </p>
                     </div>
@@ -219,14 +256,14 @@ export function RecentTracksPanel({
           </div>
         </div>
 
-        <div className="mt-2 shrink-0 border-t border-[#1e375a]/10 pt-2">
+        <div className="mt-2 shrink-0 border-t border-white/[0.06] pt-2">
           <a
             href="/playlist"
-            className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wide hover:underline sm:text-[11px]"
-            style={{ color: titlePalette.playlistLinkHex }}
+            className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] hover:underline sm:text-[11px]"
+            style={{ color: theme.playlistLinkHex }}
           >
             {historyLinkLabel}
-            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <svg className="h-3 w-3 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-5-5 5 5-5 5" />
             </svg>
           </a>

@@ -23,12 +23,14 @@ export async function updateJustPlayedBrandingAction(formData: FormData): Promis
   }
 
   const input: JustPlayedConfigInput = {
-    titleBgHex: normalizeOptionalHex(String(formData.get("jpTitleBgHex") ?? "")) ?? undefined,
-    titleTextHex: normalizeOptionalHex(String(formData.get("jpTitleTextHex") ?? "")) ?? undefined,
-    scheduleTitleBgHex: normalizeOptionalHex(String(formData.get("jpScheduleTitleBgHex") ?? "")) ?? undefined,
-    scheduleTitleTextHex: normalizeOptionalHex(String(formData.get("jpScheduleTitleTextHex") ?? "")) ?? undefined,
+    sectionTitleHex: normalizeOptionalHex(String(formData.get("jpSectionTitleHex") ?? "")) ?? undefined,
+    sectionAccentHex: normalizeOptionalHex(String(formData.get("jpSectionAccentHex") ?? "")) ?? undefined,
+    panelSurfaceHex: normalizeOptionalHex(String(formData.get("jpPanelSurfaceHex") ?? "")) ?? undefined,
+    panelBorderHex: normalizeOptionalHex(String(formData.get("jpPanelBorderHex") ?? "")) ?? undefined,
     stationTabSelectedBgHex: normalizeOptionalHex(String(formData.get("jpStationTabSelectedBgHex") ?? "")) ?? undefined,
     stationTabSelectedTextHex: normalizeOptionalHex(String(formData.get("jpStationTabSelectedTextHex") ?? "")) ?? undefined,
+    stationTabInactiveBgHex: normalizeOptionalHex(String(formData.get("jpStationTabInactiveBgHex") ?? "")) ?? undefined,
+    stationTabInactiveBorderHex: normalizeOptionalHex(String(formData.get("jpStationTabInactiveBorderHex") ?? "")) ?? undefined,
     playlistLinkHex: normalizeOptionalHex(String(formData.get("jpPlaylistLinkHex") ?? "")) ?? undefined,
   };
 

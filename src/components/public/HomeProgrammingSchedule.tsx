@@ -6,6 +6,7 @@ import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
 import type { MockProgrammingSlot } from "@/lib/mock/site";
 import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 import { KISS_PANEL_BODY_PAD } from "@/lib/publicPanelChrome";
+import { GlxyHomePanelHeading } from "@/components/public/GlxyHomePanelHeading";
 
 const DAYS: { id: number; label: string }[] = [
   { id: 1, label: "Ma" },
@@ -49,10 +50,9 @@ export function HomeProgrammingSchedule({
   temporarySlots: (MockProgrammingSlot & { startsOn: string; endsOn: string; isActive: boolean })[];
   liveBadgeText: string;
   panelTitle?: string;
-  /** Zelfde kleurpalet als JUST PLAYED-titel (admin /just-played). */
   justPlayedUi?: PublicJustPlayedConfig | null;
 }) {
-  const schedulePalette = mergeJustPlayedConfig(justPlayedUi ?? null);
+  const theme = mergeJustPlayedConfig(justPlayedUi ?? null);
   const nowRef = useRef<Date>(new Date());
   const nowDate = nowRef.current;
   const today = dayIdFromJs(nowDate.getDay());
@@ -108,22 +108,24 @@ export function HomeProgrammingSchedule({
         })?.id ?? null
       : null;
 
-  return (
-    <div className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_12px_rgba(30,55,90,0.05)]">
-      <div className="shrink-0 px-4 pb-2 pt-3">
-        <div
-          className="inline-flex max-w-full select-none rounded-md px-3 py-1.5"
-          style={{
-            backgroundColor: schedulePalette.scheduleTitleBgHex,
-            color: schedulePalette.scheduleTitleTextHex,
-          }}
-        >
-          <span className="text-[11px] font-black uppercase leading-none tracking-[0.2em] antialiased">{panelTitle}</span>
-        </div>
-      </div>
+  const dayBarBg = theme.stationTabInactiveBgHex;
+  const dayBarBorder = theme.stationTabInactiveBorderHex;
 
-      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col gap-2 pt-0 !pb-4`}>
-        <div className="overflow-x-auto rounded-md border border-[#1e375a]/18 bg-[#0b1020] p-1 [-webkit-overflow-scrolling:touch]">
+  return (
+    <div
+      className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
+      style={{
+        backgroundColor: theme.panelSurfaceHex,
+        borderColor: theme.panelBorderHex,
+      }}
+    >
+      <GlxyHomePanelHeading title={panelTitle} theme={theme} />
+
+      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col gap-2 pt-0 !px-3 !pb-3 sm:!px-4 sm:!pb-3.5`}>
+        <div
+          className="overflow-x-auto rounded-lg border p-0.5 [-webkit-overflow-scrolling:touch]"
+          style={{ backgroundColor: dayBarBg, borderColor: dayBarBorder }}
+        >
           <div className="flex min-w-max gap-0.5 sm:min-w-0 sm:grid sm:grid-cols-7">
             {dayMeta.map((day) => {
               const selected = day.id === selectedDay;
@@ -133,20 +135,23 @@ export function HomeProgrammingSchedule({
                   key={day.id}
                   type="button"
                   onClick={() => setSelectedDay(day.id)}
-                  className={`shrink-0 rounded-md px-2 py-1 text-center transition-colors sm:min-h-0 sm:px-1 ${
-                    selected
-                      ? "bg-[var(--brand-primary)] text-[#0a0f0c] shadow-inner"
-                      : isToday
-                        ? "bg-white/12 text-white"
-                        : "text-white/55 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className="min-h-[28px] shrink-0 rounded-md px-1.5 py-1 text-center text-[9px] font-semibold uppercase tracking-[0.14em] transition-colors sm:min-h-0 sm:px-1 sm:text-[10px]"
                   aria-pressed={selected}
                   title={day.fullLabel}
+                  style={
+                    selected
+                      ? {
+                          backgroundColor: theme.stationTabSelectedBgHex,
+                          color: theme.stationTabSelectedTextHex,
+                          boxShadow: `inset 0 -2px 0 0 ${theme.sectionAccentHex}`,
+                        }
+                      : {
+                          backgroundColor: "transparent",
+                          color: isToday ? "#cbd5e1" : "#64748b",
+                        }
+                  }
                 >
-                  <span className="block text-[9px] font-black uppercase leading-none tracking-wide sm:text-[10px]">{day.label}</span>
-                  <span className="mt-0.5 block text-[8px] font-semibold normal-case leading-none text-current/85 sm:text-[9px]">
-                    {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(day.date)}
-                  </span>
+                  {day.label}
                 </button>
               );
             })}
@@ -155,11 +160,14 @@ export function HomeProgrammingSchedule({
 
         <div className="min-h-0 flex-1 overflow-y-auto pr-0.5 [-webkit-overflow-scrolling:touch]">
           {daySlots.length === 0 ? (
-            <div className="rounded-lg border border-[#d5deea] bg-white/80 py-6 text-center">
-              <p className="text-[11px] font-bold text-gray-600">Geen programmering voor deze dag.</p>
+            <div
+              className="rounded-lg border border-white/[0.06] py-8 text-center"
+              style={{ backgroundColor: `${theme.panelSurfaceHex}` }}
+            >
+              <p className="text-[11px] font-medium text-slate-500">Geen programmering voor deze dag.</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1">
               {daySlots.map((slot) => {
                 const title = slot.label?.trim() || formatShowName(slot.jock.name);
                 const hideJock = isNonStopProgram(slot);
@@ -171,25 +179,36 @@ export function HomeProgrammingSchedule({
                 return (
                   <article
                     key={`${slot.source}-${slot.id}`}
-                    className="rounded-lg border border-[#1e375a]/12 bg-white/95 px-3 py-2 shadow-sm"
+                    className="flex gap-3 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-2 backdrop-blur-[2px]"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="min-w-0 flex-1 text-[11px] font-black uppercase leading-snug tracking-wide text-gray-900 line-clamp-2 sm:text-xs">
-                        {title}
+                    <div className="w-[5.25rem] shrink-0 text-right">
+                      <p
+                        className="font-mono text-[11px] font-semibold tabular-nums leading-tight text-slate-200 sm:text-xs"
+                        style={{ color: theme.sectionAccentHex }}
+                      >
+                        {slot.startTime}
                       </p>
-                      {isLive ? (
-                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.15em] text-red-700">
-                          <span className="inline-flex h-1.5 w-1.5 rounded-full kiss-live-dot" style={{ backgroundColor: "#ef4444" }} />
-                          {liveBadgeText}
-                        </span>
-                      ) : null}
+                      <p className="font-mono text-[10px] font-medium tabular-nums text-slate-500">{slot.endTime}</p>
                     </div>
-                    <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-gray-600 line-clamp-2 sm:text-[10px]">
-                      {subLine}
-                    </p>
-                    <p className="mt-1 font-mono text-[9px] font-black tabular-nums text-[var(--brand-primary)] sm:text-[10px]">
-                      {slot.startTime} – {slot.endTime}
-                    </p>
+                    <div className="min-w-0 flex-1 border-l border-white/[0.06] pl-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 flex-1 text-[11px] font-semibold uppercase leading-snug tracking-wide text-slate-100 line-clamp-2 sm:text-xs">
+                          {title}
+                        </p>
+                        {isLive ? (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/35 bg-red-500/10 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em] text-red-400">
+                            <span
+                              className="inline-flex h-1.5 w-1.5 rounded-full kiss-live-dot"
+                              style={{ backgroundColor: "#ef4444" }}
+                            />
+                            {liveBadgeText}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500 line-clamp-2">
+                        {subLine}
+                      </p>
+                    </div>
                   </article>
                 );
               })}
