@@ -1,7 +1,7 @@
 import { ProgrammingAgenda } from "@/components/public/ProgrammingAgenda";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
-import { getMockProgrammingData } from "@/lib/mock/site";
 import { getBranding } from "@/lib/brandingDb";
+import { getPublicProgrammingData } from "@/lib/publicProgramming";
 import { glxyChannelHeading } from "@/lib/glxyStations";
 
 type NpSnap = { title?: string; artist?: string; updatedAt?: string };
@@ -29,7 +29,7 @@ function fmtNlUpdated(iso?: string): string | null {
 
 export default async function ProgrammeringPage() {
   const branding = await getBranding();
-  const { slots, temporarySlots } = getMockProgrammingData();
+  const { slots, temporarySlots } = getPublicProgrammingData(branding);
   const subtitle = "Weekoverzicht en — waar beschikbaar — laatste live titel per zender.";
   const liveBadgeText = "Nu op stream";
 
