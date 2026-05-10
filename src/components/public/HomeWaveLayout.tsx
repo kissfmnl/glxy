@@ -11,7 +11,7 @@ import AppImage from "@/components/AppImage";
 import { GlxyHeroLogoVideo } from "@/components/public/GlxyHeroLogoVideo";
 import { GlxyStationListenStrip } from "@/components/public/GlxyStationListenStrip";
 import type { GlxyStation } from "@/lib/glxyStations";
-import { getMockProgrammingData } from "@/lib/mock/site";
+import type { MockProgrammingSlot } from "@/lib/mock/site";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -59,6 +59,8 @@ export function HomeWaveLayout({
   stationColors,
   stations,
   heroLogoUrl,
+  programmingSlots,
+  programmingTemporarySlots,
 }: {
   copy: HomeWaveCopy;
   heroBackdropSlides: { src: string }[];
@@ -70,16 +72,17 @@ export function HomeWaveLayout({
   stations: GlxyStation[];
   /** Admin-uploaded logo; valt terug op `/glxy-hero-logo-fallback.svg` */
   heroLogoUrl?: string | null;
+  programmingSlots: MockProgrammingSlot[];
+  programmingTemporarySlots: (MockProgrammingSlot & { startsOn: string; endsOn: string; isActive: boolean })[];
 }) {
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
   const heroLogoSrc = heroLogoUrl?.trim() ? heroLogoUrl.trim() : "/glxy-hero-logo-fallback.svg";
-  const { slots: programmingSlots, temporarySlots: programmingTemporarySlots } = getMockProgrammingData();
 
   const showProgrammingRow = copy.showRecentTracksPanel || copy.showCurrentShowPanel;
   const programmingGridClass =
     copy.showRecentTracksPanel && copy.showCurrentShowPanel
-      ? "grid gap-6 md:gap-8 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start"
+      ? "grid gap-6 md:gap-8 lg:grid-cols-[minmax(260px,300px)_1fr] lg:items-stretch"
       : "grid gap-6 md:gap-8 grid-cols-1";
 
   return (
@@ -129,16 +132,17 @@ export function HomeWaveLayout({
               {showProgrammingRow ? (
                 <div className={programmingGridClass}>
                   {copy.showRecentTracksPanel ? (
-                    <div className="min-w-0">
+                    <div className="flex min-h-[420px] min-w-0 flex-col lg:min-h-[560px]">
                       <RecentTracksPanel
-                        limit={5}
+                        limit={8}
                         panelTitle={copy.recentTracksTitle}
                         historyLinkLabel={copy.recentTracksCta}
+                        stations={stations.map((s) => ({ id: s.id, line1: s.line1 }))}
                       />
                     </div>
                   ) : null}
                   {copy.showCurrentShowPanel ? (
-                    <div className="min-w-0">
+                    <div className="flex min-h-[420px] min-w-0 flex-col lg:min-h-[560px]">
                       <HomeProgrammingSchedule
                         slots={programmingSlots}
                         temporarySlots={programmingTemporarySlots}

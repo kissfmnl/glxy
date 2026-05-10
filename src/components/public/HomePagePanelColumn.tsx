@@ -12,7 +12,7 @@ export function HomePagePanelColumn() {
         <CurrentShowPanel />
       </div>
       <div className="relative z-20 w-full min-w-0">
-        <RecentTracksPanel limit={5} />
+        <RecentTracksPanel limit={5} stations={[]} />
       </div>
       <div className="relative z-20 w-full min-w-0">
         <ConcertsPanel />

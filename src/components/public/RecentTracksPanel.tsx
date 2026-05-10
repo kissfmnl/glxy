@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import { useEffect, useMemo, useState } from "react";
+import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
 import AppImage from "@/components/AppImage";
-import { MOCK_COVER_FALLBACK, MOCK_RECENT_TRACKS_PAYLOAD } from "@/lib/mock/site";
+import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
+import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 
 function TrackThumb({ cover }: { cover: string | null | undefined }) {
   const [failed, setFailed] = useState(false);
@@ -18,7 +19,7 @@ function TrackThumb({ cover }: { cover: string | null | undefined }) {
         <AppImage
           src={MOCK_COVER_FALLBACK}
           alt=""
-          className="h-full w-full max-h-[72%] object-contain p-[18%] opacity-90"
+          className="h-full w-full max-h-[70%] object-contain p-[14%] opacity-90"
           loading="lazy"
           draggable={false}
         />
@@ -27,8 +28,8 @@ function TrackThumb({ cover }: { cover: string | null | undefined }) {
   );
 }
 
-function formatTime(value: string | Date) {
-  const d = new Date(value);
+function formatTime(iso: string) {
+  const d = new Date(iso);
   return new Intl.DateTimeFormat("nl-NL", {
     hour: "2-digit",
     minute: "2-digit",
@@ -36,61 +37,148 @@ function formatTime(value: string | Date) {
   }).format(d);
 }
 
+type ApiPayload = {
+  stations: Array<{ id: string; label: string }>;
+  byStation: Record<string, StationPlayEntry[]>;
+  merged: (StationPlayEntry & { stationId: string })[];
+};
+
 export function RecentTracksPanel({
-  limit = 5,
+  limit = 8,
   className = "",
-  panelTitle = "Laatste 5 tracks",
-  historyLinkLabel = "Volledige geschiedenis",
+  panelTitle = "JUST PLAYED",
+  historyLinkLabel = "Open playlist",
+  stations = [],
 }: {
   limit?: number;
   className?: string;
   panelTitle?: string;
   historyLinkLabel?: string;
+  /** Homepage-zenders voor filter (volgorde = zenderstrip). */
+  stations?: Array<{ id: string; line1: string }>;
 }) {
-  const tracks = MOCK_RECENT_TRACKS_PAYLOAD.tracks.slice(0, limit);
+  const [data, setData] = useState<ApiPayload | null>(null);
+  const [stationFilter, setStationFilter] = useState<string>("all");
+
+  const load = async () => {
+    try {
+      const r = await fetch("/api/public/just-played", { cache: "no-store" });
+      const j = (await r.json()) as ApiPayload;
+      if (j && typeof j === "object") setData(j);
+    } catch {
+      setData(null);
+    }
+  };
+
+  useEffect(() => {
+    void load();
+    const t = window.setInterval(() => void load(), 25_000);
+    return () => window.clearInterval(t);
+  }, []);
+
+  const rows = useMemo(() => {
+    if (!data?.stations?.length) return [];
+    if (stationFilter === "all") {
+      return data.merged.slice(0, limit);
+    }
+    return (data.byStation[stationFilter] ?? []).slice(0, limit);
+  }, [data, stationFilter, limit]);
+
+  const stationTabs = useMemo(() => {
+    const fromStrip = stations.map((s) => ({ id: s.id, label: s.line1 }));
+    const ids = new Set(fromStrip.map((s) => s.id));
+    if (data?.stations) {
+      for (const s of data.stations) {
+        if (!ids.has(s.id)) fromStrip.push({ id: s.id, label: s.label });
+      }
+    }
+    return fromStrip;
+  }, [stations, data]);
 
   return (
     <div
-      className={`kiss-public-panel flex h-full min-w-0 w-full flex-col overflow-hidden rounded-3xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_16px_rgba(30,55,90,0.05)] ${className}`}
+      className={`kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-3xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_16px_rgba(30,55,90,0.05)] ${className}`}
     >
-      <div className={`flex shrink-0 items-center justify-between gap-3 ${KISS_PANEL_HEADER_BOX}`}>
+      <div className={`flex shrink-0 flex-wrap items-center justify-between gap-2 ${KISS_PANEL_HEADER_BOX}`}>
         <p className={`${KISS_PANEL_TITLE} min-w-0`}>{panelTitle}</p>
-        <a
-          href="/playlist"
-          className="text-brand-primary inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-black hover:underline"
-        >
-          {historyLinkLabel}
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-5-5 5 5-5 5" />
-          </svg>
-        </a>
       </div>
 
       <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col pt-0`}>
-        <div className={`${KISS_PANEL_HEADER_GAP} flex min-h-0 flex-1 flex-col gap-2.5 md:gap-2`}>
-          {tracks.length === 0 ? (
-            <p className="text-sm font-medium text-gray-500">Nog geen tracks gelogd.</p>
-          ) : (
-            tracks.map((t) => (
-              <a
-                key={t.id}
-                href="/playlist"
-                className="kiss-public-track-row flex min-h-0 items-center gap-2 rounded-2xl border border-[#1e375a]/08 bg-white/90 px-2.5 py-2.5 md:flex-1 md:gap-2.5 md:px-3 md:py-3"
-                aria-label={`Ga naar playlist voor ${t.title} van ${t.artist}`}
+        {stationTabs.length > 0 ? (
+          <div className="mb-3 flex flex-wrap gap-1.5" role="tablist" aria-label="Zender">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={stationFilter === "all"}
+              onClick={() => setStationFilter("all")}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide transition-colors ${
+                stationFilter === "all"
+                  ? "bg-[var(--brand-primary)] text-[#0a0f0c] shadow-sm"
+                  : "border border-[#1e375a]/15 bg-white/90 text-gray-600 hover:border-[var(--brand-primary)]/40"
+              }`}
+            >
+              Alle
+            </button>
+            {stationTabs.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={stationFilter === s.id}
+                onClick={() => setStationFilter(s.id)}
+                className={`max-w-[140px] truncate rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide transition-colors ${
+                  stationFilter === s.id
+                    ? "bg-[var(--brand-primary)] text-[#0a0f0c] shadow-sm"
+                    : "border border-[#1e375a]/15 bg-white/90 text-gray-600 hover:border-[var(--brand-primary)]/40"
+                }`}
               >
-                <div className="w-9 shrink-0 text-[11px] font-black tabular-nums leading-none text-gray-500 md:w-10 md:text-xs">
-                  {formatTime(t.playedAt)}
+                {s.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="kiss-public-panel-scroll min-h-0 flex-1 overflow-y-auto pr-0.5 [-webkit-overflow-scrolling:touch]">
+          <div className="flex flex-col gap-1.5">
+            {rows.length === 0 ? (
+              <p className="py-4 text-center text-xs font-semibold text-gray-500">
+                Nog geen tracks gelogd — metadata verschijnt zodra listeners nu-speelt ophalen.
+              </p>
+            ) : (
+              rows.map((t) => {
+                const entry = t as StationPlayEntry & { stationId?: string };
+                return (
+                <div
+                  key={`${entry.stationId ?? "x"}-${entry.id}-${entry.playedAt}`}
+                  className="kiss-public-track-row flex items-center gap-2 rounded-xl border border-[#1e375a]/08 bg-white/95 px-2 py-1.5"
+                >
+                  <div className="w-[38px] shrink-0 text-[10px] font-black tabular-nums leading-none text-gray-500">
+                    {formatTime(entry.playedAt)}
+                  </div>
+                  <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg border border-black/5 bg-black/5">
+                    <TrackThumb cover={entry.coverUrl} />
+                  </div>
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <p className="truncate text-[13px] font-black uppercase leading-tight tracking-wide text-gray-900">{entry.title}</p>
+                    <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-gray-600">{entry.artist}</p>
+                  </div>
                 </div>
-                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-black/5 bg-black/5 md:h-[3.25rem] md:w-[3.25rem]">
-                  <TrackThumb cover={t.cover} />
-                </div>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <p className="truncate text-[15px] font-black leading-tight text-gray-900 md:text-base">{t.title}</p>
-                  <p className="mt-0.5 truncate text-xs font-bold text-gray-600 md:text-[13px]">{t.artist}</p>
-                </div>
-              </a>
-            ))
-          )}
+              );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className="mt-3 shrink-0 border-t border-[#1e375a]/10 pt-3">
+          <a
+            href="/playlist"
+            className="text-brand-primary inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide hover:underline"
+          >
+            {historyLinkLabel}
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-5-5 5 5-5 5" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>

@@ -70,6 +70,10 @@ model Branding {
   adminPortalCopy Json?
   /// Laatste bekende nu-speelt per zender-id (server-side; voor programmering-pagina)
   stationNpSnapshot Json?
+  /// Per zender: laatst gedraaide tracks (titel/artiest/tijd) voor JUST PLAYED
+  stationPlayHistory Json?
+  /// Optionele programmaschema-override (array van slots); anders vaste mock
+  programmingSchedule Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

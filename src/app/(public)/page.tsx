@@ -6,6 +6,7 @@ import { loadHomeWavePageData } from "@/lib/homePageWaveCopy";
 import { MOCK_JOCKS, MOCK_PLAYED_TRACKS } from "@/lib/mock/site";
 import { getBranding } from "@/lib/brandingDb";
 import { buildGlxyStationsFromDb } from "@/lib/glxyStations";
+import { getPublicProgrammingData } from "@/lib/publicProgramming";
 
 export default async function PublicHomePage() {
   const [variant, branding] = await Promise.all([getHomePageLayout(), getBranding()]);
@@ -29,6 +30,7 @@ export default async function PublicHomePage() {
 
   const heroBackdropSlides = uniqueSlideSrcs(heroBgPaths, trackCovers, 24);
   const stations = buildGlxyStationsFromDb(branding.stationsConfig);
+  const { slots: programmingSlots, temporarySlots: programmingTemporarySlots } = getPublicProgrammingData(branding);
 
   return (
     <HomeWaveLayout
@@ -40,6 +42,8 @@ export default async function PublicHomePage() {
       stationColors={branding.stationColors as any}
       stations={stations}
       heroLogoUrl={branding.logoUrl}
+      programmingSlots={programmingSlots}
+      programmingTemporarySlots={programmingTemporarySlots}
     />
   );
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { parseNowPlayingText } from "@/lib/parseNowPlayingText";
 import { buildGlxyStationsFromDb, resolveStationNowPlayingUrl } from "@/lib/glxyStations";
 import { prisma } from "@/lib/prisma";
+import { appendStationPlayHistory } from "@/lib/stationPlayHistory";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +77,7 @@ export async function GET(req: Request) {
     const a = artist.slice(0, 320);
     const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
     persistNpSnapshot(id, t, a);
+    appendStationPlayHistory(id, t, a);
     return NextResponse.json(
       { title: t, artist: a, text },
       { headers: { "Cache-Control": "public, s-maxage=8, stale-while-revalidate=20" } },
