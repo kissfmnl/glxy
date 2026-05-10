@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
 
 type Nav = { href: string; label: string };
 
@@ -35,11 +36,14 @@ const NAV_ADMIN_DEMO: Nav[] = [
   { href: "/admin/acties", label: "Acties (demo)" },
 ];
 
+const NAV_SUPER: Nav[] = [{ href: "/admin/portal-teksten", label: "Portalteksten" }];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session, status } = useSession();
-  const isAdmin = session?.user?.role === "ADMIN";
+  const canAdmin = isPortalAdmin(session?.user?.role);
+  const canSuper = isSuperAdmin(session?.user?.role);
 
   useEffect(() => setMobileOpen(false), [pathname]);
   useEffect(() => {
@@ -59,16 +63,16 @@ export default function Sidebar() {
   function section(title: string, items: Nav[]) {
     return (
       <div className="space-y-1 px-3">
-        <p className="px-4 pt-4 pb-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">{title}</p>
+        <p className="px-4 pb-1 pt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{title}</p>
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold transition-colors ${
+            className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors ${
               active(item.href)
-                ? "bg-[var(--brand-primary)]/15 text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30"
-                : "text-[var(--text-main)]/80 hover:bg-black/5 hover:text-[var(--text-main)]"
+                ? "bg-white/20 text-white shadow-inner ring-1 ring-white/30"
+                : "text-white/92 hover:bg-black/25 hover:text-white"
             }`}
           >
             {item.label}
@@ -83,7 +87,7 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className={`fixed left-3 top-3 z-[70] flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white/85 text-[var(--text-main)] shadow-lg backdrop-blur lg:hidden ${mobileOpen ? "hidden" : ""}`}
+        className={`fixed left-3 top-3 z-[70] flex h-11 w-11 items-center justify-center rounded-xl border border-[#0b7557]/40 bg-white text-[#0b7557] shadow-lg lg:hidden ${mobileOpen ? "hidden" : ""}`}
         aria-label="Open menu"
       >
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,25 +98,25 @@ export default function Sidebar() {
       {mobileOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-[48] bg-black/25 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-[48] bg-black/35 backdrop-blur-sm lg:hidden"
           aria-label="Close"
           onClick={() => setMobileOpen(false)}
         />
       ) : null}
 
       <aside
-        className={`fixed left-0 top-0 z-[50] flex h-screen w-64 flex-col overflow-y-auto border-r border-black/10 bg-[var(--bg-sidebar)] backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-[50] flex h-screen w-64 flex-col overflow-y-auto border-r border-white/15 bg-[#0b7557] text-white shadow-[6px_0_32px_rgba(0,0,0,0.18)] transition-transform duration-200 lg:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-black/10 px-4 py-4 text-white" style={{ backgroundColor: "#22d3ee" }}>
+        <div className="flex items-center justify-between border-b border-white/15 bg-black/10 px-4 py-4">
           <Link href="/dashboard" className="font-black tracking-tight text-white" onClick={() => setMobileOpen(false)}>
             <span className="text-lg">GLXY</span>
-            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/95">Radio</span>
+            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/90">Radio</span>
           </Link>
           <button
             type="button"
-            className="rounded-lg border border-white/30 bg-white/15 px-2 py-1 text-xs font-black text-white/95 hover:bg-white/25 lg:hidden"
+            className="rounded-lg border border-white/35 bg-white/10 px-2 py-1 text-xs font-black text-white hover:bg-white/20 lg:hidden"
             onClick={() => setMobileOpen(false)}
           >
             ✕
@@ -122,20 +126,21 @@ export default function Sidebar() {
         <div className="flex-1 space-y-5 py-4">
           {section("Workspace", NAV_MAIN)}
           {section("Instellingen", NAV_SETTINGS)}
-          {isAdmin ? section("Zenders", NAV_ADMIN_STATIONS) : null}
-          {isAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
+          {canAdmin ? section("Zenders", NAV_ADMIN_STATIONS) : null}
+          {canAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
+          {canSuper ? section("Super-admin", NAV_SUPER) : null}
         </div>
 
-        <div className="border-t border-black/10 p-4 space-y-3">
+        <div className="space-y-3 border-t border-white/15 p-4">
           {status === "authenticated" ? (
             <div className="space-y-1">
-              <p className="text-[11px] font-black text-[var(--text-main)] truncate" title={session?.user?.email ?? ""}>
+              <p className="truncate text-[11px] font-black text-white" title={session?.user?.email ?? ""}>
                 {session?.user?.email}
               </p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">{session?.user?.role ?? ""}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/65">{session?.user?.role ?? ""}</p>
               <button
                 type="button"
-                className="mt-2 w-full rounded-xl border border-black/10 bg-white/70 py-2 text-xs font-black text-[var(--text-main)]/90 hover:bg-white"
+                className="mt-2 w-full rounded-xl border border-white/30 bg-white py-2 text-xs font-black text-[#0b7557] hover:bg-white/95"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
                 Uitloggen
@@ -144,13 +149,17 @@ export default function Sidebar() {
           ) : (
             <Link
               href="/login"
-              className="flex w-full items-center justify-center rounded-xl bg-[var(--brand-primary)]/20 py-2.5 text-xs font-black text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/30 hover:bg-[var(--brand-primary)]/30"
+              className="flex w-full items-center justify-center rounded-xl border border-white/25 bg-white/15 py-2.5 text-xs font-black text-white hover:bg-white/25"
               onClick={() => setMobileOpen(false)}
             >
               Inloggen
             </Link>
           )}
-          <Link href="/" className="inline-flex text-xs font-black text-[var(--brand-primary)] hover:underline" onClick={() => setMobileOpen(false)}>
+          <Link
+            href="/"
+            className="inline-flex text-xs font-black text-white/95 underline-offset-2 hover:underline"
+            onClick={() => setMobileOpen(false)}
+          >
             Naar GLXY.live site
           </Link>
         </div>

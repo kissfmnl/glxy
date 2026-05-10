@@ -45,14 +45,16 @@ async function main() {
   const email = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD;
   const count = await prisma.user.count();
+  const bootstrapRole =
+    process.env.ADMIN_BOOTSTRAP_ROLE?.trim().toUpperCase() === "SUPER_ADMIN" ? Role.SUPER_ADMIN : Role.ADMIN;
   if (!count && email && password && password.length >= 8) {
     const passwordHash = await bcrypt.hash(password, 12);
     await prisma.user.create({
       data: {
         email,
         passwordHash,
-        role: Role.ADMIN,
-        name: "Administrator",
+        role: bootstrapRole,
+        name: bootstrapRole === Role.SUPER_ADMIN ? "Super-admin" : "Administrator",
       },
     });
     // eslint-disable-next-line no-console

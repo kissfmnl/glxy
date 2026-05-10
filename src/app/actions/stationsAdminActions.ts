@@ -4,12 +4,13 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { mergeStationsConfig } from "@/lib/stationsConfigMerge";
+import { isPortalAdmin } from "@/lib/authRoles";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !isPortalAdmin(session.user.role)) {
     throw new Error("Geen rechten.");
   }
 }

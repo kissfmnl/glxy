@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth";
+import { isPortalAdmin } from "@/lib/authRoles";
 import { publicMediaUrlFromStoragePath } from "@/lib/mediaPublicUrl";
 import { prisma } from "@/lib/prisma";
 import { MediaLibrary } from "./MediaLibrary";
@@ -11,7 +12,7 @@ export const metadata = {
 
 export default async function AdminMediaPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
+  if (!session?.user || !isPortalAdmin(session.user.role)) redirect("/dashboard");
 
   let rows: Awaited<ReturnType<typeof prisma.mediaAsset.findMany>> = [];
   let listError: string | null = null;

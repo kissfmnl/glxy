@@ -3,19 +3,17 @@
  */
 export type GlxyStation = {
   id: string;
-  /** Hoofdregel op de kaart (meestal titel / “nu speelt”) */
+  /** Fallback titel op de kaart als er geen live metadaten zijn */
   line1: string;
-  /** Tweede regel (artiest of slogan) */
+  /** Fallback artiest / tweede regel */
   line2: string;
-  /** Stream-URL */
   streamUrl: string;
-  /** Optioneel logo (https of pad op deze site, bv. /logo.png) */
   logoUrl?: string;
-  /** Optioneel: plain-text URL (bv. Icecast currentsong) voor “nu speelt” op de kaart */
+  /** Plain-text URL (bv. Icecast currentsong) voor titel/artiest op de kaart */
   nowPlayingUrl?: string;
-  /** Volledige Tailwind-classes voor de kaart (bg + tekstkleur) */
+  /** Icoonkleur van de play-knop (hex), optioneel */
+  playButtonHex?: string;
   cardClass: string;
-  /** Optioneel: licht zebra-/streeppatroon (geel kaart-effect) */
   zebraPattern?: boolean;
 };
 
@@ -29,36 +27,44 @@ export type GlxyStationInput = {
   streamUrl: string;
   logoUrl: string;
   nowPlayingUrl: string;
+  playButtonHex: string;
 };
+
+const CHANNEL_ORDER = ["z1", "z2", "z3", "z4"] as const;
+
+/** Labels voor admin UI, gesynchroniseerd met volgorde van zenders. */
+export function glxyChannelHeading(id: string): string {
+  const i = CHANNEL_ORDER.indexOf(id as (typeof CHANNEL_ORDER)[number]);
+  return i >= 0 ? `GLXY-KANAAL ${i + 1}` : id.toUpperCase();
+}
 
 export const GLXY_STATIONS: GlxyStation[] = [
   {
     id: "z1",
-    line1: "GLXY Main",
-    line2: "Live · Jouw hits",
+    line1: "GLXY Radio",
+    line2: "Live · jouw hits",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     cardClass: "bg-[#e11d48] text-white",
   },
   {
     id: "z2",
-    line1: "GLXY Non-Stop",
+    line1: "GLXY Radio",
     line2: "Non-stop muziek",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
     cardClass: "bg-[#84cc16] text-[#1e293b]",
   },
   {
     id: "z3",
-    line1: "GLXY Golf",
+    line1: "GLXY Radio",
     line2: "Andere vibe",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-    /** Geel met subtiel patroon via component */
     cardClass: "bg-[#facc15] text-[#1e293b]",
     zebraPattern: true,
   },
   {
     id: "z4",
-    line1: "GLXY Top 40",
-    line2: "De grootste hits",
+    line1: "GLXY Radio",
+    line2: "Top 40",
     streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     cardClass: "bg-[#7dd3fc] text-[#0f172a]",
   },
@@ -74,7 +80,7 @@ export function buildGlxyStationsFromDb(stationsConfig: unknown): GlxyStation[] 
       const id = String((row as GlxyStationInput).id ?? "").trim();
       if (!map.has(id)) continue;
       const base = map.get(id)!;
-      const r = row as GlxyStationInput & { logoUrl?: string; nowPlayingUrl?: string };
+      const r = row as GlxyStationInput & { logoUrl?: string; nowPlayingUrl?: string; playButtonHex?: string };
       if (typeof r.line1 === "string") base.line1 = r.line1.trim();
       if (typeof r.line2 === "string") base.line2 = r.line2.trim();
       if (typeof r.streamUrl === "string") base.streamUrl = r.streamUrl.trim();
@@ -83,6 +89,9 @@ export function buildGlxyStationsFromDb(stationsConfig: unknown): GlxyStation[] 
       }
       if (typeof r.nowPlayingUrl === "string" && r.nowPlayingUrl.trim()) {
         base.nowPlayingUrl = r.nowPlayingUrl.trim();
+      }
+      if (typeof r.playButtonHex === "string" && r.playButtonHex.trim()) {
+        base.playButtonHex = r.playButtonHex.trim();
       }
     }
   }
@@ -107,6 +116,7 @@ export function stationsForAdminFormDefaults(stationsConfig: unknown): {
       streamUrl: s.streamUrl,
       logoUrl: isEmbedded ? "" : (s.logoUrl ?? ""),
       nowPlayingUrl: s.nowPlayingUrl ?? "",
+      playButtonHex: s.playButtonHex ?? "",
     });
   }
   return { stations, stationsLogoEmbedded };

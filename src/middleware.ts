@@ -1,11 +1,15 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+function portalAdminRole(role: unknown): boolean {
+  return role === "ADMIN" || role === "SUPER_ADMIN";
+}
+
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     if (req.nextUrl.pathname.startsWith("/admin")) {
-      if (token?.role !== "ADMIN") {
+      if (!portalAdminRole(token?.role)) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     }
@@ -15,7 +19,7 @@ export default withAuth(
     callbacks: {
       authorized({ token, req }) {
         if (!token) return false;
-        if (req.nextUrl.pathname.startsWith("/admin")) return token.role === "ADMIN";
+        if (req.nextUrl.pathname.startsWith("/admin")) return portalAdminRole(token.role);
         return true;
       },
     },

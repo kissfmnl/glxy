@@ -9,17 +9,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendInviteEmail } from "@/lib/mail";
 import { getPublicAppUrl } from "@/lib/publicAppUrl";
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
-    throw new Error("Geen rechten.");
-  }
-  return session.user;
-}
+import { isPortalAdmin } from "@/lib/authRoles";
 
 export async function createInviteAction(formData: FormData): Promise<{ ok?: true; inviteUrl?: string; error?: string }> {
-  await requireAdmin();
+  const session = await getServerSession(authOptions);
+  if (!session?.user || !isPortalAdmin(session.user.role)) {
+    return { error: "Geen rechten." };
+  }
   const rawEmail = String(formData.get("email") ?? "").trim().toLowerCase();
   const rawRole = String(formData.get("role") ?? "DJ").toUpperCase();
   const role = rawRole === "ADMIN" ? Role.ADMIN : Role.DJ;

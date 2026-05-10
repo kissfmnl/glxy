@@ -1,7 +1,11 @@
 import { authOptions } from "@/lib/auth";
+import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
+import { mergeAdminPortalCopy } from "@/lib/adminPortalCopy";
+import { AdminIntroHtml } from "@/components/portal/AdminIntroHtml";
 import { prisma } from "@/lib/prisma";
 import { BrandingForm } from "./BrandingForm";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 const FALLBACK = {
@@ -37,7 +41,9 @@ export const metadata = {
 
 export default async function AdminBrandingPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
+  if (!session?.user || !isPortalAdmin(session.user.role)) redirect("/dashboard");
+
+  let portalIntro = mergeAdminPortalCopy(null).brandingIntroHtml;
 
   let defaults = {
     ...FALLBACK,
@@ -68,18 +74,27 @@ export default async function AdminBrandingPage() {
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,
         mainLogoEmbedded: !!row.logoDataUri,
       };
+      portalIntro = mergeAdminPortalCopy(row.adminPortalCopy ?? null).brandingIntroHtml;
     }
   } catch {
     /* database niet beschikbaar */
   }
 
+  const showPortalTekstenLink = session.user.role ? isSuperAdmin(session.user.role) : false;
+
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 py-2">
-      <header>
+      <header className="space-y-2">
         <h1 className="text-2xl font-black text-[var(--text-main)]">Huisstijl & livestream</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Publieke GLXY-site: kleuren via CSS-variabelen, optioneel logo in de header, favicon, en de HLS-embed op de homepage.
-        </p>
+        <AdminIntroHtml html={portalIntro} />
+        {showPortalTekstenLink ? (
+          <p className="text-xs text-[var(--text-muted)]">
+            <Link href="/admin/portal-teksten" className="font-semibold text-[var(--brand-yellow)] underline-offset-2 hover:underline">
+              Portalteksten bewerken
+            </Link>{" "}
+            (super-admin)
+          </p>
+        ) : null}
       </header>
       <BrandingForm defaults={defaults} />
     </div>

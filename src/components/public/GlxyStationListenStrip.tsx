@@ -5,7 +5,7 @@ import AppImage from "@/components/AppImage";
 import type { GlxyStation } from "@/lib/glxyStations";
 
 function StationLogoCompact({ station }: { station: GlxyStation }) {
-  const initial = station.line1.charAt(0).toUpperCase();
+  const initial = (station.line1?.trim()?.charAt(0) || station.id.charAt(1) || "?").toUpperCase();
   if (station.logoUrl) {
     return (
       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-white/20 shadow-inner ring-1 ring-black/10 sm:h-12 sm:w-12">
@@ -38,22 +38,28 @@ function StationCardCompact({
   onToggle: () => void;
   bgOverride?: string | null;
 }) {
-  const [nowPlayingLine, setNowPlayingLine] = useState("");
+  const [np, setNp] = useState<{ title: string; artist: string }>({ title: "", artist: "" });
+
+  const hasNpUrl = !!(station.nowPlayingUrl?.trim());
 
   useEffect(() => {
-    const url = station.nowPlayingUrl?.trim();
-    if (!playing || !url) {
-      setNowPlayingLine("");
+    if (!playing || !hasNpUrl) {
+      setNp({ title: "", artist: "" });
       return;
     }
     let cancelled = false;
     const load = async () => {
       try {
         const r = await fetch(`/api/stations/now-playing?id=${encodeURIComponent(station.id)}`);
-        const j = (await r.json()) as { text?: string };
-        if (!cancelled) setNowPlayingLine((j.text ?? "").trim());
+        const j = (await r.json()) as { title?: string; artist?: string };
+        if (!cancelled) {
+          setNp({
+            title: (j.title ?? "").trim(),
+            artist: (j.artist ?? "").trim(),
+          });
+        }
       } catch {
-        if (!cancelled) setNowPlayingLine("");
+        if (!cancelled) setNp({ title: "", artist: "" });
       }
     };
     load();
@@ -62,7 +68,13 @@ function StationCardCompact({
       cancelled = true;
       window.clearInterval(t);
     };
-  }, [playing, station.id, station.nowPlayingUrl]);
+  }, [playing, station.id, hasNpUrl]);
+
+  const live = playing && hasNpUrl;
+  const titleLine = live ? np.title || station.line1 : station.line1;
+  const artistLine = live ? np.artist || station.line2 : station.line2;
+
+  const playColor = station.playButtonHex?.trim() || undefined;
 
   const bgStyle =
     station.zebraPattern
@@ -87,23 +99,14 @@ function StationCardCompact({
             style={{ color: "var(--glxy-station-text)" }}
             className="truncate text-[9px] font-black uppercase leading-tight tracking-wide sm:text-[10px]"
           >
-            {station.line1}
+            {titleLine}
           </p>
           <p
             style={{ color: "var(--glxy-station-subtext)" }}
             className="truncate text-[8px] font-semibold uppercase leading-tight sm:text-[9px]"
           >
-            {station.line2}
+            {artistLine}
           </p>
-          {playing && nowPlayingLine ? (
-            <p
-              style={{ color: "var(--glxy-station-subtext)" }}
-              className="truncate pt-0.5 text-[7px] font-semibold leading-tight opacity-95 sm:text-[8px]"
-              title={nowPlayingLine}
-            >
-              {nowPlayingLine}
-            </p>
-          ) : null}
         </div>
       </div>
       <button
@@ -111,7 +114,7 @@ function StationCardCompact({
         onClick={onToggle}
         aria-label={playing ? `Pauzeer ${station.line1}` : `Speel ${station.line1}`}
         className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white shadow-md ring-2 ring-black/10 transition hover:bg-white/95"
-        style={{ color: "var(--glxy-station-play)" }}
+        style={{ color: playColor ?? "var(--glxy-station-play)" }}
       >
         {playing ? (
           <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

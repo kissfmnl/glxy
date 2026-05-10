@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth";
+import { isPortalAdmin } from "@/lib/authRoles";
 import { prisma } from "@/lib/prisma";
 import { InviteCreateForm } from "./InviteCreateForm";
 import type { Invite, User } from "@prisma/client";
@@ -15,7 +16,7 @@ function fmtDate(d: Date) {
 
 export default async function AdminGebruikersPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
+  if (!session?.user || !isPortalAdmin(session.user.role)) redirect("/dashboard");
 
   let invites: Invite[] = [];
   let users: Pick<User, "id" | "email" | "role" | "name" | "createdAt">[] = [];

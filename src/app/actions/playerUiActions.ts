@@ -6,10 +6,11 @@ import { authOptions } from "@/lib/auth";
 import type { PlayerUiConfig } from "@/lib/playerUi";
 import { DEFAULT_PLAYER_UI } from "@/lib/playerUi";
 import { prisma } from "@/lib/prisma";
+import { isPortalAdmin } from "@/lib/authRoles";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !isPortalAdmin(session.user.role)) {
     throw new Error("Geen rechten.");
   }
 }

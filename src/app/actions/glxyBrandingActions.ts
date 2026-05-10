@@ -5,10 +5,11 @@ import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { MAX_IMAGE_DATA_URI_CHARS, inlineApiMediaUrlIfLocal } from "@/lib/inlineMediaFromApiUrl";
 import { prisma } from "@/lib/prisma";
+import { isPortalAdmin } from "@/lib/authRoles";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !isPortalAdmin(session.user.role)) {
     throw new Error("Geen rechten.");
   }
 }

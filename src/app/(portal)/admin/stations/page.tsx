@@ -1,7 +1,11 @@
 import { authOptions } from "@/lib/auth";
+import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
+import { mergeAdminPortalCopy } from "@/lib/adminPortalCopy";
 import { prisma } from "@/lib/prisma";
 import { stationsForAdminFormDefaults } from "@/lib/glxyStations";
+import { AdminIntroHtml } from "@/components/portal/AdminIntroHtml";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StationsAdminForm } from "./StationsAdminForm";
 
@@ -18,12 +22,14 @@ export const metadata = {
 
 export default async function AdminStationsPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
+  if (!session?.user || !isPortalAdmin(session.user.role)) redirect("/dashboard");
 
   let defaults = {
     ...stationsForAdminFormDefaults(null),
     stationColors: { ...FALLBACK_COLORS },
   };
+
+  let portalIntro = mergeAdminPortalCopy(null).stationsIntroHtml;
 
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 } });
@@ -36,22 +42,27 @@ export default async function AdminStationsPage() {
             ? { ...FALLBACK_COLORS, ...(row.stationColors as Record<string, string>) }
             : { ...FALLBACK_COLORS },
       };
+      portalIntro = mergeAdminPortalCopy(row.adminPortalCopy ?? null).stationsIntroHtml;
     }
   } catch {
     /* db off */
   }
 
+  const showPortalTekstenLink = isSuperAdmin(session.user.role);
+
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 py-2">
-      <header>
+      <header className="space-y-2">
         <h1 className="text-2xl font-black text-[var(--text-main)]">Zenders & streams</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Beheer wat op de homepage onder de live-video staat: streams, logo’s, nu-speelt-tekstbestanden en kaartkleuren.{" "}
-          <a href="/admin/player-ui" className="font-semibold text-[var(--brand-yellow)] underline-offset-2 hover:underline">
-            Player & weergave
-          </a>{" "}
-          voor kleuren van knoppen en de vaste mini-player.
-        </p>
+        <AdminIntroHtml html={portalIntro} />
+        {showPortalTekstenLink ? (
+          <p className="text-xs text-[var(--text-muted)]">
+            <Link href="/admin/portal-teksten" className="font-semibold text-[var(--brand-yellow)] underline-offset-2 hover:underline">
+              Portalteksten bewerken
+            </Link>{" "}
+            (super-admin)
+          </p>
+        ) : null}
       </header>
       <StationsAdminForm defaults={defaults} />
     </div>

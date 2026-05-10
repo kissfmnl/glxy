@@ -11,6 +11,7 @@ import { publicMediaUrlFromStoragePath } from "@/lib/mediaPublicUrl";
 import { prisma } from "@/lib/prisma";
 import { absoluteWebsitePath } from "@/lib/websitePaths";
 import { writeUnderWebsite } from "@/lib/websiteDisk";
+import { isPortalAdmin } from "@/lib/authRoles";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -35,7 +36,7 @@ const EXT_TO_MIME: Record<string, string> = {
 
 async function requireAdmin(): Promise<{ ok: true } | { error: string }> {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !isPortalAdmin(session.user.role)) {
     return { error: "Geen rechten." };
   }
   return { ok: true };
@@ -125,6 +126,7 @@ export async function uploadMediaAssetAction(
     const url = publicMediaUrlFromStoragePath(storagePath);
     revalidatePath("/admin/media");
     revalidatePath("/admin/branding");
+    revalidatePath("/admin/stations");
     return { ok: true, url, id: row.id };
   } catch (e) {
     console.error("[uploadMediaAssetAction] unexpected", e);
