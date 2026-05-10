@@ -38,6 +38,32 @@ function StationCardCompact({
   onToggle: () => void;
   bgOverride?: string | null;
 }) {
+  const [nowPlayingLine, setNowPlayingLine] = useState("");
+
+  useEffect(() => {
+    const url = station.nowPlayingUrl?.trim();
+    if (!playing || !url) {
+      setNowPlayingLine("");
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const r = await fetch(`/api/stations/now-playing?id=${encodeURIComponent(station.id)}`);
+        const j = (await r.json()) as { text?: string };
+        if (!cancelled) setNowPlayingLine((j.text ?? "").trim());
+      } catch {
+        if (!cancelled) setNowPlayingLine("");
+      }
+    };
+    load();
+    const t = window.setInterval(load, 25_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(t);
+    };
+  }, [playing, station.id, station.nowPlayingUrl]);
+
   const bgStyle =
     station.zebraPattern
       ? {
@@ -51,12 +77,12 @@ function StationCardCompact({
 
   return (
     <div
-      className={`group relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-2 gap-y-1 overflow-hidden rounded-md px-2 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out hover:-translate-y-1 hover:brightness-[1.07] hover:shadow-[0_12px_32px_rgba(11,117,87,0.42)] active:scale-[0.99] sm:gap-x-2.5 sm:px-2.5 sm:py-2.5 ${station.cardClass}`}
+      className={`group relative flex min-h-[3.25rem] items-center gap-2 overflow-hidden rounded-md px-2 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out hover:-translate-y-1 hover:brightness-[1.07] hover:shadow-[0_12px_32px_rgba(11,117,87,0.42)] active:scale-[0.99] sm:gap-x-2.5 sm:px-2.5 sm:py-2.5 ${station.cardClass}`}
       style={bgStyle}
     >
-      <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <StationLogoCompact station={station} />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p
             style={{ color: "var(--glxy-station-text)" }}
             className="truncate text-[9px] font-black uppercase leading-tight tracking-wide sm:text-[10px]"
@@ -69,13 +95,22 @@ function StationCardCompact({
           >
             {station.line2}
           </p>
+          {playing && nowPlayingLine ? (
+            <p
+              style={{ color: "var(--glxy-station-subtext)" }}
+              className="truncate pt-0.5 text-[7px] font-semibold leading-tight opacity-95 sm:text-[8px]"
+              title={nowPlayingLine}
+            >
+              {nowPlayingLine}
+            </p>
+          ) : null}
         </div>
       </div>
       <button
         type="button"
         onClick={onToggle}
         aria-label={playing ? `Pauzeer ${station.line1}` : `Speel ${station.line1}`}
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white shadow-md ring-2 ring-black/10 transition hover:bg-white/95"
+        className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white shadow-md ring-2 ring-black/10 transition hover:bg-white/95"
         style={{ color: "var(--glxy-station-play)" }}
       >
         {playing ? (
@@ -89,7 +124,6 @@ function StationCardCompact({
           </svg>
         )}
       </button>
-      <div className="min-w-0" aria-hidden />
     </div>
   );
 }

@@ -21,10 +21,14 @@ const NAV_SETTINGS: Nav[] = [
   { href: "/settings/kiss40", label: "GLXY40" },
 ];
 
+const NAV_ADMIN_STATIONS: Nav[] = [
+  { href: "/admin/stations", label: "Zenders & streams" },
+  { href: "/admin/player-ui", label: "Player & weergave" },
+];
+
 const NAV_ADMIN_DEMO: Nav[] = [
   { href: "/admin/gebruikers", label: "Gebruikers & uitnodigingen" },
   { href: "/admin/branding", label: "Huisstijl (GLXY)" },
-  { href: "/admin/player-ui", label: "Player & weergave" },
   { href: "/admin/media", label: "Mediabibliotheek" },
   { href: "/admin/djs", label: "Hosts (demo)" },
   { href: "/admin/programmering", label: "Planner (demo)" },
@@ -118,6 +122,7 @@ export default function Sidebar() {
         <div className="flex-1 space-y-5 py-4">
           {section("Workspace", NAV_MAIN)}
           {section("Instellingen", NAV_SETTINGS)}
+          {isAdmin ? section("Zenders", NAV_ADMIN_STATIONS) : null}
           {isAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
         </div>
 

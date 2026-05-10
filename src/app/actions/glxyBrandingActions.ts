@@ -3,7 +3,6 @@
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
-import { KEEP_STATION_LOGO } from "@/lib/glxyStations";
 import { MAX_IMAGE_DATA_URI_CHARS, inlineApiMediaUrlIfLocal } from "@/lib/inlineMediaFromApiUrl";
 import { prisma } from "@/lib/prisma";
 
@@ -75,45 +74,6 @@ async function resolveLogoFields(
   return { logoUrl: normalizeUrl(logoUrlRaw), logoDataUri: null };
 }
 
-async function mergeStationsConfig(raw: string, prevConfig: unknown): Promise<object[] | undefined> {
-  let incoming: unknown;
-  try {
-    incoming = JSON.parse(raw);
-  } catch {
-    return undefined;
-  }
-  if (!Array.isArray(incoming)) return undefined;
-  const prevArr = Array.isArray(prevConfig) ? prevConfig : [];
-  const prevById = new Map<string, { logoUrl?: string }>();
-  for (const p of prevArr) {
-    if (p && typeof p === "object" && typeof (p as { id?: string }).id === "string") {
-      prevById.set(String((p as { id: string }).id), p as { logoUrl?: string });
-    }
-  }
-  const out: object[] = [];
-  for (const inc of incoming) {
-    if (!inc || typeof inc !== "object") continue;
-    const id = String((inc as { id?: string }).id ?? "").trim();
-    if (!id) continue;
-    const prevSt = prevById.get(id);
-    let logoUrlStation = String((inc as { logoUrl?: string }).logoUrl ?? "").trim();
-    if (logoUrlStation === KEEP_STATION_LOGO) {
-      logoUrlStation = typeof prevSt?.logoUrl === "string" ? prevSt.logoUrl : "";
-    }
-    if (logoUrlStation.startsWith("/api/media/")) {
-      const inlined = await inlineApiMediaUrlIfLocal(logoUrlStation);
-      if (inlined?.startsWith("data:image/")) logoUrlStation = inlined;
-    }
-    const line1 = String((inc as { line1?: string }).line1 ?? "").trim();
-    const line2 = String((inc as { line2?: string }).line2 ?? "").trim();
-    const streamUrl = String((inc as { streamUrl?: string }).streamUrl ?? "").trim();
-    const row: Record<string, unknown> = { id, line1, line2, streamUrl };
-    if (logoUrlStation) row.logoUrl = logoUrlStation;
-    out.push(row);
-  }
-  return out;
-}
-
 export async function updateBrandingAction(formData: FormData): Promise<{ ok?: true; error?: string }> {
   await requireAdmin();
 
@@ -128,18 +88,6 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const heroVideoFrameHex = normalizeOptionalHex(String(formData.get("heroVideoFrameHex") ?? ""));
   const listenBarBgHex = normalizeOptionalHex(String(formData.get("listenBarBgHex") ?? ""));
   const listenBarTextHex = normalizeOptionalHex(String(formData.get("listenBarTextHex") ?? ""));
-  let stationColors: Record<string, any> | null = null;
-  try {
-    const raw = String(formData.get("stationColorsJson") ?? "").trim();
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        stationColors = parsed as Record<string, any>;
-      }
-    }
-  } catch {
-    stationColors = null;
-  }
   let navItems: Array<{ href: string; label: string }> | null = null;
   try {
     const raw = String(formData.get("navItemsJson") ?? "").trim();
@@ -163,9 +111,6 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
   const prev = await prisma.branding.findUnique({ where: { id: 1 } });
   const { logoUrl, logoDataUri } = await resolveLogoFields(formData, prev);
 
-  const stationsRaw = String(formData.get("stationsJson") ?? "").trim();
-  const stationsMerged = stationsRaw ? await mergeStationsConfig(stationsRaw, prev?.stationsConfig) : undefined;
-
   await prisma.branding.upsert({
     where: { id: 1 },
     create: {
@@ -184,8 +129,6 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       listenBarBgHex,
       listenBarTextHex,
       navItems: navItems ?? undefined,
-      stationColors: stationColors ?? undefined,
-      stationsConfig: stationsMerged ?? undefined,
       homeHlsUrl: hlsFinal,
     },
     update: {
@@ -203,8 +146,6 @@ export async function updateBrandingAction(formData: FormData): Promise<{ ok?: t
       listenBarBgHex,
       listenBarTextHex,
       navItems: navItems ?? undefined,
-      stationColors: stationColors ?? undefined,
-      ...(stationsMerged !== undefined ? { stationsConfig: stationsMerged } : {}),
       homeHlsUrl: hlsFinal,
     },
   });

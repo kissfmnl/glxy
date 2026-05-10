@@ -1,5 +1,4 @@
 import { authOptions } from "@/lib/auth";
-import { stationsForAdminFormDefaults } from "@/lib/glxyStations";
 import { prisma } from "@/lib/prisma";
 import { BrandingForm } from "./BrandingForm";
 import { getServerSession } from "next-auth";
@@ -29,16 +28,8 @@ const FALLBACK = {
   heroVideoFrameHex: "#ffe200",
   listenBarBgHex: "#0b7557",
   listenBarTextHex: "#ffffff",
-  stationColors: {
-    z1: "#e11d48",
-    z2: "#84cc16",
-    z3: "#facc15",
-    z4: "#7dd3fc",
-  },
   homeHlsUrl: "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8",
 };
-
-const FALLBACK_STATIONS = stationsForAdminFormDefaults(null);
 
 export const metadata = {
   title: "Huisstijl — GLXY",
@@ -50,7 +41,6 @@ export default async function AdminBrandingPage() {
 
   let defaults = {
     ...FALLBACK,
-    ...FALLBACK_STATIONS,
     mainLogoEmbedded: false,
   };
   try {
@@ -61,7 +51,6 @@ export default async function AdminBrandingPage() {
         row.navItems.every((x: any) => x && typeof x.href === "string" && typeof x.label === "string")
           ? (row.navItems as Array<{ href: string; label: string }>)
           : FALLBACK.navItems;
-      const stationDefaults = stationsForAdminFormDefaults(row.stationsConfig ?? null);
       defaults = {
         primaryHex: row.primaryHex,
         accentHex: row.accentHex,
@@ -76,12 +65,7 @@ export default async function AdminBrandingPage() {
         heroVideoFrameHex: row.heroVideoFrameHex ?? FALLBACK.heroVideoFrameHex,
         listenBarBgHex: row.listenBarBgHex ?? FALLBACK.listenBarBgHex,
         listenBarTextHex: row.listenBarTextHex ?? FALLBACK.listenBarTextHex,
-        stationColors:
-          row.stationColors && typeof row.stationColors === "object" && !Array.isArray(row.stationColors)
-            ? (row.stationColors as any)
-            : FALLBACK.stationColors,
         homeHlsUrl: row.homeHlsUrl || FALLBACK.homeHlsUrl,
-        ...stationDefaults,
         mainLogoEmbedded: !!row.logoDataUri,
       };
     }

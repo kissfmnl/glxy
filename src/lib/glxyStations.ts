@@ -11,6 +11,8 @@ export type GlxyStation = {
   streamUrl: string;
   /** Optioneel logo (https of pad op deze site, bv. /logo.png) */
   logoUrl?: string;
+  /** Optioneel: plain-text URL (bv. Icecast currentsong) voor “nu speelt” op de kaart */
+  nowPlayingUrl?: string;
   /** Volledige Tailwind-classes voor de kaart (bg + tekstkleur) */
   cardClass: string;
   /** Optioneel: licht zebra-/streeppatroon (geel kaart-effect) */
@@ -26,6 +28,7 @@ export type GlxyStationInput = {
   line2: string;
   streamUrl: string;
   logoUrl: string;
+  nowPlayingUrl: string;
 };
 
 export const GLXY_STATIONS: GlxyStation[] = [
@@ -71,12 +74,15 @@ export function buildGlxyStationsFromDb(stationsConfig: unknown): GlxyStation[] 
       const id = String((row as GlxyStationInput).id ?? "").trim();
       if (!map.has(id)) continue;
       const base = map.get(id)!;
-      const r = row as GlxyStationInput & { logoUrl?: string };
+      const r = row as GlxyStationInput & { logoUrl?: string; nowPlayingUrl?: string };
       if (typeof r.line1 === "string") base.line1 = r.line1.trim();
       if (typeof r.line2 === "string") base.line2 = r.line2.trim();
       if (typeof r.streamUrl === "string") base.streamUrl = r.streamUrl.trim();
       if (typeof r.logoUrl === "string" && r.logoUrl.trim()) {
         base.logoUrl = r.logoUrl.trim();
+      }
+      if (typeof r.nowPlayingUrl === "string" && r.nowPlayingUrl.trim()) {
+        base.nowPlayingUrl = r.nowPlayingUrl.trim();
       }
     }
   }
@@ -100,6 +106,7 @@ export function stationsForAdminFormDefaults(stationsConfig: unknown): {
       line2: s.line2,
       streamUrl: s.streamUrl,
       logoUrl: isEmbedded ? "" : (s.logoUrl ?? ""),
+      nowPlayingUrl: s.nowPlayingUrl ?? "",
     });
   }
   return { stations, stationsLogoEmbedded };

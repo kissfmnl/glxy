@@ -1,8 +1,6 @@
 "use client";
 
 import { updateBrandingAction } from "@/app/actions/glxyBrandingActions";
-import { KEEP_STATION_LOGO } from "@/lib/glxyStations";
-import type { GlxyStationInput } from "@/lib/glxyStations";
 import { BrandingUploadPick } from "./BrandingUploadPick";
 import { useState } from "react";
 
@@ -20,10 +18,7 @@ type Defaults = {
   heroVideoFrameHex: string;
   listenBarBgHex: string;
   listenBarTextHex: string;
-  stationColors: Record<string, string>;
   homeHlsUrl: string;
-  stations: GlxyStationInput[];
-  stationsLogoEmbedded: Record<string, boolean>;
   mainLogoEmbedded: boolean;
 };
 
@@ -47,8 +42,6 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
   const [heroVideoFrameHex, setHeroVideoFrameHex] = useState(defaults.heroVideoFrameHex ?? "");
   const [listenBarBgHex, setListenBarBgHex] = useState(defaults.listenBarBgHex ?? "");
   const [listenBarTextHex, setListenBarTextHex] = useState(defaults.listenBarTextHex ?? "");
-  const [stationColors, setStationColors] = useState<Record<string, string>>(defaults.stationColors ?? {});
-  const [stations, setStations] = useState<GlxyStationInput[]>(defaults.stations ?? []);
 
   const embeddedMarkerActive =
     defaults.mainLogoEmbedded && !clearMainLogo && !logoUrl.trim();
@@ -67,18 +60,6 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         fd.set("heroVideoFrameHex", heroVideoFrameHex);
         fd.set("listenBarBgHex", listenBarBgHex);
         fd.set("listenBarTextHex", listenBarTextHex);
-        fd.set("stationColorsJson", JSON.stringify(stationColors));
-        fd.set(
-          "stationsJson",
-          JSON.stringify(
-            stations.map((s) => ({
-              ...s,
-              logoUrl:
-                s.logoUrl.trim() ||
-                (defaults.stationsLogoEmbedded[s.id] ? KEEP_STATION_LOGO : ""),
-            })),
-          ),
-        );
         setBusy(true);
         setMsg(null);
         const res = await updateBrandingAction(fd);
@@ -297,91 +278,12 @@ export function BrandingForm({ defaults }: { defaults: Defaults }) {
         </label>
       </div>
 
-      <div className="border-t border-white/10 pt-5">
-        <h2 className="text-lg font-black text-[var(--text-main)]">Stations</h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Zenders op de homepage (GLXY Main, Non-Stop, …): naam, subtitel, streamlink en optioneel een vierkant logo (bron bv. 1080×1080; wordt klein op de kaart getoond). Bij opslaan worden uploads vanaf <code className="text-[var(--brand-yellow)]">/api/media/</code> net als het hoofdlogo in de database ingesloten.
-        </p>
-      </div>
-      <div className="grid gap-4">
-        {stations.map((s, idx) => (
-          <div key={s.id} className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-3">
-            <p className="text-xs font-black uppercase tracking-wider text-[var(--brand-yellow)]">{s.id}</p>
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="block text-xs font-semibold text-[var(--text-muted)]">
-                Radionaam
-                <input
-                  value={s.line1}
-                  onChange={(e) =>
-                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, line1: e.target.value } : x)))
-                  }
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-sm font-black text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
-                />
-              </label>
-              <label className="block text-xs font-semibold text-[var(--text-muted)]">
-                Subtitel
-                <input
-                  value={s.line2}
-                  onChange={(e) =>
-                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, line2: e.target.value } : x)))
-                  }
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
-                />
-              </label>
-              <label className="block text-xs font-semibold text-[var(--text-muted)] md:col-span-2">
-                Stream-URL
-                <input
-                  value={s.streamUrl}
-                  onChange={(e) =>
-                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, streamUrl: e.target.value } : x)))
-                  }
-                  placeholder="https://…"
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
-                />
-              </label>
-              <label className="block text-xs font-semibold text-[var(--text-muted)] md:col-span-2">
-                Logo-URL (optioneel)
-                <input
-                  value={s.logoUrl}
-                  onChange={(e) =>
-                    setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, logoUrl: e.target.value } : x)))
-                  }
-                  placeholder="/api/media/… of https://…"
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
-                />
-              </label>
-            </div>
-            {defaults.stationsLogoEmbedded[s.id] && !s.logoUrl.trim() ? (
-              <p className="text-[11px] font-semibold text-[var(--brand-primary)]">Logo ingesloten — upload om te vervangen.</p>
-            ) : null}
-            <BrandingUploadPick
-              label={`Upload logo (${s.id})`}
-              onUploaded={(url) =>
-                setStations((prev) => prev.map((x, i) => (i === idx ? { ...x, logoUrl: url } : x)))
-              }
-            />
-          </div>
-        ))}
-      </div>
-
-      <div className="border-t border-white/10 pt-5">
-        <h2 className="text-lg font-black text-[var(--text-main)]">Zenders (kleuren)</h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Achtergrondkleuren voor de zenderkaarten. Gebruik hex (bijv. <code className="text-[var(--brand-yellow)]">#e11d48</code>).
-        </p>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {["z1", "z2", "z3", "z4"].map((id) => (
-          <label key={id} className="block text-xs font-semibold text-[var(--text-muted)]">
-            {id.toUpperCase()} kleur
-            <input
-              value={stationColors[id] ?? ""}
-              onChange={(e) => setStationColors((prev) => ({ ...prev, [id]: e.target.value }))}
-              placeholder="#000000"
-              className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-xs text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
-            />
-          </label>
-        ))}
+      <div className="rounded-xl border border-[var(--brand-primary)]/25 bg-[var(--brand-primary)]/8 px-4 py-3 text-sm text-[var(--text-muted)]">
+        <strong className="font-black text-[var(--text-main)]">Zenders & streams</strong> — streams, logo’s, nu-speelt en kaartkleuren beheer je onder{" "}
+        <a href="/admin/stations" className="font-semibold text-[var(--brand-yellow)] underline-offset-2 hover:underline">
+          Beheer → Zenders & streams
+        </a>
+        .
       </div>
 
       <div className="border-t border-white/10 pt-5">
