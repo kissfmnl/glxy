@@ -20,12 +20,12 @@ export default async function AdminPlayerUiPage() {
   if (!session?.user || !isPortalAdmin(session.user.role)) redirect("/dashboard");
 
   let defaults = mergePlayerUi(null);
-  let npPhrases = mergeNpWordFilter(null).phrases;
+  let npRules = mergeNpWordFilter(null).rules;
   let portalIntro = mergeAdminPortalCopy(null).playerUiIntroHtml;
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 } });
     if (row?.playerUi) defaults = mergePlayerUi(row.playerUi);
-    if (row) npPhrases = mergeNpWordFilter(row.npWordFilter ?? null).phrases;
+    if (row) npRules = mergeNpWordFilter(row.npWordFilter ?? null).rules;
     if (row) portalIntro = mergeAdminPortalCopy(row.adminPortalCopy ?? null).playerUiIntroHtml;
   } catch {
     /* db weg */
@@ -48,7 +48,7 @@ export default async function AdminPlayerUiPage() {
         ) : null}
       </header>
       <PlayerUiForm defaults={defaults} />
-      <NpWordFilterForm phrases={npPhrases} />
+      <NpWordFilterForm rules={npRules} />
     </div>
   );
 }

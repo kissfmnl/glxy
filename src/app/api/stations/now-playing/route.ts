@@ -3,7 +3,7 @@ import { buildGlxyStationsFromDb, resolveStationNowPlayingUrl } from "@/lib/glxy
 import { prisma } from "@/lib/prisma";
 import { appendStationPlayHistory } from "@/lib/stationPlayHistory";
 import { fetchNowPlayingFromRemoteUrl, isAllowedNowPlayingUrl } from "@/lib/stationNowPlayingFetch";
-import { applyNpWordFilter, mergeNpWordFilter } from "@/lib/npWordFilter";
+import { applyNpWordFilter, mergeNpWordFilter, phraseListEverywhere, phraseListForLiveNp } from "@/lib/npWordFilter";
 import { persistNpSnapshotMerge } from "@/lib/stationNpSnapshotMerge";
 
 export const dynamic = "force-dynamic";
@@ -21,11 +21,14 @@ export async function GET(req: Request) {
   }
 
   let stationsConfig: unknown = null;
-  let npPhrases: string[] = [];
+  let phrasesLive: string[] = [];
+  let phrasesHistory: string[] = [];
   try {
     const row = await prisma.branding.findUnique({ where: { id: 1 }, select: { stationsConfig: true, npWordFilter: true } });
     stationsConfig = row?.stationsConfig ?? null;
-    npPhrases = mergeNpWordFilter(row?.npWordFilter ?? null).phrases;
+    const f = mergeNpWordFilter(row?.npWordFilter ?? null);
+    phrasesLive = phraseListForLiveNp(f);
+    phrasesHistory = phraseListEverywhere(f);
   } catch {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
@@ -38,13 +41,17 @@ export async function GET(req: Request) {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
 
-  let { title: t, artist: a, coverUrl } = await fetchNowPlayingFromRemoteUrl(rawUrl);
-  if (npPhrases.length > 0) {
-    ({ title: t, artist: a } = applyNpWordFilter(t, a, npPhrases));
-  }
+  const fetched = await fetchNowPlayingFromRemoteUrl(rawUrl);
+  const live =
+    phrasesLive.length > 0 ? applyNpWordFilter(fetched.title, fetched.artist, phrasesLive) : fetched;
+  const hist =
+    phrasesHistory.length > 0 ? applyNpWordFilter(fetched.title, fetched.artist, phrasesHistory) : fetched;
+  const t = live.title;
+  const a = live.artist;
+  const coverUrl = fetched.coverUrl;
   const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
   persistNpSnapshot(id, t, a, coverUrl);
-  appendStationPlayHistory(id, t, a, coverUrl);
+  appendStationPlayHistory(id, hist.title, hist.artist, coverUrl);
   return NextResponse.json(
     { title: t, artist: a, text },
     { headers: { "Cache-Control": "public, s-maxage=8, stale-while-revalidate=20" } },

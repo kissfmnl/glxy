@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildGlxyStationsFromDb } from "@/lib/glxyStations";
-import { applyNpWordFilter, mergeNpWordFilter } from "@/lib/npWordFilter";
+import { applyNpWordFilter, mergeNpWordFilter, phraseListEverywhere } from "@/lib/npWordFilter";
 import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 import { prisma } from "@/lib/prisma";
 
@@ -29,7 +29,7 @@ export async function GET() {
       where: { id: 1 },
       select: { stationPlayHistory: true, stationsConfig: true, npWordFilter: true },
     });
-    const phrases = mergeNpWordFilter(row?.npWordFilter ?? null).phrases;
+    const phrases = phraseListEverywhere(mergeNpWordFilter(row?.npWordFilter ?? null));
     const stations = buildGlxyStationsFromDb(row?.stationsConfig ?? null);
     const stationOptions = stations.map((s) => ({ id: s.id, label: s.line1 }));
 

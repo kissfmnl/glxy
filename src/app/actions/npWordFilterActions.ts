@@ -13,13 +13,17 @@ export async function updateNpWordFilterAction(formData: FormData): Promise<{ ok
     return { error: "Geen rechten." };
   }
 
-  const raw = String(formData.get("npPhrases") ?? "");
-  const lines = raw
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
+  let rules: unknown;
+  try {
+    rules = JSON.parse(String(formData.get("npRulesJson") ?? "[]"));
+  } catch {
+    return { error: "Ongeldige filterdata." };
+  }
+  if (!Array.isArray(rules)) {
+    return { error: "Ongeldige filterdata." };
+  }
 
-  const merged = mergeNpWordFilter({ phrases: lines });
+  const merged = mergeNpWordFilter({ rules });
 
   try {
     await prisma.branding.upsert({

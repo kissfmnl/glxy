@@ -77,6 +77,11 @@
 }
 
 @layer components {
+  /* Homepage + hero: zelfde buitenrand als zenderstrip (max-width + horizontale padding) */
+  .home-content-grid {
+    @apply mx-auto w-full max-w-[1500px] px-4 sm:px-6 md:px-8;
+  }
+
   /* ==========================================
      Kaart / Widget basisstijl
   ========================================== */

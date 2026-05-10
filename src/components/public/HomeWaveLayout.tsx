@@ -120,7 +120,7 @@ export function HomeWaveLayout({
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8 [isolation:isolate]">
+        <div className="relative z-10 home-content-grid [isolation:isolate]">
           <GlxyHeroLogoVideo heroLogoSrc={heroLogoSrc} homeHlsSrc={homeHlsSrc ?? null} />
 
           <div className="mt-10 border-t border-white/10 pt-8 sm:mt-12 sm:pt-10 md:mt-14 md:pt-11">
@@ -130,40 +130,42 @@ export function HomeWaveLayout({
       </section>
 
       <section className="relative flex-1 overflow-x-hidden bg-gradient-to-b from-[#dce6ef] via-[#d5e0ea] to-[#cad8e6] pt-8 md:pt-10 pb-12 md:pb-16">
-        <div className="mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8">
-          <div className="grid lg:grid-cols-[1fr_290px] xl:grid-cols-[1fr_320px] gap-6 md:gap-8 xl:gap-8 items-start">
-            <div className="min-w-0 flex flex-col gap-6 md:gap-8">
-              {showProgrammingRow ? (
-                <div
-                  className={splitAlignStrip ? "kiss-jp-prog-row" : "flex flex-col gap-4 md:gap-5"}
-                  style={splitAlignStrip ? ({ ["--kiss-station-n" as string]: String(stationGridN) } as CSSProperties) : undefined}
-                >
-                  {showJp ? (
-                    <div className="flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px]">
-                      <RecentTracksPanel
-                        limit={10}
-                        panelTitle={copy.recentTracksTitle}
-                        historyLinkLabel={copy.recentTracksCta}
-                        stations={stations.map((s) => ({ id: s.id, line1: s.line1 }))}
-                        justPlayedUi={justPlayedUi}
-                      />
-                    </div>
-                  ) : null}
-                  {showProg ? (
-                    <div className={`flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px] ${splitAlignStrip ? "kiss-jp-prog-span" : ""}`}>
-                      <HomeProgrammingSchedule
-                        slots={programmingSlots}
-                        temporarySlots={programmingTemporarySlots}
-                        liveBadgeText={copy.liveLabel}
-                        panelTitle={copy.currentShowTitle}
-                        scheduleCta={copy.currentShowCta}
-                        scheduleHref="/programmering"
-                      />
-                    </div>
-                  ) : null}
+        {showProgrammingRow ? (
+          <div className="home-content-grid pb-6 md:pb-8">
+            <div
+              className={splitAlignStrip ? "kiss-jp-prog-row" : "flex flex-col gap-4 md:gap-5"}
+              style={splitAlignStrip ? ({ ["--kiss-station-n" as string]: String(stationGridN) } as CSSProperties) : undefined}
+            >
+              {showJp ? (
+                <div className="flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px]">
+                  <RecentTracksPanel
+                    limit={10}
+                    panelTitle={copy.recentTracksTitle}
+                    historyLinkLabel={copy.recentTracksCta}
+                    stations={stations.map((s) => ({ id: s.id, line1: s.line1 }))}
+                    justPlayedUi={justPlayedUi}
+                  />
                 </div>
               ) : null}
+              {showProg ? (
+                <div className={`flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px] ${splitAlignStrip ? "kiss-jp-prog-span" : ""}`}>
+                  <HomeProgrammingSchedule
+                    slots={programmingSlots}
+                    temporarySlots={programmingTemporarySlots}
+                    liveBadgeText={copy.liveLabel}
+                    panelTitle={copy.currentShowTitle}
+                    scheduleCta={copy.currentShowCta}
+                    scheduleHref="/programmering"
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
+        <div className="home-content-grid">
+          <div className="grid lg:grid-cols-[1fr_290px] xl:grid-cols-[1fr_320px] gap-6 md:gap-8 xl:gap-8 items-start">
+            <div className="min-w-0 flex flex-col gap-6 md:gap-8">
               {copy.showConcertsPanel ? <ConcertsPanel sectionTitle={copy.concertsTitle} /> : null}
               {copy.showActionsPanel ? <ActionsPanel /> : null}
               {(copy.showInstagramPanel || copy.showTikTokPanel) ? (
@@ -199,6 +201,7 @@ export function HomeWaveLayout({
             ) : null}
           </div>
         </div>
+
         <AppDownloadPopup
           enabled={copy.showAppPopup}
           title={copy.appPopupTitle}
