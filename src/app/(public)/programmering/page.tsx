@@ -1,6 +1,7 @@
 import { ProgrammingAgenda } from "@/components/public/ProgrammingAgenda";
 import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL_WIDE } from "@/lib/publicPageLayout";
 import { getBranding } from "@/lib/brandingDb";
+import { applyNpWordFilter } from "@/lib/npWordFilter";
 import { getPublicProgrammingData } from "@/lib/publicProgramming";
 import { glxyChannelHeading } from "@/lib/glxyStations";
 
@@ -57,8 +58,9 @@ export default async function ProgrammeringPage() {
           <ul className="mt-4 divide-y divide-black/5">
             {stationRows.map((row) => {
               const np = snap[row.id];
-              const title = (np?.title ?? "").trim();
-              const artist = (np?.artist ?? "").trim();
+              const rawTitle = (np?.title ?? "").trim();
+              const rawArtist = (np?.artist ?? "").trim();
+              const { title, artist } = applyNpWordFilter(rawTitle, rawArtist, branding.npWordFilter.phrases);
               const line =
                 artist && title ? `${artist} — ${title}` : title || artist || "—";
               const updated = fmtNlUpdated(np?.updatedAt);

@@ -3,6 +3,7 @@ import { buildGlxyStationsFromDb, resolveStationNowPlayingUrl } from "@/lib/glxy
 import { prisma } from "@/lib/prisma";
 import { appendStationPlayHistory } from "@/lib/stationPlayHistory";
 import { fetchNowPlayingFromRemoteUrl, isAllowedNowPlayingUrl } from "@/lib/stationNowPlayingFetch";
+import { applyNpWordFilter, mergeNpWordFilter } from "@/lib/npWordFilter";
 import { persistNpSnapshotMerge } from "@/lib/stationNpSnapshotMerge";
 
 export const dynamic = "force-dynamic";
@@ -20,9 +21,11 @@ export async function GET(req: Request) {
   }
 
   let stationsConfig: unknown = null;
+  let npPhrases: string[] = [];
   try {
-    const row = await prisma.branding.findUnique({ where: { id: 1 }, select: { stationsConfig: true } });
+    const row = await prisma.branding.findUnique({ where: { id: 1 }, select: { stationsConfig: true, npWordFilter: true } });
     stationsConfig = row?.stationsConfig ?? null;
+    npPhrases = mergeNpWordFilter(row?.npWordFilter ?? null).phrases;
   } catch {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
@@ -35,7 +38,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
 
-  const { title: t, artist: a, coverUrl } = await fetchNowPlayingFromRemoteUrl(rawUrl);
+  let { title: t, artist: a, coverUrl } = await fetchNowPlayingFromRemoteUrl(rawUrl);
+  if (npPhrases.length > 0) {
+    ({ title: t, artist: a } = applyNpWordFilter(t, a, npPhrases));
+  }
   const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
   persistNpSnapshot(id, t, a, coverUrl);
   appendStationPlayHistory(id, t, a, coverUrl);

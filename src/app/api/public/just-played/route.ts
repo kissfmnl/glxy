@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildGlxyStationsFromDb } from "@/lib/glxyStations";
+import { applyNpWordFilter, mergeNpWordFilter } from "@/lib/npWordFilter";
 import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 import { prisma } from "@/lib/prisma";
 
@@ -16,12 +17,19 @@ function isEntry(x: unknown): x is StationPlayEntry {
   );
 }
 
+function scrubEntry(e: StationPlayEntry, phrases: string[]): StationPlayEntry {
+  if (phrases.length === 0) return e;
+  const { title, artist } = applyNpWordFilter(e.title, e.artist, phrases);
+  return { ...e, title, artist };
+}
+
 export async function GET() {
   try {
     const row = await prisma.branding.findUnique({
       where: { id: 1 },
-      select: { stationPlayHistory: true, stationsConfig: true },
+      select: { stationPlayHistory: true, stationsConfig: true, npWordFilter: true },
     });
+    const phrases = mergeNpWordFilter(row?.npWordFilter ?? null).phrases;
     const stations = buildGlxyStationsFromDb(row?.stationsConfig ?? null);
     const stationOptions = stations.map((s) => ({ id: s.id, label: s.line1 }));
 
@@ -30,7 +38,7 @@ export async function GET() {
     if (rawHist && typeof rawHist === "object" && !Array.isArray(rawHist)) {
       for (const [k, v] of Object.entries(rawHist)) {
         if (Array.isArray(v)) {
-          byStation[k] = v.filter(isEntry).slice(0, 50);
+          byStation[k] = v.filter(isEntry).slice(0, 50).map((e) => scrubEntry(e, phrases));
         }
       }
     }
