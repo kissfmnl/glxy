@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-const MAX_PER_STATION = 10;
+/** Max opgeslagen per zender (display-limiet kan lager zijn via admin). */
+const MAX_PER_STATION = 50;
 
 export type StationPlayEntry = {
   id: string;

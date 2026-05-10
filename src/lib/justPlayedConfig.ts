@@ -1,6 +1,8 @@
 /** Homepage JUST PLAYED + SCHEDULE — Branding.justPlayedConfig (JSON). Premium donkere stijl + zender-tabs. */
 
 export type JustPlayedConfigInput = {
+  /** Aantal tracks zichtbaar in JUST PLAYED (1–50). */
+  recentTracksDisplayLimit?: number;
   sectionTitleHex?: string;
   sectionAccentHex?: string;
   panelSurfaceHex?: string;
@@ -18,6 +20,7 @@ export type JustPlayedConfigInput = {
 };
 
 export type PublicJustPlayedConfig = {
+  recentTracksDisplayLimit: number;
   sectionTitleHex: string;
   sectionAccentHex: string;
   panelSurfaceHex: string;
@@ -30,16 +33,26 @@ export type PublicJustPlayedConfig = {
 };
 
 export const DEFAULT_JUST_PLAYED: PublicJustPlayedConfig = {
-  sectionTitleHex: "#94a3b8",
+  recentTracksDisplayLimit: 10,
+  sectionTitleHex: "#e8e8e8",
   sectionAccentHex: "#2dd4bf",
-  panelSurfaceHex: "#0a0f1a",
-  panelBorderHex: "#1e293b",
-  stationTabSelectedBgHex: "#0f172a",
-  stationTabSelectedTextHex: "#e2e8f0",
-  stationTabInactiveBgHex: "#070b14",
-  stationTabInactiveBorderHex: "#334155",
+  panelSurfaceHex: "#6e6e6e",
+  panelBorderHex: "#5a5a5a",
+  stationTabSelectedBgHex: "#555555",
+  stationTabSelectedTextHex: "#ffffff",
+  stationTabInactiveBgHex: "#5f5f5f",
+  stationTabInactiveBorderHex: "#4a4a4a",
   playlistLinkHex: "#2dd4bf",
 };
+
+const DISPLAY_LIMIT_MIN = 1;
+const DISPLAY_LIMIT_MAX = 50;
+
+function pickInt(v: unknown, fallback: number): number {
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number.parseInt(String(v).trim(), 10) : Number.NaN;
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(DISPLAY_LIMIT_MAX, Math.max(DISPLAY_LIMIT_MIN, Math.round(n)));
+}
 
 function pickHex(v: unknown, fallback: string): string {
   if (typeof v !== "string") return fallback;
@@ -54,6 +67,7 @@ function pickHex(v: unknown, fallback: string): string {
 export function mergeJustPlayedConfig(raw: unknown): PublicJustPlayedConfig {
   const o = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
   return {
+    recentTracksDisplayLimit: pickInt(o.recentTracksDisplayLimit, DEFAULT_JUST_PLAYED.recentTracksDisplayLimit),
     sectionTitleHex: pickHex(o.sectionTitleHex, DEFAULT_JUST_PLAYED.sectionTitleHex),
     sectionAccentHex: pickHex(o.sectionAccentHex, DEFAULT_JUST_PLAYED.sectionAccentHex),
     panelSurfaceHex: pickHex(o.panelSurfaceHex, DEFAULT_JUST_PLAYED.panelSurfaceHex),

@@ -139,7 +139,7 @@ export function HomeWaveLayout({
               {showJp ? (
                 <div className="flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px]">
                   <RecentTracksPanel
-                    limit={10}
+                    limit={justPlayedUi.recentTracksDisplayLimit}
                     panelTitle={copy.recentTracksTitle}
                     historyLinkLabel={copy.recentTracksCta}
                         stations={stations.map((s) => ({ id: s.id, line1: s.line1, logoUrl: s.logoUrl ?? null }))}

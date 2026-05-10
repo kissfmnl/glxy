@@ -25,9 +25,22 @@ export function JustPlayedAdminForm({ defaults }: { defaults: PublicJustPlayedCo
       <div>
         <h2 className="text-lg font-black text-[var(--text-main)]">Homepage: JUST PLAYED &amp; SCHEDULE</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Donkere panelen, sectiekoppen en accentlijn. Gebruikt op beide blokken; zender-tabs alleen bij JUST PLAYED.
+          Panelkleuren, sectiekoppen en accentlijn voor beide blokken; zender-tabs alleen bij JUST PLAYED.
         </p>
       </div>
+
+      <label className="block max-w-xs text-xs font-semibold text-[var(--text-muted)]">
+        JUST PLAYED — aantal zichtbare tracks (1–50)
+        <input
+          type="number"
+          name="jpRecentTracksLimit"
+          min={1}
+          max={50}
+          step={1}
+          defaultValue={defaults.recentTracksDisplayLimit}
+          className="mt-1 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2 font-mono text-sm text-white outline-none ring-[var(--brand-primary)]/30 focus:ring-2"
+        />
+      </label>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block text-xs font-semibold text-[var(--text-muted)]">

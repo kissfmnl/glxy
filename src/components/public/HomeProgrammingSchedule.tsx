@@ -33,12 +33,6 @@ function formatShowName(value: string) {
   return value;
 }
 
-function isNonStopProgram(slot: { label: string | null; jock: { name: string } }) {
-  const label = slot.label?.trim().toLowerCase() || "";
-  const jock = slot.jock.name.trim().toLowerCase();
-  return label === "non-stop" || label === "nonstop" || jock === "non-stop" || jock === "nonstop";
-}
-
 export function HomeProgrammingSchedule({
   slots,
   temporarySlots,
@@ -164,50 +158,37 @@ export function HomeProgrammingSchedule({
               className="rounded-lg border border-white/[0.06] py-8 text-center"
               style={{ backgroundColor: `${theme.panelSurfaceHex}` }}
             >
-              <p className="text-[11px] font-medium text-slate-500">Geen programmering voor deze dag.</p>
+              <p className="text-[11px] font-medium text-white/55">Geen programmering voor deze dag.</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5">
               {daySlots.map((slot) => {
                 const title = slot.label?.trim() || formatShowName(slot.jock.name);
-                const hideJock = isNonStopProgram(slot);
-                const hostLine = slot.coHostName?.trim()
-                  ? `${formatShowName(slot.jock.name)} & ${formatShowName(slot.coHostName)}`
-                  : formatShowName(slot.jock.name);
-                const subLine = !hideJock ? hostLine : title;
                 const isLive = slot.id === nowPlayingId;
                 return (
                   <article
                     key={`${slot.source}-${slot.id}`}
-                    className="flex gap-3 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-2 backdrop-blur-[2px]"
+                    className="flex items-center gap-2 rounded border border-white/10 bg-black/15 px-2 py-0.5 sm:gap-2.5 sm:px-2.5 sm:py-1"
                   >
-                    <div className="w-[5.25rem] shrink-0 text-right">
-                      <p
-                        className="font-mono text-[11px] font-semibold tabular-nums leading-tight text-slate-200 sm:text-xs"
-                        style={{ color: theme.sectionAccentHex }}
-                      >
-                        {slot.startTime}
+                    <span
+                      className="shrink-0 whitespace-nowrap font-mono text-[9px] font-medium tabular-nums tracking-tight text-white/95 sm:text-[10px]"
+                      style={{ color: theme.sectionAccentHex }}
+                    >
+                      {slot.startTime}\u2009–\u2009{slot.endTime}
+                    </span>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2 border-l border-white/15 pl-2 sm:pl-2.5">
+                      <p className="min-w-0 truncate text-[10px] font-semibold uppercase leading-none tracking-[0.06em] text-white sm:text-[11px]">
+                        {title}
                       </p>
-                      <p className="font-mono text-[10px] font-medium tabular-nums text-slate-500">{slot.endTime}</p>
-                    </div>
-                    <div className="min-w-0 flex-1 border-l border-white/[0.06] pl-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="min-w-0 flex-1 text-[11px] font-semibold uppercase leading-snug tracking-wide text-slate-100 line-clamp-2 sm:text-xs">
-                          {title}
-                        </p>
-                        {isLive ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/35 bg-red-500/10 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em] text-red-400">
-                            <span
-                              className="inline-flex h-1.5 w-1.5 rounded-full kiss-live-dot"
-                              style={{ backgroundColor: "#ef4444" }}
-                            />
-                            {liveBadgeText}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500 line-clamp-2">
-                        {subLine}
-                      </p>
+                      {isLive ? (
+                        <span className="inline-flex shrink-0 items-center gap-0.5 rounded border border-red-400/40 bg-red-500/15 px-1.5 py-px text-[7px] font-semibold uppercase tracking-wide text-red-100">
+                          <span
+                            className="inline-flex h-1 w-1 rounded-full kiss-live-dot"
+                            style={{ backgroundColor: "#ef4444" }}
+                          />
+                          {liveBadgeText}
+                        </span>
+                      ) : null}
                     </div>
                   </article>
                 );

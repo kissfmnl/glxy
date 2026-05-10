@@ -7,6 +7,12 @@ import { prisma } from "@/lib/prisma";
 import { isPortalAdmin } from "@/lib/authRoles";
 import { mergeJustPlayedConfig, type JustPlayedConfigInput } from "@/lib/justPlayedConfig";
 
+function normalizeDisplayLimit(raw: string): number | undefined {
+  const n = Number.parseInt(raw.trim(), 10);
+  if (!Number.isFinite(n)) return undefined;
+  return Math.min(50, Math.max(1, n));
+}
+
 function normalizeOptionalHex(raw: string): string | null {
   const s = raw.trim();
   if (!s) return null;
@@ -23,6 +29,7 @@ export async function updateJustPlayedBrandingAction(formData: FormData): Promis
   }
 
   const input: JustPlayedConfigInput = {
+    recentTracksDisplayLimit: normalizeDisplayLimit(String(formData.get("jpRecentTracksLimit") ?? "")),
     sectionTitleHex: normalizeOptionalHex(String(formData.get("jpSectionTitleHex") ?? "")) ?? undefined,
     sectionAccentHex: normalizeOptionalHex(String(formData.get("jpSectionAccentHex") ?? "")) ?? undefined,
     panelSurfaceHex: normalizeOptionalHex(String(formData.get("jpPanelSurfaceHex") ?? "")) ?? undefined,

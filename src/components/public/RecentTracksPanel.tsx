@@ -97,6 +97,7 @@ export function RecentTracksPanel({
   justPlayedUi?: PublicJustPlayedConfig | null;
 }) {
   const theme = mergeJustPlayedConfig(justPlayedUi ?? null);
+  const displayLimit = Math.min(50, Math.max(1, limit));
   const [data, setData] = useState<ApiPayload | null>(null);
   const [stationFilter, setStationFilter] = useState<string>("");
   const [extraCovers, setExtraCovers] = useState<Record<string, string>>({});
@@ -142,8 +143,8 @@ export function RecentTracksPanel({
 
   const rows = useMemo(() => {
     if (!data?.stations?.length || !stationFilter) return [];
-    return (data.byStation[stationFilter] ?? []).slice(0, limit);
-  }, [data, stationFilter, limit]);
+    return (data.byStation[stationFilter] ?? []).slice(0, displayLimit);
+  }, [data, stationFilter, displayLimit]);
 
   useEffect(() => {
     let cancelled = false;
@@ -206,7 +207,7 @@ export function RecentTracksPanel({
                         }
                       : {
                           backgroundColor: theme.stationTabInactiveBgHex,
-                          color: "#94a3b8",
+                          color: "rgba(255,255,255,0.72)",
                           borderWidth: 1,
                           borderStyle: "solid",
                           borderColor: theme.stationTabInactiveBorderHex,
@@ -223,7 +224,7 @@ export function RecentTracksPanel({
         <div className="kiss-public-panel-scroll min-h-0 flex-1 overflow-y-auto pr-0.5 [-webkit-overflow-scrolling:touch]">
           <div className="flex flex-col gap-1">
             {rows.length === 0 ? (
-              <p className="py-4 text-center text-[11px] font-medium text-slate-500">
+              <p className="py-4 text-center text-[11px] font-medium text-white/55">
                 Nog geen tracks gelogd — geschiedenis wordt server-side bijgewerkt (ongeveer elke minuut).
               </p>
             ) : (
@@ -235,17 +236,17 @@ export function RecentTracksPanel({
                     key={`${entry.stationId ?? "x"}-${entry.id}-${entry.playedAt}`}
                     className="flex items-center gap-2.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 backdrop-blur-[2px]"
                   >
-                    <div className="w-9 shrink-0 text-[9px] font-medium tabular-nums leading-none text-slate-500 sm:text-[10px]">
+                    <div className="w-9 shrink-0 text-[9px] font-medium tabular-nums leading-none text-white/55 sm:text-[10px]">
                       {formatTime(entry.playedAt)}
                     </div>
                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-md border border-white/[0.08] bg-black/20">
                       <TrackThumb cover={resolvedCover} stationLogo={activeStationLogo} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="break-words text-[11px] font-semibold uppercase leading-snug tracking-wide text-slate-100 line-clamp-2 sm:text-xs">
+                      <p className="break-words text-[11px] font-semibold uppercase leading-snug tracking-wide text-white line-clamp-2 sm:text-xs">
                         {entry.title}
                       </p>
-                      <p className="mt-0.5 break-words text-[10px] font-medium uppercase tracking-wide text-slate-500 line-clamp-2">
+                      <p className="mt-0.5 break-words text-[10px] font-medium uppercase tracking-wide text-white/75 line-clamp-2">
                         {entry.artist}
                       </p>
                     </div>

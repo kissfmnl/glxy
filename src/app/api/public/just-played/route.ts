@@ -12,7 +12,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-const MAX_TRACKS_PER_STATION = 10;
+const MAX_TRACKS_PER_STATION = 50;
 
 function isEntry(x: unknown): x is StationPlayEntry {
   if (!x || typeof x !== "object") return false;
