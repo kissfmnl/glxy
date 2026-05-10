@@ -149,29 +149,38 @@ export function RecentTracksPanel({
           className="inline-flex max-w-full select-none rounded-md px-3 py-1.5"
           style={{ backgroundColor: titlePalette.titleBgHex, color: titlePalette.titleTextHex }}
         >
-          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{panelTitle}</span>
+          <span className="text-[11px] font-black uppercase leading-none tracking-[0.2em] antialiased">{panelTitle}</span>
         </div>
       </div>
 
       <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col pt-0 !px-4 !pb-4`}>
         {stationTabs.length > 0 ? (
           <div className="mb-2 flex flex-wrap gap-1" role="tablist" aria-label="Zender">
-            {stationTabs.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                role="tab"
-                aria-selected={stationFilter === s.id}
-                onClick={() => setStationFilter(s.id)}
-                className={`max-w-[min(100%,11rem)] truncate rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wide transition-colors sm:text-[10px] ${
-                  stationFilter === s.id
-                    ? "bg-[var(--brand-primary)] text-[#0a0f0c] shadow-sm"
-                    : "border border-[#1e375a]/15 bg-white/90 text-gray-600 hover:border-[var(--brand-primary)]/40"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
+            {stationTabs.map((s) => {
+              const selected = stationFilter === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setStationFilter(s.id)}
+                  className={`max-w-[min(100%,11rem)] truncate rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wide transition-colors sm:text-[10px] ${
+                    selected ? "shadow-sm" : "border border-[#1e375a]/15 bg-white/90 text-gray-600 hover:border-[var(--brand-primary)]/40"
+                  }`}
+                  style={
+                    selected
+                      ? {
+                          backgroundColor: titlePalette.stationTabSelectedBgHex,
+                          color: titlePalette.stationTabSelectedTextHex,
+                        }
+                      : undefined
+                  }
+                >
+                  {s.label}
+                </button>
+              );
+            })}
           </div>
         ) : null}
 
@@ -213,7 +222,8 @@ export function RecentTracksPanel({
         <div className="mt-2 shrink-0 border-t border-[#1e375a]/10 pt-2">
           <a
             href="/playlist"
-            className="text-brand-primary inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wide hover:underline sm:text-[11px]"
+            className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wide hover:underline sm:text-[11px]"
+            style={{ color: titlePalette.playlistLinkHex }}
           >
             {historyLinkLabel}
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">

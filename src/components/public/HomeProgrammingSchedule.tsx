@@ -4,7 +4,8 @@ import { useMemo, useRef, useState } from "react";
 import { formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
 import type { MockProgrammingSlot } from "@/lib/mock/site";
-import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
+import { KISS_PANEL_BODY_PAD } from "@/lib/publicPanelChrome";
 
 const DAYS: { id: number; label: string }[] = [
   { id: 1, label: "Ma" },
@@ -41,17 +42,17 @@ export function HomeProgrammingSchedule({
   slots,
   temporarySlots,
   liveBadgeText,
-  panelTitle = "Programmering",
-  scheduleCta = "Volledige programmering",
-  scheduleHref = "/programmering",
+  panelTitle = "SCHEDULE",
+  justPlayedUi,
 }: {
   slots: MockProgrammingSlot[];
   temporarySlots: (MockProgrammingSlot & { startsOn: string; endsOn: string; isActive: boolean })[];
   liveBadgeText: string;
   panelTitle?: string;
-  scheduleCta?: string;
-  scheduleHref?: string;
+  /** Zelfde kleurpalet als JUST PLAYED-titel (admin /just-played). */
+  justPlayedUi?: PublicJustPlayedConfig | null;
 }) {
+  const schedulePalette = mergeJustPlayedConfig(justPlayedUi ?? null);
   const nowRef = useRef<Date>(new Date());
   const nowDate = nowRef.current;
   const today = dayIdFromJs(nowDate.getDay());
@@ -109,17 +110,16 @@ export function HomeProgrammingSchedule({
 
   return (
     <div className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_12px_rgba(30,55,90,0.05)]">
-      <div className={`flex shrink-0 items-center justify-between gap-3 ${KISS_PANEL_HEADER_BOX}`}>
-        <p className={`${KISS_PANEL_TITLE} min-w-0`}>{panelTitle}</p>
-        <a
-          href={scheduleHref}
-          className="text-brand-primary inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-black hover:underline sm:text-xs"
+      <div className="shrink-0 px-4 pb-2 pt-3">
+        <div
+          className="inline-flex max-w-full select-none rounded-md px-3 py-1.5"
+          style={{
+            backgroundColor: schedulePalette.scheduleTitleBgHex,
+            color: schedulePalette.scheduleTitleTextHex,
+          }}
         >
-          {scheduleCta}
-          <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-5-5 5 5-5 5" />
-          </svg>
-        </a>
+          <span className="text-[11px] font-black uppercase leading-none tracking-[0.2em] antialiased">{panelTitle}</span>
+        </div>
       </div>
 
       <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col gap-2 pt-0 !pb-4`}>

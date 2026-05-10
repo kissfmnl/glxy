@@ -154,8 +154,7 @@ export function HomeWaveLayout({
                     temporarySlots={programmingTemporarySlots}
                     liveBadgeText={copy.liveLabel}
                     panelTitle={copy.currentShowTitle}
-                    scheduleCta={copy.currentShowCta}
-                    scheduleHref="/programmering"
+                    justPlayedUi={justPlayedUi}
                   />
                 </div>
               ) : null}

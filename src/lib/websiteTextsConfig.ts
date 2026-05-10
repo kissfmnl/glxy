@@ -151,10 +151,10 @@ export const websiteTextGroups = [
       { key: "HOME_SIDEBAR_TITLE", label: "Kolom rechts — titel", fallback: "De stemmen van KISS", section: "Panelen" },
       { key: "HOME_RECENT_TRACKS_TITLE", label: "Laatste tracks — titel", fallback: "Laatste 5 tracks", section: "Panelen" },
       { key: "HOME_RECENT_TRACKS_CTA", label: "Laatste tracks — linktekst", fallback: "Volledige geschiedenis", section: "Panelen" },
-      { key: "HOME_CURRENT_SHOW_TITLE", label: "Nu op zender — label", fallback: "Nu op zender", section: "Panelen" },
+      { key: "HOME_CURRENT_SHOW_TITLE", label: "Programmering-paneel — titelbadge (wave)", fallback: "SCHEDULE", section: "Panelen" },
       {
         key: "HOME_CURRENT_SHOW_CTA",
-        label: "Programmering — linktekst",
+        label: "Programmering — linktekst (alleen legacy-paneel)",
         fallback: "Volledige programmering",
         section: "Panelen",
       },

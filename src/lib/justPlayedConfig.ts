@@ -1,18 +1,33 @@
-/** Homepage JUST PLAYED — opgeslagen als Branding.justPlayedConfig (JSON). */
+/** Homepage JUST PLAYED + gerelateerde knoppen — Branding.justPlayedConfig (JSON). */
 
 export type JustPlayedConfigInput = {
   titleBgHex?: string;
   titleTextHex?: string;
+  scheduleTitleBgHex?: string;
+  scheduleTitleTextHex?: string;
+  stationTabSelectedBgHex?: string;
+  stationTabSelectedTextHex?: string;
+  playlistLinkHex?: string;
 };
 
 export type PublicJustPlayedConfig = {
   titleBgHex: string;
   titleTextHex: string;
+  scheduleTitleBgHex: string;
+  scheduleTitleTextHex: string;
+  stationTabSelectedBgHex: string;
+  stationTabSelectedTextHex: string;
+  playlistLinkHex: string;
 };
 
 export const DEFAULT_JUST_PLAYED: PublicJustPlayedConfig = {
   titleBgHex: "#ffe200",
   titleTextHex: "#111827",
+  scheduleTitleBgHex: "#ffe200",
+  scheduleTitleTextHex: "#111827",
+  stationTabSelectedBgHex: "#0b7557",
+  stationTabSelectedTextHex: "#0a0f0c",
+  playlistLinkHex: "#0b7557",
 };
 
 function pickHex(v: unknown, fallback: string): string {
@@ -30,5 +45,10 @@ export function mergeJustPlayedConfig(raw: unknown): PublicJustPlayedConfig {
   return {
     titleBgHex: pickHex(o.titleBgHex, DEFAULT_JUST_PLAYED.titleBgHex),
     titleTextHex: pickHex(o.titleTextHex, DEFAULT_JUST_PLAYED.titleTextHex),
+    scheduleTitleBgHex: pickHex(o.scheduleTitleBgHex, DEFAULT_JUST_PLAYED.scheduleTitleBgHex),
+    scheduleTitleTextHex: pickHex(o.scheduleTitleTextHex, DEFAULT_JUST_PLAYED.scheduleTitleTextHex),
+    stationTabSelectedBgHex: pickHex(o.stationTabSelectedBgHex, DEFAULT_JUST_PLAYED.stationTabSelectedBgHex),
+    stationTabSelectedTextHex: pickHex(o.stationTabSelectedTextHex, DEFAULT_JUST_PLAYED.stationTabSelectedTextHex),
+    playlistLinkHex: pickHex(o.playlistLinkHex, DEFAULT_JUST_PLAYED.playlistLinkHex),
   };
 }

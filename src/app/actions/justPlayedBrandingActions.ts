@@ -25,6 +25,11 @@ export async function updateJustPlayedBrandingAction(formData: FormData): Promis
   const input: JustPlayedConfigInput = {
     titleBgHex: normalizeOptionalHex(String(formData.get("jpTitleBgHex") ?? "")) ?? undefined,
     titleTextHex: normalizeOptionalHex(String(formData.get("jpTitleTextHex") ?? "")) ?? undefined,
+    scheduleTitleBgHex: normalizeOptionalHex(String(formData.get("jpScheduleTitleBgHex") ?? "")) ?? undefined,
+    scheduleTitleTextHex: normalizeOptionalHex(String(formData.get("jpScheduleTitleTextHex") ?? "")) ?? undefined,
+    stationTabSelectedBgHex: normalizeOptionalHex(String(formData.get("jpStationTabSelectedBgHex") ?? "")) ?? undefined,
+    stationTabSelectedTextHex: normalizeOptionalHex(String(formData.get("jpStationTabSelectedTextHex") ?? "")) ?? undefined,
+    playlistLinkHex: normalizeOptionalHex(String(formData.get("jpPlaylistLinkHex") ?? "")) ?? undefined,
   };
 
   const merged = mergeJustPlayedConfig(input as unknown);
