@@ -1,5 +1,5 @@
 import { ProgrammingAgenda } from "@/components/public/ProgrammingAgenda";
-import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL } from "@/lib/publicPageLayout";
+import { PUBLIC_PAGE_INTRO, PUBLIC_PAGE_SHELL_WIDE } from "@/lib/publicPageLayout";
 import { getBranding } from "@/lib/brandingDb";
 import { getPublicProgrammingData } from "@/lib/publicProgramming";
 import { glxyChannelHeading } from "@/lib/glxyStations";
@@ -40,7 +40,7 @@ export default async function ProgrammeringPage() {
   const stationRows = parseStationRows(branding.stationsConfig);
 
   return (
-    <div className={PUBLIC_PAGE_SHELL}>
+    <div className={PUBLIC_PAGE_SHELL_WIDE}>
       <div className={PUBLIC_PAGE_INTRO}>
         <h1 className="text-3xl font-black tracking-tight md:text-4xl" style={{ color: "var(--brand-navy)" }}>
           Programmering

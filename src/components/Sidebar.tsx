@@ -1,41 +1,23 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isPortalAdmin, isSuperAdmin } from "@/lib/authRoles";
 
 type Nav = { href: string; label: string };
 
-const NAV_MAIN: Nav[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/studio-beta", label: "Studio (demo)" },
-  { href: "/dashboard/mijn-profiel", label: "Mijn profiel" },
-];
-
-const NAV_SETTINGS: Nav[] = [
-  { href: "/settings", label: "Instellingen" },
-  { href: "/settings/site", label: "Site" },
-  { href: "/settings/programmering", label: "Programmering" },
-  { href: "/settings/concerten", label: "Concerten" },
-  { href: "/settings/kiss40", label: "GLXY40" },
-];
-
-const NAV_ADMIN_STATIONS: Nav[] = [
-  { href: "/admin/stations", label: "Zenders & streams" },
-  { href: "/admin/player-ui", label: "Player & weergave" },
-];
-
-const NAV_ADMIN_DEMO: Nav[] = [
-  { href: "/admin/gebruikers", label: "Gebruikers & uitnodigingen" },
-  { href: "/admin/branding", label: "Huisstijl (GLXY)" },
-  { href: "/admin/footer", label: "Footer" },
-  { href: "/admin/just-played", label: "Just played" },
-  { href: "/admin/media", label: "Mediabibliotheek" },
-  { href: "/admin/djs", label: "Hosts (demo)" },
+const NAV_INHOUD: Nav[] = [
+  { href: "/admin/branding", label: "Huisstijl GLXY" },
   { href: "/admin/programmering", label: "Programmering" },
-  { href: "/admin/acties", label: "Acties (demo)" },
+  { href: "/admin/just-played", label: "Just played" },
+];
+
+const NAV_BEHEER: Nav[] = [
+  { href: "/admin/stations", label: "Zenders en streams" },
+  { href: "/admin/player-ui", label: "Player en weergave" },
 ];
 
 const NAV_SUPER: Nav[] = [{ href: "/admin/portal-teksten", label: "Portalteksten" }];
@@ -46,6 +28,15 @@ export default function Sidebar() {
   const { data: session, status } = useSession();
   const canAdmin = isPortalAdmin(session?.user?.role);
   const canSuper = isSuperAdmin(session?.user?.role);
+
+  const workspaceItems = useMemo((): Nav[] => {
+    const items: Nav[] = [{ href: "/dashboard", label: "Dashboard" }];
+    if (canAdmin) items.push({ href: "/admin/media", label: "Mediabibliotheek" });
+    items.push({ href: "/settings", label: "Instellingen" });
+    if (canAdmin) items.push({ href: "/admin/gebruikers", label: "Gebruikers en uitnodigingen" });
+    items.push({ href: "/dashboard/mijn-profiel", label: "Mijn profiel" });
+    return items;
+  }, [canAdmin]);
 
   useEffect(() => setMobileOpen(false), [pathname]);
   useEffect(() => {
@@ -63,6 +54,7 @@ export default function Sidebar() {
   }
 
   function section(title: string, items: Nav[]) {
+    if (items.length === 0) return null;
     return (
       <div className="space-y-1 px-3">
         <p className="px-4 pb-1 pt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{title}</p>
@@ -111,25 +103,34 @@ export default function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-white/15 bg-black/10 px-4 py-4">
-          <Link href="/dashboard" className="font-black tracking-tight text-white" onClick={() => setMobileOpen(false)}>
-            <span className="text-lg">GLXY</span>
-            <span className="ml-1 text-xs font-black uppercase tracking-[0.2em] text-white/90">Radio</span>
+        <div className="flex items-center justify-between gap-2 border-b border-white/15 bg-black/10 px-4 py-4">
+          <Link
+            href="/dashboard"
+            className="flex min-w-0 flex-1 items-center py-1"
+            onClick={() => setMobileOpen(false)}
+          >
+            <Image
+              src="/glxy-hero-logo-fallback.svg"
+              alt="GLXY Radio"
+              width={160}
+              height={48}
+              className="h-10 w-auto max-w-[min(100%,11rem)] object-contain object-left brightness-0 invert"
+              priority
+            />
           </Link>
           <button
             type="button"
-            className="rounded-lg border border-white/35 bg-white/10 px-2 py-1 text-xs font-black text-white hover:bg-white/20 lg:hidden"
+            className="shrink-0 rounded-lg border border-white/35 bg-white/10 px-2 py-1 text-xs font-black text-white hover:bg-white/20 lg:hidden"
             onClick={() => setMobileOpen(false)}
           >
             ✕
           </button>
         </div>
 
-        <div className="flex-1 space-y-5 py-4">
-          {section("Workspace", NAV_MAIN)}
-          {section("Instellingen", NAV_SETTINGS)}
-          {canAdmin ? section("Zenders", NAV_ADMIN_STATIONS) : null}
-          {canAdmin ? section("Beheer", NAV_ADMIN_DEMO) : null}
+        <div className="flex-1 space-y-1 py-4">
+          {section("Workspace", workspaceItems)}
+          {canAdmin ? section("Inhoud", NAV_INHOUD) : null}
+          {canAdmin ? section("Beheer", NAV_BEHEER) : null}
           {canSuper ? section("Super-admin", NAV_SUPER) : null}
         </div>
 

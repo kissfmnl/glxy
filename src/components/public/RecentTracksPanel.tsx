@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { KISS_PANEL_BODY_PAD } from "@/lib/publicPanelChrome";
 import AppImage from "@/components/AppImage";
 import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
@@ -44,6 +44,10 @@ type ApiPayload = {
   merged: (StationPlayEntry & { stationId: string })[];
 };
 
+function trackKey(e: { artist: string; title: string }) {
+  return `${e.artist.trim().toLowerCase()}||${e.title.trim().toLowerCase()}`;
+}
+
 export function RecentTracksPanel({
   limit = 8,
   className = "",
@@ -64,6 +68,9 @@ export function RecentTracksPanel({
   const titlePalette = mergeJustPlayedConfig(justPlayedUi ?? null);
   const [data, setData] = useState<ApiPayload | null>(null);
   const [stationFilter, setStationFilter] = useState<string>("");
+  const [extraCovers, setExtraCovers] = useState<Record<string, string>>({});
+  const extraCoversRef = useRef<Record<string, string>>({});
+  extraCoversRef.current = extraCovers;
 
   const load = async () => {
     try {
@@ -104,6 +111,34 @@ export function RecentTracksPanel({
     if (!data?.stations?.length || !stationFilter) return [];
     return (data.byStation[stationFilter] ?? []).slice(0, limit);
   }, [data, stationFilter, limit]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const need = rows.filter((r) => {
+      if (r.coverUrl && String(r.coverUrl).trim()) return false;
+      if (!r.title.trim() && !r.artist.trim()) return false;
+      const k = trackKey(r);
+      return !extraCoversRef.current[k];
+    });
+    if (need.length === 0) return;
+    void Promise.all(
+      need.map(async (r) => {
+        const k = trackKey(r);
+        try {
+          const qs = new URLSearchParams({ artist: r.artist, title: r.title });
+          const res = await fetch(`/api/cover-art?${qs.toString()}`);
+          const j = (await res.json()) as { url?: string };
+          if (cancelled || !j?.url) return;
+          setExtraCovers((prev) => (prev[k] ? prev : { ...prev, [k]: j.url! }));
+        } catch {
+          /* ignore */
+        }
+      }),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [rows]);
 
   return (
     <div
@@ -158,7 +193,7 @@ export function RecentTracksPanel({
                       {formatTime(entry.playedAt)}
                     </div>
                     <div className="h-8 w-8 shrink-0 overflow-hidden rounded-md border border-black/5 bg-black/5">
-                      <TrackThumb cover={entry.coverUrl} />
+                      <TrackThumb cover={entry.coverUrl?.trim() || extraCovers[trackKey(entry)] || null} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="break-words text-[12px] font-black uppercase leading-snug tracking-wide text-gray-900 line-clamp-2">
