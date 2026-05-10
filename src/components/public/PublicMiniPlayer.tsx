@@ -1,58 +1,44 @@
 "use client";
 
 import { getGlxySharedAudio, useGlxyRadio } from "@/components/public/GlxyRadioProvider";
+import { glxyChannelHeading } from "@/lib/glxyStations";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import AppImage from "@/components/AppImage";
 import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
-
-const PIN_KEY = "glxy_mini_player_pinned";
 
 function kissVolumeSliderStyle(volume: number): CSSProperties {
   return { ["--kiss-vol-pct" as string]: `${Math.round(volume * 100)}%` } as CSSProperties;
 }
 
-function IconDockBottom({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 19h16" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11l4 4 4-4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15V5" />
-    </svg>
-  );
-}
-
-function IconUndock({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 19h16" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 13l4-4 4 4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v10" />
-    </svg>
-  );
-}
-
 export function PublicMiniPlayer() {
-  const { activeStation, playing, togglePlay, volume, setVolume } = useGlxyRadio();
-  const [pinned, setPinned] = useState(false);
+  const { activeStation, activeStationId, stations, playing, togglePlay, volume, setVolume, selectStationAndPlay } =
+    useGlxyRadio();
   const [hydrated, setHydrated] = useState(false);
   const [dockProgress, setDockProgress] = useState(0);
-  const [dockLockedByScroll, setDockLockedByScroll] = useState(false);
   const [np, setNp] = useState({ title: "", artist: "" });
   const [itunesCover, setItunesCover] = useState<string | null>(null);
   const [coverTier, setCoverTier] = useState(0);
+  const [stationPickerOpen, setStationPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
   const dockTargetRef = useRef(0);
   const dockCurrentRef = useRef(0);
   const animFrameRef = useRef<number | null>(null);
   const lastTsRef = useRef(0);
 
   useEffect(() => {
-    try {
-      setPinned(localStorage.getItem(PIN_KEY) === "1");
-    } catch {
-      setPinned(false);
-    }
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!stationPickerOpen) return;
+    const onDocDown = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setStationPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocDown);
+    return () => document.removeEventListener("mousedown", onDocDown);
+  }, [stationPickerOpen]);
 
   useEffect(() => {
     if (!activeStation?.id) return;
@@ -116,20 +102,15 @@ export function PublicMiniPlayer() {
 
     const computeScrollState = () => {
       const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-      if (pinned) return { target: 1, lockedByScroll: false };
-      if (maxScroll <= 0) return { target: 1, lockedByScroll: false };
+      if (maxScroll <= 0) return 1;
       if (maxScroll <= SHORT_PAGE_MAX_SCROLL) {
-        const target = Math.max(0, Math.min(1, window.scrollY / maxScroll));
-        const lockedByScroll = window.scrollY >= maxScroll - 1;
-        return { target, lockedByScroll };
+        return Math.max(0, Math.min(1, window.scrollY / maxScroll));
       }
-      if (window.scrollY <= ARM_SCROLL_Y) return { target: 0, lockedByScroll: false };
+      if (window.scrollY <= ARM_SCROLL_Y) return 0;
       const startY = Math.max(ARM_SCROLL_Y, maxScroll - MORPH_WINDOW_PX);
       const endY = maxScroll;
       const raw = (window.scrollY - startY) / Math.max(1, endY - startY);
-      const target = Math.max(0, Math.min(1, raw));
-      const lockedByScroll = window.scrollY >= maxScroll - 1;
-      return { target, lockedByScroll };
+      return Math.max(0, Math.min(1, raw));
     };
 
     const animateToTarget = (ts: number) => {
@@ -157,9 +138,7 @@ export function PublicMiniPlayer() {
     };
 
     const evaluateDockState = () => {
-      const state = computeScrollState();
-      dockTargetRef.current = state.target;
-      setDockLockedByScroll(state.lockedByScroll);
+      dockTargetRef.current = computeScrollState();
       if (animFrameRef.current === null) {
         animFrameRef.current = window.requestAnimationFrame(animateToTarget);
       }
@@ -181,7 +160,7 @@ export function PublicMiniPlayer() {
         animFrameRef.current = null;
       }
     };
-  }, [pinned, hydrated]);
+  }, [hydrated]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -214,15 +193,9 @@ export function PublicMiniPlayer() {
 
   const npArtist = (np.artist ?? "").trim();
   const npTitle = (np.title ?? "").trim();
-  const npCombined =
-    npArtist && npTitle ? `${npArtist} — ${npTitle}` : npArtist || npTitle || "";
-  const titleLine = npCombined || activeStation?.line1 || "GLXY Radio";
-  const artistLine =
-    npArtist && npTitle
-      ? activeStation?.line2?.trim() || ""
-      : npArtist || npTitle
-        ? ""
-        : activeStation?.line2 || "Live stream";
+  /** Titel op de eerste regel; artiest op de tweede (zoals op de kaart). */
+  const titleLine = npTitle || activeStation?.line1?.trim() || "GLXY Radio";
+  const artistLine = npArtist || activeStation?.line2?.trim() || "";
 
   const artworkSrc =
     coverTier === 0 && itunesCover
@@ -262,31 +235,82 @@ export function PublicMiniPlayer() {
         }}
       >
         <div className="relative z-10 flex w-full flex-wrap items-center gap-3 sm:flex-nowrap">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div
-              className="h-12 w-12 shrink-0 overflow-hidden rounded-xl shadow-sm"
-              style={{ backgroundColor: "var(--glxy-mini-muted)" }}
+          <div ref={pickerRef} className="relative min-w-0 flex-1">
+            <button
+              type="button"
+              className="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-xl border border-transparent text-left outline-none ring-[var(--glxy-mini-accent)]/35 hover:border-white/10 hover:bg-white/[0.04] focus-visible:ring-2"
+              onClick={() => setStationPickerOpen((o) => !o)}
+              aria-expanded={stationPickerOpen}
+              aria-haspopup="listbox"
+              aria-label="Zender kiezen"
             >
-              <AppImage
-                src={artworkSrc}
-                alt=""
-                className="h-full w-full object-cover"
-                onError={() => setCoverTier((t) => Math.min(t + 1, 2))}
-              />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--glxy-mini-muted)" }}>
-                Nu live
-              </p>
-              <p className="truncate text-sm font-black" style={{ color: "var(--glxy-mini-text)" }}>
-                {titleLine}
-              </p>
-              {artistLine ? (
-                <p className="truncate text-xs font-bold" style={{ color: "var(--glxy-mini-muted)" }}>
-                  {artistLine}
+              <div
+                className="h-12 w-12 shrink-0 overflow-hidden rounded-xl shadow-sm"
+                style={{ backgroundColor: "var(--glxy-mini-muted)" }}
+              >
+                <AppImage
+                  src={artworkSrc}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  onError={() => setCoverTier((t) => Math.min(t + 1, 2))}
+                />
+              </div>
+              <div className="min-w-0 flex-1 py-0.5">
+                <p
+                  className="truncate text-sm font-black uppercase leading-tight tracking-wide"
+                  style={{ color: "var(--glxy-mini-text)" }}
+                >
+                  {titleLine}
                 </p>
-              ) : null}
-            </div>
+                {artistLine ? (
+                  <p
+                    className="truncate text-xs font-semibold uppercase leading-snug tracking-wide"
+                    style={{ color: "var(--glxy-mini-muted)" }}
+                  >
+                    {artistLine}
+                  </p>
+                ) : null}
+              </div>
+            </button>
+
+            {stationPickerOpen && stations.length > 0 ? (
+              <div
+                className="absolute bottom-full left-0 z-[60] mb-2 min-w-[min(100%,280px)] max-w-[min(100vw-2rem,320px)] rounded-xl border py-1 shadow-xl"
+                style={{
+                  backgroundColor: "color-mix(in srgb, var(--glxy-mini-bg) 96%, black)",
+                  borderColor: "var(--glxy-mini-border)",
+                }}
+                role="listbox"
+              >
+                {stations.map((s, i) => {
+                  const active = s.id === activeStationId;
+                  const disabled = !s.streamUrl?.trim();
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      disabled={disabled}
+                      className={`flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-xs transition-colors ${
+                        active ? "bg-white/[0.08]" : "hover:bg-white/[0.06]"
+                      } ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
+                      style={{ color: "var(--glxy-mini-text)" }}
+                      onClick={() => {
+                        if (disabled) return;
+                        void selectStationAndPlay(s);
+                        setStationPickerOpen(false);
+                      }}
+                    >
+                      <span className="font-black uppercase tracking-wide opacity-70">
+                        {glxyChannelHeading(s.id, i)}
+                      </span>
+                      <span className="font-semibold">{s.line1}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-2 py-0.5">
@@ -321,47 +345,6 @@ export function PublicMiniPlayer() {
                   <path d="M7 4.5v15L21 12 7 4.5z" />
                 </svg>
               )}
-            </button>
-            <button
-              type="button"
-              disabled={dockLockedByScroll}
-              onClick={() => {
-                const next = !pinned;
-                setPinned(next);
-                try {
-                  if (next) localStorage.setItem(PIN_KEY, "1");
-                  else localStorage.removeItem(PIN_KEY);
-                } catch {
-                  /* ignore */
-                }
-              }}
-              className={`kiss-mini-player-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
-                dockLockedByScroll ? "pointer-events-none cursor-not-allowed border-white/10 bg-white/10 text-white/35" : ""
-              }`}
-              style={
-                dockLockedByScroll
-                  ? undefined
-                  : pinned
-                    ? {
-                        borderColor: "var(--glxy-mini-accent)",
-                        backgroundColor: "color-mix(in srgb, var(--glxy-mini-accent) 18%, transparent)",
-                        color: "var(--glxy-mini-accent)",
-                      }
-                    : {
-                        borderColor: "var(--glxy-mini-border)",
-                        color: "var(--glxy-mini-text)",
-                      }
-              }
-              aria-label={
-                dockLockedByScroll
-                  ? "Miniplayer al automatisch volledig breed onderaan de pagina"
-                  : pinned
-                    ? "Miniplayer losmaken"
-                    : "Miniplayer vastzetten onderaan het scherm"
-              }
-              title={dockLockedByScroll ? "Automatisch volledig breed onderaan pagina" : pinned ? "Losmaken" : "Vastzetten onderaan"}
-            >
-              {pinned ? <IconUndock className="h-5 w-5" /> : <IconDockBottom className="h-5 w-5" />}
             </button>
           </div>
         </div>

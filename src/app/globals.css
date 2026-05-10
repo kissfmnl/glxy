@@ -545,6 +545,13 @@ input[type="range"] {
   border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
+/* HomeHlsEmbed: slider uitlijnen met vaste knoppen (zelfde middenlijn) */
+.kiss-hero-vol-slider--embed {
+  align-self: center;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+}
+
 /* Public live dot: constant red + subtle pulsing */
 @keyframes kiss-live-dot-pulse {
   0% {

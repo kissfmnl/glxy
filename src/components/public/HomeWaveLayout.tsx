@@ -1,5 +1,5 @@
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
-import { CurrentShowPanel } from "@/components/public/CurrentShowPanel";
+import { HomeProgrammingSchedule } from "@/components/public/HomeProgrammingSchedule";
 import { RecentTracksPanel } from "@/components/public/RecentTracksPanel";
 import { ConcertsPanel } from "@/components/public/ConcertsPanel";
 import { ActionsPanel } from "@/components/public/ActionsPanel";
@@ -11,6 +11,7 @@ import AppImage from "@/components/AppImage";
 import { GlxyHeroLogoVideo } from "@/components/public/GlxyHeroLogoVideo";
 import { GlxyStationListenStrip } from "@/components/public/GlxyStationListenStrip";
 import type { GlxyStation } from "@/lib/glxyStations";
+import { getMockProgrammingData } from "@/lib/mock/site";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
 
@@ -73,6 +74,13 @@ export function HomeWaveLayout({
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
   const heroLogoSrc = heroLogoUrl?.trim() ? heroLogoUrl.trim() : "/glxy-hero-logo-fallback.svg";
+  const { slots: programmingSlots, temporarySlots: programmingTemporarySlots } = getMockProgrammingData();
+
+  const showProgrammingRow = copy.showRecentTracksPanel || copy.showCurrentShowPanel;
+  const programmingGridClass =
+    copy.showRecentTracksPanel && copy.showCurrentShowPanel
+      ? "grid gap-6 md:gap-8 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start"
+      : "grid gap-6 md:gap-8 grid-cols-1";
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 min-w-0 max-w-full w-full">
@@ -115,22 +123,29 @@ export function HomeWaveLayout({
       </section>
 
       <section className="relative flex-1 overflow-x-hidden bg-gradient-to-b from-[#dce6ef] via-[#d5e0ea] to-[#cad8e6] pt-8 md:pt-10 pb-12 md:pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+        <div className="mx-auto max-w-[1500px] px-4 sm:px-6 md:px-8">
           <div className="grid lg:grid-cols-[1fr_290px] xl:grid-cols-[1fr_320px] gap-6 md:gap-8 xl:gap-8 items-start">
             <div className="min-w-0 flex flex-col gap-6 md:gap-8">
-              {(copy.showCurrentShowPanel || copy.showRecentTracksPanel) ? (
-                <div className="grid gap-6 md:gap-8 md:grid-cols-2 md:items-stretch">
-                  {copy.showCurrentShowPanel ? (
-                    <div className="min-w-0 flex flex-col min-h-0">
-                      <CurrentShowPanel panelTitle={copy.currentShowTitle} scheduleCta={copy.currentShowCta} />
-                    </div>
-                  ) : null}
+              {showProgrammingRow ? (
+                <div className={programmingGridClass}>
                   {copy.showRecentTracksPanel ? (
-                    <div className="min-w-0 flex flex-col min-h-0">
+                    <div className="min-w-0">
                       <RecentTracksPanel
                         limit={5}
                         panelTitle={copy.recentTracksTitle}
                         historyLinkLabel={copy.recentTracksCta}
+                      />
+                    </div>
+                  ) : null}
+                  {copy.showCurrentShowPanel ? (
+                    <div className="min-w-0">
+                      <HomeProgrammingSchedule
+                        slots={programmingSlots}
+                        temporarySlots={programmingTemporarySlots}
+                        liveBadgeText={copy.liveLabel}
+                        panelTitle={copy.currentShowTitle}
+                        scheduleCta={copy.currentShowCta}
+                        scheduleHref="/programmering"
                       />
                     </div>
                   ) : null}
