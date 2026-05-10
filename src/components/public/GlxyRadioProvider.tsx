@@ -29,16 +29,24 @@ export function getGlxySharedAudio(): HTMLAudioElement | null {
   const w = window as Window & { __glxyAudio?: HTMLAudioElement };
   if (!w.__glxyAudio) {
     const a = document.createElement("audio");
-    a.preload = "none";
+    a.preload = "metadata";
     a.crossOrigin = "anonymous";
     w.__glxyAudio = a;
   }
   return w.__glxyAudio;
 }
 
-export function GlxyRadioProvider({ children }: { children: React.ReactNode }) {
-  const [stations, setStations] = useState<GlxyStation[]>([]);
-  const [loading, setLoading] = useState(true);
+export function GlxyRadioProvider({
+  children,
+  initialStations,
+}: {
+  children: React.ReactNode;
+  /** Server-rendered zenders: geen lege flash + direct juiste stream-url. */
+  initialStations?: GlxyStation[];
+}) {
+  const seeded = initialStations && initialStations.length > 0;
+  const [stations, setStations] = useState<GlxyStation[]>(() => initialStations ?? []);
+  const [loading, setLoading] = useState(() => !seeded);
   const [activeStationId, setActiveStationId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolumeState] = useState(0.8);
@@ -108,11 +116,13 @@ export function GlxyRadioProvider({ children }: { children: React.ReactNode }) {
       if (cur.href !== next.href) {
         a.pause();
         a.src = url;
+        void a.load();
       }
     } catch {
       if (a.src !== url) {
         a.pause();
         a.src = url;
+        void a.load();
       }
     }
   }, [activeStation?.streamUrl, activeStation?.id]);
@@ -173,6 +183,7 @@ export function GlxyRadioProvider({ children }: { children: React.ReactNode }) {
     }
     if (a.src !== station.streamUrl) {
       a.src = station.streamUrl;
+      void a.load();
     }
     await a.play().catch(() => {});
   }, []);

@@ -22,10 +22,16 @@ function sameTrack(a: { title: string; artist: string }, b: { title: string; art
  * Wanneer metadata verandert: opslaan in play history (dedup t.o.v. vorige logregel per zender).
  * Fire-and-forget vriendelijk: async, errors slikken.
  */
-export function appendStationPlayHistory(stationId: string, title: string, artist: string): void {
+export function appendStationPlayHistory(
+  stationId: string,
+  title: string,
+  artist: string,
+  coverUrl?: string | null,
+): void {
   const t = title.trim();
   const a = artist.trim();
   if (!t && !a) return;
+  const cover = typeof coverUrl === "string" && /^https?:\/\//i.test(coverUrl.trim()) ? coverUrl.trim().slice(0, 2000) : null;
 
   void (async () => {
     try {
@@ -45,6 +51,7 @@ export function appendStationPlayHistory(stationId: string, title: string, artis
         title: t,
         artist: a,
         playedAt: new Date().toISOString(),
+        ...(cover ? { coverUrl: cover } : {}),
       };
       const next = [entry, ...list].slice(0, MAX_PER_STATION);
       prev[stationId] = next;

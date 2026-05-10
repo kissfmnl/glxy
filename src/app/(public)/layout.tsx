@@ -2,10 +2,10 @@ import { PublicThemeGuard } from "@/components/public/PublicThemeGuard";
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicRadioShell } from "@/components/public/PublicRadioShell";
 import { PublicTabTitle } from "@/components/public/PublicTabTitle";
-import Link from "next/link";
 import { MOCK_NAV, MOCK_PUBLIC_UI, MOCK_SOCIAL } from "@/lib/mock/site";
-import { GlxyWordmark } from "@/components/public/GlxyWordmark";
+import { PublicFooter } from "@/components/public/PublicFooter";
 import { getBranding } from "@/lib/brandingDb";
+import { buildGlxyStationsFromDb } from "@/lib/glxyStations";
 
 export const viewport = {
   width: "device-width",
@@ -17,6 +17,7 @@ export const viewport = {
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const ui = MOCK_PUBLIC_UI;
   const branding = await getBranding();
+  const initialStations = buildGlxyStationsFromDb(branding.stationsConfig);
   const navItems = (branding.navItems?.length ? branding.navItems : [...MOCK_NAV]) as Array<{ href: string; label: string }>;
   const instagramUrl = branding.instagramUrl || MOCK_SOCIAL.instagramUrl;
   const tiktokUrl = branding.tiktokUrl || MOCK_SOCIAL.tiktokUrl;
@@ -38,42 +39,16 @@ export default async function PublicLayout({ children }: { children: React.React
         navItems={navItems}
         logoUrl={branding.logoUrl}
       />
-      <PublicRadioShell enabled={ui.showCookieBanner} text={ui.cookieBannerText} cta={ui.cookieBannerCta}>
+      <PublicRadioShell
+        enabled={ui.showCookieBanner}
+        text={ui.cookieBannerText}
+        cta={ui.cookieBannerCta}
+        initialStations={initialStations}
+      >
         {children}
       </PublicRadioShell>
 
-      <footer
-        id="kiss-public-footer"
-        className="relative z-[40] isolate mt-0 mb-[calc(5.25rem+env(safe-area-inset-bottom))] border-t border-cyan-500/15 bg-[#060914]/95 backdrop-blur-sm"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-full bg-[#060914]"
-          style={{ height: "calc(5.25rem + env(safe-area-inset-bottom))" }}
-        />
-        <div className="relative z-[1] mx-auto flex w-full max-w-[1500px] flex-wrap items-center justify-between gap-4 bg-transparent px-4 py-4 md:px-10 md:py-5">
-          <div className="flex shrink-0 items-center gap-1.5 md:gap-2.5">
-            <GlxyWordmark className="text-xl md:text-2xl" />
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-3 font-black text-white/65 md:gap-5 text-[11px] md:text-xs">
-            <Link href="/contact" className="transition-colors hover:text-cyan-200">
-              Contact
-            </Link>
-            <Link href="/join-kiss" className="transition-colors hover:text-cyan-200">
-              Word host
-            </Link>
-            <Link href="/acties" className="transition-colors hover:text-cyan-200">
-              Acties
-            </Link>
-            <Link href="/giveaway-voorwaarden" className="transition-colors hover:text-cyan-200">
-              Giveaway-voorwaarden
-            </Link>
-            <Link href="/disclaimer" className="transition-colors hover:text-cyan-200">
-              Disclaimer
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter footer={branding.footer} siteLogoUrl={branding.logoUrl} />
     </div>
   );
 }

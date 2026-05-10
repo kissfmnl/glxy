@@ -552,6 +552,38 @@ input[type="range"] {
   max-height: 1.5rem;
 }
 
+/* Zenderstrip: op tablet/desktop gelijke kolombreedtes per actief aantal zenders */
+@media (min-width: 768px) {
+  .kiss-station-strip {
+    grid-template-columns: repeat(var(--kiss-station-n, 1), minmax(0, 1fr));
+  }
+}
+
+/* Homepage: JUST PLAYED + programmering uitlijnen met zenderstrip (2 / -1 op desktop) */
+.kiss-jp-prog-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .kiss-jp-prog-row {
+    display: grid;
+    grid-template-columns: repeat(var(--kiss-station-n, 4), minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .kiss-jp-prog-row > .kiss-jp-prog-span {
+    grid-column: 2 / -1;
+    min-width: 0;
+  }
+}
+@media (min-width: 1280px) {
+  .kiss-jp-prog-row {
+    gap: 1rem;
+  }
+}
+
 /* Public live dot: constant red + subtle pulsing */
 @keyframes kiss-live-dot-pulse {
   0% {

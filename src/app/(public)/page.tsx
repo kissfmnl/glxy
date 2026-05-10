@@ -44,6 +44,7 @@ export default async function PublicHomePage() {
       heroLogoUrl={branding.logoUrl}
       programmingSlots={programmingSlots}
       programmingTemporarySlots={programmingTemporarySlots}
+      justPlayedUi={branding.justPlayed}
     />
   );
 }

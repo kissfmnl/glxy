@@ -30,9 +30,11 @@ const NAV_ADMIN_STATIONS: Nav[] = [
 const NAV_ADMIN_DEMO: Nav[] = [
   { href: "/admin/gebruikers", label: "Gebruikers & uitnodigingen" },
   { href: "/admin/branding", label: "Huisstijl (GLXY)" },
+  { href: "/admin/footer", label: "Footer" },
+  { href: "/admin/just-played", label: "Just played" },
   { href: "/admin/media", label: "Mediabibliotheek" },
   { href: "/admin/djs", label: "Hosts (demo)" },
-  { href: "/admin/programmering", label: "Planner (demo)" },
+  { href: "/admin/programmering", label: "Programmering" },
   { href: "/admin/acties", label: "Acties (demo)" },
 ];
 

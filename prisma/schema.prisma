@@ -74,6 +74,10 @@ model Branding {
   stationPlayHistory Json?
   /// Optionele programmaschema-override (array van slots); anders vaste mock
   programmingSchedule Json?
+  /// Publieke footer: kleuren, optioneel logo-URL, social links (JSON)
+  footerConfig Json?
+  /// Homepage JUST PLAYED titelblok (hex-kleuren JSON)
+  justPlayedConfig Json?
   homeHlsUrl String   @default("https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8")
   updatedAt  DateTime @updatedAt
 }

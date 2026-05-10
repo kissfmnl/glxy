@@ -6,11 +6,13 @@ import { ActionsPanel } from "@/components/public/ActionsPanel";
 import { SocialProfilePanel } from "@/components/public/SocialProfilePanel";
 import { AppDownloadPopup } from "@/components/public/AppDownloadPopup";
 import { HomeHeroBackdrop } from "@/components/public/HomeHeroBackdrop";
+import type { CSSProperties } from "react";
 import type { HomeWaveCopy } from "@/types/home-wave";
 import AppImage from "@/components/AppImage";
 import { GlxyHeroLogoVideo } from "@/components/public/GlxyHeroLogoVideo";
 import { GlxyStationListenStrip } from "@/components/public/GlxyStationListenStrip";
 import type { GlxyStation } from "@/lib/glxyStations";
+import type { PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 import type { MockProgrammingSlot } from "@/lib/mock/site";
 
 export type HomeImageTile = { src: string; alt: string; slug?: string; focalX?: number; focalY?: number };
@@ -61,6 +63,7 @@ export function HomeWaveLayout({
   heroLogoUrl,
   programmingSlots,
   programmingTemporarySlots,
+  justPlayedUi,
 }: {
   copy: HomeWaveCopy;
   heroBackdropSlides: { src: string }[];
@@ -74,16 +77,17 @@ export function HomeWaveLayout({
   heroLogoUrl?: string | null;
   programmingSlots: MockProgrammingSlot[];
   programmingTemporarySlots: (MockProgrammingSlot & { startsOn: string; endsOn: string; isActive: boolean })[];
+  justPlayedUi: PublicJustPlayedConfig;
 }) {
   const autoVoicesCount = copy.showInstagramPanel && copy.showTikTokPanel ? 4 : copy.showInstagramPanel || copy.showTikTokPanel ? 5 : 6;
   const voicesCount = copy.voicesPhotoCount ?? autoVoicesCount;
   const heroLogoSrc = heroLogoUrl?.trim() ? heroLogoUrl.trim() : "/glxy-hero-logo-fallback.svg";
 
-  const showProgrammingRow = copy.showRecentTracksPanel || copy.showCurrentShowPanel;
-  const programmingGridClass =
-    copy.showRecentTracksPanel && copy.showCurrentShowPanel
-      ? "grid gap-6 md:gap-8 lg:grid-cols-[minmax(260px,300px)_1fr] lg:items-stretch"
-      : "grid gap-6 md:gap-8 grid-cols-1";
+  const showJp = copy.showRecentTracksPanel;
+  const showProg = copy.showCurrentShowPanel;
+  const showProgrammingRow = showJp || showProg;
+  const stationGridN = Math.max(stations.length, 1);
+  const splitAlignStrip = showJp && showProg && stationGridN >= 2;
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 min-w-0 max-w-full w-full">
@@ -130,19 +134,23 @@ export function HomeWaveLayout({
           <div className="grid lg:grid-cols-[1fr_290px] xl:grid-cols-[1fr_320px] gap-6 md:gap-8 xl:gap-8 items-start">
             <div className="min-w-0 flex flex-col gap-6 md:gap-8">
               {showProgrammingRow ? (
-                <div className={programmingGridClass}>
-                  {copy.showRecentTracksPanel ? (
-                    <div className="flex min-h-[420px] min-w-0 flex-col lg:min-h-[560px]">
+                <div
+                  className={splitAlignStrip ? "kiss-jp-prog-row" : "flex flex-col gap-4 md:gap-5"}
+                  style={splitAlignStrip ? ({ ["--kiss-station-n" as string]: String(stationGridN) } as CSSProperties) : undefined}
+                >
+                  {showJp ? (
+                    <div className="flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px]">
                       <RecentTracksPanel
-                        limit={8}
+                        limit={10}
                         panelTitle={copy.recentTracksTitle}
                         historyLinkLabel={copy.recentTracksCta}
                         stations={stations.map((s) => ({ id: s.id, line1: s.line1 }))}
+                        justPlayedUi={justPlayedUi}
                       />
                     </div>
                   ) : null}
-                  {copy.showCurrentShowPanel ? (
-                    <div className="flex min-h-[420px] min-w-0 flex-col lg:min-h-[560px]">
+                  {showProg ? (
+                    <div className={`flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px] ${splitAlignStrip ? "kiss-jp-prog-span" : ""}`}>
                       <HomeProgrammingSchedule
                         slots={programmingSlots}
                         temporarySlots={programmingTemporarySlots}

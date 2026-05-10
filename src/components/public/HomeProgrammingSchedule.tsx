@@ -3,8 +3,6 @@
 import { useMemo, useRef, useState } from "react";
 import { formatAmsterdamYMD } from "@/lib/amsterdamClock";
 import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
-import AppImage from "@/components/AppImage";
-import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 import type { MockProgrammingSlot } from "@/lib/mock/site";
 import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
 
@@ -37,12 +35,6 @@ function isNonStopProgram(slot: { label: string | null; jock: { name: string } }
   const label = slot.label?.trim().toLowerCase() || "";
   const jock = slot.jock.name.trim().toLowerCase();
   return label === "non-stop" || label === "nonstop" || jock === "non-stop" || jock === "nonstop";
-}
-
-function assetSrc(imagePath: string | null | undefined) {
-  if (!imagePath) return null;
-  if (/^https?:\/\//i.test(imagePath)) return imagePath;
-  return imagePath;
 }
 
 export function HomeProgrammingSchedule({
@@ -116,22 +108,22 @@ export function HomeProgrammingSchedule({
       : null;
 
   return (
-    <div className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-3xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_16px_rgba(30,55,90,0.05)]">
+    <div className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_12px_rgba(30,55,90,0.05)]">
       <div className={`flex shrink-0 items-center justify-between gap-3 ${KISS_PANEL_HEADER_BOX}`}>
         <p className={`${KISS_PANEL_TITLE} min-w-0`}>{panelTitle}</p>
         <a
           href={scheduleHref}
-          className="text-brand-primary inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-black hover:underline"
+          className="text-brand-primary inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-black hover:underline sm:text-xs"
         >
           {scheduleCta}
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-5-5 5 5-5 5" />
           </svg>
         </a>
       </div>
 
-      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col gap-3 pt-0`}>
-        <div className="overflow-x-auto rounded-lg border border-[#1e375a]/18 bg-[#0b1020] p-1 [-webkit-overflow-scrolling:touch]">
+      <div className={`${KISS_PANEL_BODY_PAD} flex min-h-0 flex-1 flex-col gap-2 pt-0 !pb-4`}>
+        <div className="overflow-x-auto rounded-md border border-[#1e375a]/18 bg-[#0b1020] p-1 [-webkit-overflow-scrolling:touch]">
           <div className="flex min-w-max gap-0.5 sm:min-w-0 sm:grid sm:grid-cols-7">
             {dayMeta.map((day) => {
               const selected = day.id === selectedDay;
@@ -141,7 +133,7 @@ export function HomeProgrammingSchedule({
                   key={day.id}
                   type="button"
                   onClick={() => setSelectedDay(day.id)}
-                  className={`shrink-0 rounded-md px-2 py-1.5 text-center transition-colors sm:min-h-0 sm:px-1 ${
+                  className={`shrink-0 rounded-md px-2 py-1 text-center transition-colors sm:min-h-0 sm:px-1 ${
                     selected
                       ? "bg-[var(--brand-primary)] text-[#0a0f0c] shadow-inner"
                       : isToday
@@ -151,8 +143,8 @@ export function HomeProgrammingSchedule({
                   aria-pressed={selected}
                   title={day.fullLabel}
                 >
-                  <span className="block text-[10px] font-black uppercase leading-none tracking-wide">{day.label}</span>
-                  <span className="mt-0.5 block text-[9px] font-semibold normal-case leading-none text-current/85">
+                  <span className="block text-[9px] font-black uppercase leading-none tracking-wide sm:text-[10px]">{day.label}</span>
+                  <span className="mt-0.5 block text-[8px] font-semibold normal-case leading-none text-current/85 sm:text-[9px]">
                     {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(day.date)}
                   </span>
                 </button>
@@ -163,13 +155,12 @@ export function HomeProgrammingSchedule({
 
         <div className="min-h-0 flex-1 overflow-y-auto pr-0.5 [-webkit-overflow-scrolling:touch]">
           {daySlots.length === 0 ? (
-            <div className="rounded-xl border border-[#d5deea] bg-white/80 py-8 text-center">
-              <p className="text-xs font-bold text-gray-600">Geen programmering voor deze dag.</p>
+            <div className="rounded-lg border border-[#d5deea] bg-white/80 py-6 text-center">
+              <p className="text-[11px] font-bold text-gray-600">Geen programmering voor deze dag.</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {daySlots.map((slot) => {
-                const img = assetSrc(slot.programImagePath || slot.jock.imagePath);
                 const title = slot.label?.trim() || formatShowName(slot.jock.name);
                 const hideJock = isNonStopProgram(slot);
                 const hostLine = slot.coHostName?.trim()
@@ -180,49 +171,25 @@ export function HomeProgrammingSchedule({
                 return (
                   <article
                     key={`${slot.source}-${slot.id}`}
-                    className="group relative overflow-hidden rounded-xl border border-[#1e375a]/15 bg-[#0f172a] shadow-md"
+                    className="rounded-lg border border-[#1e375a]/12 bg-white/95 px-3 py-2 shadow-sm"
                   >
-                    <div className="relative aspect-[21/9] min-h-[96px] w-full overflow-hidden sm:min-h-[108px]">
-                      {img ? (
-                        <AppImage
-                          src={img}
-                          alt=""
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                          style={
-                            slot.programImagePath
-                              ? undefined
-                              : {
-                                  objectPosition: `${(slot.jock.imageFocusX <= 1 ? slot.jock.imageFocusX * 100 : slot.jock.imageFocusX)}% ${
-                                    slot.jock.imageFocusY <= 1 ? slot.jock.imageFocusY * 100 : slot.jock.imageFocusY
-                                  }%`,
-                                }
-                          }
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-[#1e375a] p-4">
-                          <AppImage src={MOCK_COVER_FALLBACK} alt="" className="h-14 w-auto object-contain opacity-90" loading="lazy" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="min-w-0 flex-1 text-[11px] font-black uppercase leading-snug tracking-wide text-gray-900 line-clamp-2 sm:text-xs">
+                        {title}
+                      </p>
                       {isLive ? (
-                        <div className="absolute right-2 top-2">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/50 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.18em] text-white backdrop-blur-sm">
-                            <span className="inline-flex h-1.5 w-1.5 rounded-full kiss-live-dot" style={{ backgroundColor: "#ef4444" }} />
-                            {liveBadgeText}
-                          </span>
-                        </div>
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.15em] text-red-700">
+                          <span className="inline-flex h-1.5 w-1.5 rounded-full kiss-live-dot" style={{ backgroundColor: "#ef4444" }} />
+                          {liveBadgeText}
+                        </span>
                       ) : null}
-                      <div className="absolute inset-x-0 bottom-0 p-2.5 pt-8">
-                        <p className="line-clamp-2 text-xs font-black uppercase leading-snug tracking-wide text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
-                          {title}
-                        </p>
-                        <p className="mt-0.5 line-clamp-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/75">{subLine}</p>
-                        <p className="mt-1 font-mono text-[10px] font-black tabular-nums text-[var(--brand-primary)]">
-                          {slot.startTime} – {slot.endTime}
-                        </p>
-                      </div>
                     </div>
+                    <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-gray-600 line-clamp-2 sm:text-[10px]">
+                      {subLine}
+                    </p>
+                    <p className="mt-1 font-mono text-[9px] font-black tabular-nums text-[var(--brand-primary)] sm:text-[10px]">
+                      {slot.startTime} – {slot.endTime}
+                    </p>
                   </article>
                 );
               })}

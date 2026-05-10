@@ -1,38 +1,15 @@
 import { NextResponse } from "next/server";
-import { parseNowPlayingText } from "@/lib/parseNowPlayingText";
 import { buildGlxyStationsFromDb, resolveStationNowPlayingUrl } from "@/lib/glxyStations";
 import { prisma } from "@/lib/prisma";
 import { appendStationPlayHistory } from "@/lib/stationPlayHistory";
+import { fetchNowPlayingFromRemoteUrl, isAllowedNowPlayingUrl } from "@/lib/stationNowPlayingFetch";
+import { persistNpSnapshotMerge } from "@/lib/stationNpSnapshotMerge";
 
 export const dynamic = "force-dynamic";
 
-function isAllowedNowPlayingUrl(url: string): boolean {
-  try {
-    const u = new URL(url);
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-function persistNpSnapshot(id: string, title: string, artist: string) {
+function persistNpSnapshot(id: string, title: string, artist: string, coverUrl: string | null) {
   if (!title.trim() && !artist.trim()) return;
-  void (async () => {
-    try {
-      const row = await prisma.branding.findUnique({ where: { id: 1 }, select: { stationNpSnapshot: true } });
-      const prev =
-        row?.stationNpSnapshot && typeof row.stationNpSnapshot === "object" && !Array.isArray(row.stationNpSnapshot)
-          ? { ...(row.stationNpSnapshot as Record<string, unknown>) }
-          : {};
-      prev[id] = { title, artist, updatedAt: new Date().toISOString() };
-      await prisma.branding.update({
-        where: { id: 1 },
-        data: { stationNpSnapshot: prev as object },
-      });
-    } catch {
-      /* ignore */
-    }
-  })();
+  void persistNpSnapshotMerge({ [id]: { title, artist, coverUrl } });
 }
 
 export async function GET(req: Request) {
@@ -58,31 +35,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ title: "", artist: "", text: "" });
   }
 
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(rawUrl, {
-      signal: ctrl.signal,
-      headers: { Accept: "text/plain,*/*" },
-      cache: "no-store",
-    });
-    clearTimeout(timer);
-    if (!res.ok) {
-      return NextResponse.json({ title: "", artist: "", text: "" });
-    }
-    const body = await res.text();
-    const snippet = body.trim().slice(0, 4000);
-    const { title, artist } = parseNowPlayingText(snippet);
-    const t = title.slice(0, 320);
-    const a = artist.slice(0, 320);
-    const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
-    persistNpSnapshot(id, t, a);
-    appendStationPlayHistory(id, t, a);
-    return NextResponse.json(
-      { title: t, artist: a, text },
-      { headers: { "Cache-Control": "public, s-maxage=8, stale-while-revalidate=20" } },
-    );
-  } catch {
-    return NextResponse.json({ title: "", artist: "", text: "" });
-  }
+  const { title: t, artist: a, coverUrl } = await fetchNowPlayingFromRemoteUrl(rawUrl);
+  const text = [a, t].filter(Boolean).join(" — ").slice(0, 320);
+  persistNpSnapshot(id, t, a, coverUrl);
+  appendStationPlayHistory(id, t, a, coverUrl);
+  return NextResponse.json(
+    { title: t, artist: a, text },
+    { headers: { "Cache-Control": "public, s-maxage=8, stale-while-revalidate=20" } },
+  );
 }

@@ -1,5 +1,7 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { mergeFooterConfig, type PublicFooterConfig } from "@/lib/footerConfig";
+import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 
 const DEFAULT_HLS = "https://mistserv4.videostreams.nl/hls/camfactor/index.m3u8";
 
@@ -25,6 +27,8 @@ export type PublicBranding = {
   stationNpSnapshot: unknown | null;
   stationPlayHistory: unknown | null;
   programmingSchedule: unknown | null;
+  footer: PublicFooterConfig;
+  justPlayed: PublicJustPlayedConfig;
 };
 
 export const getBranding = cache(async (): Promise<PublicBranding> => {
@@ -62,6 +66,8 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
         stationNpSnapshot: row.stationNpSnapshot ?? null,
         stationPlayHistory: row.stationPlayHistory ?? null,
         programmingSchedule: row.programmingSchedule ?? null,
+        footer: mergeFooterConfig(row.footerConfig ?? null),
+        justPlayed: mergeJustPlayedConfig(row.justPlayedConfig ?? null),
       };
     }
   } catch {
@@ -88,5 +94,7 @@ export const getBranding = cache(async (): Promise<PublicBranding> => {
     stationNpSnapshot: null,
     stationPlayHistory: null,
     programmingSchedule: null,
+    footer: mergeFooterConfig(null),
+    justPlayed: mergeJustPlayedConfig(null),
   };
 });
