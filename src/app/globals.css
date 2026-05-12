@@ -769,11 +769,8 @@ input[type="range"] {
 }
 
 .kiss-public-top-nav-item--active {
-  color: rgba(255, 255, 255, 1);
-  text-shadow:
-    0 0 12px rgba(255, 255, 255, 0.5),
-    0 0 26px rgba(34, 211, 238, 0.42),
-    0 0 42px rgba(34, 211, 238, 0.18);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
 /* Active state: geen “blok” of vaste underline — alleen glow; underline verschijnt bij hover */

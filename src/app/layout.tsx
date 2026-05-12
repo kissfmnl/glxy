@@ -36,7 +36,8 @@ export default async function RootLayout({
     "--brand-navy": branding.navyHex,
     "--brand-yellow": branding.yellowHex,
     "--glxy-panel-bg": "rgba(54, 54, 54, 0.96)",
-    "--glxy-menu-bar": branding.menuBarHex || branding.primaryHex,
+    /** Donker bosgroen i.p.v. fel primary — sluit aan bij homepage screenshot (vaste menubalk). */
+    "--glxy-menu-bar": branding.menuBarHex || "#052e22",
     "--glxy-hero-video-frame": branding.heroVideoFrameHex || "#ffe200",
     "--glxy-listen-bar-bg": branding.listenBarBgHex || branding.primaryHex,
     "--glxy-listen-bar-text": branding.listenBarTextHex || "#ffffff",

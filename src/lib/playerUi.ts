@@ -19,7 +19,7 @@ export type PlayerUiConfig = {
 export type MergedPlayerUi = Required<PlayerUiConfig>;
 
 export const DEFAULT_PLAYER_UI: MergedPlayerUi = {
-  stationPlayHex: "#e11d48",
+  stationPlayHex: "#0b7557",
   stationTextHex: "#ffffff",
   stationSubtextHex: "#e7e7e7",
   miniBgHex: "#3f3f46",

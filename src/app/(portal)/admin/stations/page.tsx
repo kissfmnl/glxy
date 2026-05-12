@@ -10,10 +10,10 @@ import { redirect } from "next/navigation";
 import { StationsAdminForm } from "./StationsAdminForm";
 
 const FALLBACK_COLORS: Record<string, string> = {
-  z1: "#e11d48",
-  z2: "#84cc16",
-  z3: "#facc15",
-  z4: "#7dd3fc",
+  z1: "#0b7557",
+  z2: "#111816",
+  z3: "#eab308",
+  z4: "#064e3b",
 };
 
 export const metadata = {

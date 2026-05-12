@@ -1,4 +1,9 @@
-import { KISS_PANEL_BODY_PAD, KISS_PANEL_HEADER_BOX, KISS_PANEL_HEADER_GAP, KISS_PANEL_TITLE } from "@/lib/publicPanelChrome";
+import {
+  KISS_PANEL_BODY_PAD,
+  KISS_PANEL_HEADER_BOX,
+  KISS_PANEL_HEADER_GAP,
+  KISS_PANEL_TITLE_ON_DARK,
+} from "@/lib/publicPanelChrome";
 import { HomeProgrammingSchedule } from "@/components/public/HomeProgrammingSchedule";
 import { RecentTracksPanel } from "@/components/public/RecentTracksPanel";
 import { ConcertsPanel } from "@/components/public/ConcertsPanel";
@@ -21,16 +26,16 @@ function VoicesSidebar({ title, djs, maxItems }: { title: string; djs: HomeImage
   const list = djs.filter((d) => d.src).slice(0, Math.max(4, maxItems));
   if (list.length === 0) return null;
   return (
-    <aside className="hidden lg:flex flex-col w-full min-w-0 kiss-public-panel rounded-3xl border border-solid border-[#1e375a]/12 bg-[#f2f8fb] shadow-[0_2px_16px_rgba(30,55,90,0.05)] overflow-hidden">
-      <div className={`${KISS_PANEL_HEADER_BOX} shrink-0`}>
-        <p className={KISS_PANEL_TITLE}>{title}</p>
+    <aside className="hidden lg:flex flex-col w-full min-w-0 kiss-public-panel rounded-3xl border border-[#1a3329] bg-[#0a100d] shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden">
+      <div className={`${KISS_PANEL_HEADER_BOX} shrink-0 border-b border-[#1a3329] bg-[#050a08]`}>
+        <p className={KISS_PANEL_TITLE_ON_DARK}>{title}</p>
       </div>
       <div className={`${KISS_PANEL_BODY_PAD} pt-0 grid gap-2.5 ${KISS_PANEL_HEADER_GAP}`}>
         {list.map((t, i) => (
           <a
             key={`${t.src}-v-${i}`}
             href={t.slug ? `/djs/${encodeURIComponent(t.slug)}` : "/djs"}
-            className="group relative rounded-2xl overflow-hidden border border-[#1e375a]/12 bg-white shadow-[0_8px_22px_rgba(30,55,90,0.1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#37bfbf]"
+            className="group relative rounded-2xl overflow-hidden border border-[#1a3329] bg-[#0c1411] shadow-[0_6px_20px_rgba(0,0,0,0.35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b7557]/50"
           >
             <div className="relative aspect-[1/1]">
               <AppImage
@@ -96,40 +101,36 @@ export function HomeWaveLayout({
           <HomeHeroBackdrop slides={heroBackdropSlides} motionEnabled={copy.heroBackdropMotion} />
         </div>
         <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-[#050912]/58"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[#030806]/75"
           style={{
-            WebkitBackdropFilter: "blur(12px)",
-            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(4px)",
+            backdropFilter: "blur(4px)",
           }}
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#050912]/94 via-[#071520]/82 to-[#0c2238]/90"
+          className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-black/80 via-[#050a08]/88 to-[#06120d]/92"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_95%_58%_at_72%_10%,rgba(11,117,87,0.32),transparent_58%)]"
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_90%_50%_at_50%_0%,rgba(11,117,87,0.22),transparent_55%)]"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_52%_48%_at_10%_85%,rgba(34,211,238,0.15),transparent_56%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_55%_42%_at_48%_52%,rgba(192,132,252,0.08),transparent_62%)]"
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_55%_40%_at_85%_88%,rgba(255,226,0,0.12),transparent_60%)]"
           aria-hidden
         />
 
         <div className="relative z-10 home-content-grid [isolation:isolate]">
           <GlxyHeroLogoVideo heroLogoSrc={heroLogoSrc} homeHlsSrc={homeHlsSrc ?? null} />
 
-          <div className="mt-10 border-t border-white/10 pt-8 sm:mt-12 sm:pt-10 md:mt-14 md:pt-11">
+          <div className="mt-10 border-t border-white/15 pt-8 sm:mt-12 sm:pt-10 md:mt-14 md:pt-11">
             <GlxyStationListenStrip stations={stations} colorOverrides={stationColors} />
           </div>
         </div>
       </section>
 
-      <section className="relative flex-1 overflow-x-hidden bg-gradient-to-b from-[#dce6ef] via-[#d5e0ea] to-[#cad8e6] pt-8 md:pt-10 pb-12 md:pb-16">
+      <section className="relative flex-1 overflow-x-hidden bg-gradient-to-b from-[#070b0a] via-[#050807] to-[#030504] pt-8 md:pt-10 pb-12 md:pb-16">
         {showProgrammingRow ? (
           <div className="home-content-grid pb-6 md:pb-8">
             <div

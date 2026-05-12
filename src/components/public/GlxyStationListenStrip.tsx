@@ -57,7 +57,7 @@ function StationCardCompact({
     station.zebraPattern
       ? {
           backgroundImage:
-            "repeating-linear-gradient(-52deg, rgba(0,0,0,0.06) 0 8px, transparent 8px 16px), linear-gradient(#facc15, #facc15)",
+            "repeating-linear-gradient(-44deg, rgba(0,0,0,0.11) 0 11px, transparent 11px 22px), linear-gradient(155deg, #fde047 0%, #eab308 55%, #ca8a04 100%)",
           ...(bgOverride ? { backgroundColor: bgOverride } : {}),
         }
       : bgOverride
@@ -66,7 +66,7 @@ function StationCardCompact({
 
   return (
     <div
-      className={`group relative flex min-h-[3.25rem] items-center gap-2 overflow-hidden rounded-md px-2 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out hover:-translate-y-1 hover:brightness-[1.07] hover:shadow-[0_12px_32px_rgba(11,117,87,0.42)] active:scale-[0.99] sm:gap-x-2.5 sm:px-2.5 sm:py-2.5 ${station.cardClass}`}
+      className={`group relative flex min-h-[3.25rem] items-center gap-2 overflow-hidden rounded-lg border border-black/15 px-2 py-2 shadow-[0_6px_20px_rgba(0,0,0,0.35)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:brightness-[1.04] hover:shadow-[0_14px_36px_rgba(0,0,0,0.45)] active:scale-[0.99] sm:gap-x-2.5 sm:px-2.5 sm:py-2.5 ${station.cardClass}`}
       style={bgStyle}
     >
       <div className="flex min-w-0 flex-1 items-center gap-2">

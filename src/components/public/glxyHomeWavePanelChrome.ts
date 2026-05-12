@@ -2,7 +2,7 @@ import type { PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 
 /** Gedeelde listing-rij: JUST PLAYED + programmering (zelfde “streaming”-chrome). */
 export const GLXY_HOME_LIST_ROW_CLASS =
-  "group flex overflow-hidden rounded-lg border border-[#1e293b] bg-[#101822] transition-all duration-200 hover:-translate-y-px hover:border-white/[0.12] hover:shadow-[0_10px_32px_rgba(0,0,0,0.55),0_0_0_1px_rgba(11,117,87,0.22)]";
+  "group flex overflow-hidden rounded-lg border border-[#1a3329] bg-[#0c1411] transition-all duration-200 hover:-translate-y-px hover:border-[#2a4d3e] hover:shadow-[0_10px_32px_rgba(0,0,0,0.55),0_0_0_1px_rgba(11,117,87,0.35),0_0_24px_rgba(253,224,71,0.06)]";
 
 /** Zender-tabs + dagen-tabs — zelfde pill-strip. */
 export const GLXY_HOME_TAB_STRIP_CLASS =
@@ -14,7 +14,7 @@ export const GLXY_HOME_LIST_SCROLL_CLASS =
 
 export function glxyAccentRailStyle(theme: Pick<PublicJustPlayedConfig, "panelBorderHex" | "sectionAccentHex">) {
   return {
-    backgroundColor: "#0c121c",
+    backgroundColor: "#080f0c",
     borderRight: `1px solid ${theme.panelBorderHex}`,
     borderLeft: `3px solid ${theme.sectionAccentHex}`,
   };
