@@ -7,19 +7,21 @@ import { PlaylistKeepaliveMonitorClient } from "@/components/public/PlaylistKeep
 
 export const dynamic = "force-dynamic";
 
-export default async function MonitorPage({ searchParams }: { searchParams?: { err?: string } }) {
+export default async function PlaylistMonitorPage({ searchParams }: { searchParams?: { err?: string } }) {
   const store = await cookies();
   const authed = store.get(MONITOR_AUTH_COOKIE)?.value === monitorExpectedCode();
   const branding = await getBranding();
   const stations = buildGlxyStationsFromDb(branding.stationsConfig).map((s) => ({ id: s.id, label: s.line1 }));
-  const returnTo = "/monitor";
+  const returnTo = "/playlist-monitor";
 
   if (!authed) {
     return (
       <div className="mx-auto w-full max-w-xl px-4 py-10">
         <div className="rounded-3xl border border-white/10 bg-[#0f172a]/90 p-6 shadow-xl">
-          <h1 className="text-2xl font-black text-white">Now Playing monitor</h1>
-          <p className="mt-2 text-sm text-gray-300">Vul de toegangscode in. Zie ook de dedicated pagina /playlist-monitor.</p>
+          <h1 className="text-2xl font-black text-white">Playlist keepalive</h1>
+          <p className="mt-2 text-sm text-gray-300">
+            Aparte monitor-pagina: laat open om continu nu-speelt te pollen en Just played te vullen.
+          </p>
           {searchParams?.err === "1" ? (
             <p className="mt-3 rounded-xl border border-red-500/40 bg-red-950/50 px-3 py-2 text-sm font-bold text-red-200">
               Verkeerde code.
@@ -35,11 +37,11 @@ export default async function MonitorPage({ searchParams }: { searchParams?: { e
               required
             />
             <button className="h-10 rounded-full bg-cyan-600 px-5 text-sm font-black text-white transition hover:bg-cyan-500">
-              Open monitor
+              Openen
             </button>
           </form>
           <p className="mt-4 text-xs text-gray-500">
-            Code via env <span className="font-mono">MONITOR_PAGE_CODE</span> (default kissfm123).
+            Zelfde code als /monitor — env <span className="font-mono">MONITOR_PAGE_CODE</span>.
           </p>
         </div>
       </div>
@@ -49,7 +51,10 @@ export default async function MonitorPage({ searchParams }: { searchParams?: { e
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-black text-white">Now Playing monitor (keepalive)</h1>
+        <div>
+          <h1 className="text-2xl font-black text-white">Playlist keepalive</h1>
+          <p className="mt-1 text-xs text-gray-400">/playlist-monitor — nu-speelt batch + geschiedenis</p>
+        </div>
         <form action={monitorLogoutAction}>
           <input type="hidden" name="returnTo" value={returnTo} />
           <button className="h-9 rounded-full border border-white/20 bg-white/10 px-4 text-xs font-black text-white transition hover:bg-white/15">
@@ -58,7 +63,7 @@ export default async function MonitorPage({ searchParams }: { searchParams?: { e
         </form>
       </div>
       {stations.length === 0 ? (
-        <p className="text-sm text-amber-200">Geen zenders gevonden in stationsConfig — voeg zenders toe in admin.</p>
+        <p className="text-sm text-amber-200">Geen zenders gevonden in stationsConfig.</p>
       ) : (
         <PlaylistKeepaliveMonitorClient stations={stations} />
       )}
