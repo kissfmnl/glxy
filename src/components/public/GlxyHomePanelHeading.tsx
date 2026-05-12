@@ -1,34 +1,30 @@
 import type { PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 
+/** Strakke sectiekop — één geheel met het paneel, navy + dun GLXY-accent (geen glow/wash). */
 export function GlxyHomePanelHeading({ title, theme }: { title: string; theme: PublicJustPlayedConfig }) {
   return (
-    <div className="relative shrink-0 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-90"
-        style={{
-          background: `linear-gradient(180deg, color-mix(in srgb, ${theme.sectionAccentHex} 22%, transparent) 0%, transparent 100%)`,
-        }}
-        aria-hidden
-      />
-      <p
-        className="relative text-[11px] font-bold uppercase tracking-[0.42em] sm:text-xs"
-        style={{
-          color: theme.sectionTitleHex,
-          textShadow: `0 0 28px color-mix(in srgb, ${theme.sectionAccentHex} 35%, transparent)`,
-        }}
-      >
-        {title}
-      </p>
-      <div className="relative mt-3 flex items-center gap-3">
-        <div
-          className="h-[3px] w-20 max-w-[45%] rounded-full sm:w-28"
-          style={{
-            background: `linear-gradient(90deg, ${theme.sectionAccentHex}, transparent)`,
-            boxShadow: `0 0 20px color-mix(in srgb, ${theme.sectionAccentHex} 60%, transparent)`,
-          }}
-        />
-        <div className="h-px flex-1 bg-gradient-to-r from-white/12 to-transparent" />
+    <header
+      className="shrink-0 border-b px-4 pb-3 pt-3.5 sm:px-4 sm:pb-3 sm:pt-4"
+      style={{
+        borderColor: theme.panelBorderHex,
+        background: `linear-gradient(180deg, #0a101c 0%, ${theme.panelSurfaceHex} 100%)`,
+      }}
+    >
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p
+            className="text-[10px] font-bold uppercase tracking-[0.28em] sm:text-[11px] sm:tracking-[0.32em]"
+            style={{ color: theme.sectionTitleHex }}
+          >
+            {title}
+          </p>
+          <div
+            className="mt-2 h-0.5 w-12 rounded-full sm:w-14"
+            style={{ backgroundColor: theme.sectionAccentHex }}
+            aria-hidden
+          />
+        </div>
       </div>
-    </div>
+    </header>
   );
 }

@@ -34,15 +34,15 @@ export type PublicJustPlayedConfig = {
 
 export const DEFAULT_JUST_PLAYED: PublicJustPlayedConfig = {
   recentTracksDisplayLimit: 10,
-  sectionTitleHex: "#cbd5e1",
-  sectionAccentHex: "#2dd4bf",
-  panelSurfaceHex: "#0b1020",
-  panelBorderHex: "#152238",
-  stationTabSelectedBgHex: "#134e4a",
-  stationTabSelectedTextHex: "#ecfeff",
-  stationTabInactiveBgHex: "#060a12",
-  stationTabInactiveBorderHex: "#1e293b",
-  playlistLinkHex: "#5eead4",
+  sectionTitleHex: "#f8fafc",
+  sectionAccentHex: "#0b7557",
+  panelSurfaceHex: "#080d18",
+  panelBorderHex: "#1a2436",
+  stationTabSelectedBgHex: "#0d4a3c",
+  stationTabSelectedTextHex: "#ffffff",
+  stationTabInactiveBgHex: "#0c121c",
+  stationTabInactiveBorderHex: "#243044",
+  playlistLinkHex: "#34d399",
 };
 
 const DISPLAY_LIMIT_MIN = 1;

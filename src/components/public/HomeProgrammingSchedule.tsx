@@ -109,140 +109,112 @@ export function HomeProgrammingSchedule({
 
   return (
     <div
-      className="kiss-public-panel font-sans relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-[1.35rem] border border-solid sm:rounded-3xl"
+      className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border sm:rounded-2xl"
       style={{
-        background: `linear-gradient(165deg, color-mix(in srgb, ${theme.panelSurfaceHex} 92%, ${theme.sectionAccentHex}) 0%, ${theme.panelSurfaceHex} 42%, #050810 100%)`,
-        borderColor: `${theme.panelBorderHex}80`,
-        boxShadow: `0 4px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)`,
+        background: `linear-gradient(180deg, #0a101c 0%, ${theme.panelSurfaceHex} 45%, #05070d 100%)`,
+        borderColor: theme.panelBorderHex,
+        boxShadow: "0 18px 50px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,255,255,0.05)",
       }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.35]"
-        style={{
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-        }}
-        aria-hidden
-      />
-      <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
-        <GlxyHomePanelHeading title={panelTitle} theme={theme} />
+      <GlxyHomePanelHeading title={panelTitle.toUpperCase()} theme={theme} />
 
-        <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-0 sm:px-5 sm:pb-5">
-          <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:mb-5">
-            <div className="flex min-w-min gap-1 rounded-2xl p-1.5" style={{ backgroundColor: "rgba(0,0,0,0.38)" }}>
-              {dayMeta.map((day) => {
-                const selected = day.id === selectedDay;
-                const isToday = day.id === today;
+      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0 sm:px-3.5 sm:pb-3.5">
+        <div className="mb-2 flex gap-1 overflow-x-auto border-b pb-2 [-webkit-overflow-scrolling:touch] sm:mb-2.5" style={{ borderColor: theme.panelBorderHex }}>
+          <div className="flex min-w-min gap-1">
+            {dayMeta.map((day) => {
+              const selected = day.id === selectedDay;
+              const isToday = day.id === today;
+              return (
+                <button
+                  key={day.id}
+                  type="button"
+                  onClick={() => setSelectedDay(day.id)}
+                  className="min-w-[2.25rem] shrink-0 rounded-md px-2 py-1 text-center text-[10px] font-bold uppercase tracking-[0.1em] transition-colors sm:min-w-[2.5rem] sm:px-2.5 sm:py-1.5 sm:text-[11px]"
+                  aria-pressed={selected}
+                  title={day.fullLabel}
+                  style={
+                    selected
+                      ? {
+                          backgroundColor: theme.stationTabSelectedBgHex,
+                          color: "#ffffff",
+                          boxShadow: `inset 0 -2px 0 0 ${theme.sectionAccentHex}`,
+                        }
+                      : {
+                          backgroundColor: isToday ? "rgba(255,255,255,0.06)" : "transparent",
+                          color: isToday ? "#e2e8f0" : "#64748b",
+                        }
+                  }
+                >
+                  {day.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
+          {daySlots.length === 0 ? (
+            <p className="py-5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Geen programmering voor deze dag.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {daySlots.map((slot) => {
+                const title = slot.label?.trim() || formatShowName(slot.jock.name);
+                const hostLine = slot.coHostName?.trim()
+                  ? `${formatShowName(slot.jock.name)} & ${formatShowName(slot.coHostName)}`
+                  : formatShowName(slot.jock.name);
+                const hideJock = isNonStopProgram(slot);
+                const subtitleRaw = hideJock ? null : hostLine;
+                const subtitle =
+                  subtitleRaw && subtitleRaw.trim().toLowerCase() !== title.trim().toLowerCase() ? subtitleRaw : null;
+                const isLive = slot.id === nowPlayingId;
                 return (
-                  <button
-                    key={day.id}
-                    type="button"
-                    onClick={() => setSelectedDay(day.id)}
-                    className="relative min-w-[2.75rem] shrink-0 rounded-xl px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] transition-all duration-300 sm:min-w-[3rem] sm:px-3.5 sm:py-2.5 sm:text-xs"
-                    aria-pressed={selected}
-                    title={day.fullLabel}
-                    style={
-                      selected
-                        ? {
-                            background: `linear-gradient(160deg, color-mix(in srgb, ${theme.sectionAccentHex} 50%, #0f172a), ${theme.stationTabSelectedBgHex})`,
-                            color: theme.stationTabSelectedTextHex,
-                            boxShadow: `0 0 22px color-mix(in srgb, ${theme.sectionAccentHex} 40%, transparent)`,
-                          }
-                        : {
-                            color: isToday ? "rgba(226,232,240,0.85)" : "rgba(148,163,184,0.65)",
-                          }
-                    }
+                  <article
+                    key={`${slot.source}-${slot.id}`}
+                    className="group flex overflow-hidden rounded-lg border border-[#1e293b] bg-[#101822] transition-all duration-200 hover:-translate-y-px hover:border-white/[0.12] hover:shadow-[0_10px_32px_rgba(0,0,0,0.55),0_0_0_1px_rgba(11,117,87,0.2)]"
                   >
-                    {day.label}
-                  </button>
+                    <div
+                      className="flex w-[4.25rem] shrink-0 flex-col justify-center px-2 py-2.5 sm:w-[4.75rem] sm:py-3"
+                      style={{
+                        backgroundColor: "#0c121c",
+                        borderRight: `1px solid ${theme.panelBorderHex}`,
+                        borderLeft: `3px solid ${theme.sectionAccentHex}`,
+                      }}
+                    >
+                      <span
+                        className="font-mono text-[13px] font-bold tabular-nums leading-none text-white sm:text-sm"
+                        style={{ color: "#f8fafc" }}
+                      >
+                        {slot.startTime}
+                      </span>
+                      <span className="mt-1 font-mono text-[10px] font-semibold tabular-nums text-slate-400 sm:text-[11px]">
+                        {slot.endTime}
+                      </span>
+                    </div>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 py-2 sm:px-3 sm:py-2.5">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="line-clamp-2 text-[12px] font-bold uppercase leading-tight tracking-wide text-white sm:text-[13px]">
+                          {title}
+                        </h3>
+                        {subtitle ? (
+                          <p className="mt-0.5 line-clamp-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">
+                            {subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                      {isLive ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-red-600 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.14em] text-white shadow-[0_0_12px_rgba(220,38,38,0.65)] sm:text-[9px]">
+                          <span className="h-1 w-1 rounded-full bg-white kiss-live-dot" aria-hidden />
+                          {liveBadgeText.toUpperCase()}
+                        </span>
+                      ) : null}
+                    </div>
+                  </article>
                 );
               })}
             </div>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch]">
-            {daySlots.length === 0 ? (
-              <div className="rounded-2xl bg-white/[0.03] px-4 py-10 text-center backdrop-blur-sm">
-                <p className="text-sm font-medium text-slate-400">Geen programmering voor deze dag.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3 sm:gap-3.5">
-                {daySlots.map((slot) => {
-                  const title = slot.label?.trim() || formatShowName(slot.jock.name);
-                  const hostLine = slot.coHostName?.trim()
-                    ? `${formatShowName(slot.jock.name)} & ${formatShowName(slot.coHostName)}`
-                    : formatShowName(slot.jock.name);
-                  const hideJock = isNonStopProgram(slot);
-                  const subtitleRaw = hideJock ? null : hostLine;
-                  const subtitle =
-                    subtitleRaw && subtitleRaw.trim().toLowerCase() !== title.trim().toLowerCase() ? subtitleRaw : null;
-                  const isLive = slot.id === nowPlayingId;
-                  return (
-                    <article
-                      key={`${slot.source}-${slot.id}`}
-                      className="group relative flex min-h-[4.5rem] overflow-hidden rounded-2xl transition-all duration-300 sm:min-h-[5rem] sm:rounded-[1.25rem]"
-                      style={{
-                        background: "linear-gradient(100deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 45%, rgba(0,0,0,0.2) 100%)",
-                        boxShadow: "0 10px 40px rgba(0,0,0,0.28)",
-                      }}
-                    >
-                      <div
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                        style={{
-                          background: `radial-gradient(100% 80% at 0% 50%, color-mix(in srgb, ${theme.sectionAccentHex} 14%, transparent), transparent 60%)`,
-                        }}
-                      />
-                      <div
-                        className="relative flex w-[5.25rem] shrink-0 flex-col items-center justify-center px-2 py-3 sm:w-24 sm:px-3"
-                        style={{
-                          background: "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 100%)",
-                        }}
-                      >
-                        <span
-                          className="font-mono text-lg font-bold tabular-nums leading-none tracking-tight text-white sm:text-xl"
-                          style={{ color: theme.sectionAccentHex }}
-                        >
-                          {slot.startTime}
-                        </span>
-                        <span className="mt-1.5 font-mono text-[11px] font-medium tabular-nums text-slate-500 sm:text-xs">
-                          {slot.endTime}
-                        </span>
-                      </div>
-                      <div className="relative flex min-w-0 flex-1 flex-col justify-center px-3 py-3 pl-4 sm:px-5 sm:py-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <h3 className="line-clamp-2 text-[0.95rem] font-bold leading-tight tracking-tight text-white sm:text-lg">
-                              {title}
-                            </h3>
-                            {subtitle ? (
-                              <p className="mt-1 line-clamp-2 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500 sm:text-xs">
-                                {subtitle}
-                              </p>
-                            ) : null}
-                          </div>
-                          {isLive ? (
-                            <span
-                              className="relative shrink-0 rounded-full px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-red-100 sm:text-[10px]"
-                              style={{
-                                background: "linear-gradient(135deg, rgba(239,68,68,0.35), rgba(127,29,29,0.5))",
-                                boxShadow: "0 0 20px rgba(239,68,68,0.55), 0 0 40px rgba(239,68,68,0.2)",
-                              }}
-                            >
-                              <span
-                                className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full align-middle"
-                                style={{ backgroundColor: "#fca5a5", boxShadow: "0 0 8px #ef4444" }}
-                              />
-                              {liveBadgeText}
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

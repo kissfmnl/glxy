@@ -137,7 +137,7 @@ export function HomeWaveLayout({
               style={splitAlignStrip ? ({ ["--kiss-station-n" as string]: String(stationGridN) } as CSSProperties) : undefined}
             >
               {showJp ? (
-                <div className="flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px]">
+                <div className="flex min-h-[220px] min-w-0 flex-1 flex-col lg:min-h-[300px]">
                   <RecentTracksPanel
                     limit={justPlayedUi.recentTracksDisplayLimit}
                     panelTitle={copy.recentTracksTitle}
@@ -148,7 +148,7 @@ export function HomeWaveLayout({
                 </div>
               ) : null}
               {showProg ? (
-                <div className={`flex min-h-[260px] min-w-0 flex-1 flex-col lg:min-h-[400px] ${splitAlignStrip ? "kiss-jp-prog-span" : ""}`}>
+                <div className={`flex min-h-[220px] min-w-0 flex-1 flex-col lg:min-h-[300px] ${splitAlignStrip ? "kiss-jp-prog-span" : ""}`}>
                   <HomeProgrammingSchedule
                     slots={programmingSlots}
                     temporarySlots={programmingTemporarySlots}
