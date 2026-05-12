@@ -6,6 +6,12 @@ import { MOCK_COVER_FALLBACK } from "@/lib/mock/site";
 import type { StationPlayEntry } from "@/lib/stationPlayHistory";
 import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 import { GlxyHomePanelHeading } from "@/components/public/GlxyHomePanelHeading";
+import {
+  GLXY_HOME_LIST_ROW_CLASS,
+  GLXY_HOME_LIST_SCROLL_CLASS,
+  GLXY_HOME_TAB_STRIP_CLASS,
+  glxyAccentRailStyle,
+} from "@/components/public/glxyHomeWavePanelChrome";
 
 function TrackThumb({ cover, stationLogo }: { cover: string | null | undefined; stationLogo?: string | null }) {
   const [coverFailed, setCoverFailed] = useState(false);
@@ -175,7 +181,7 @@ export function RecentTracksPanel({
 
   return (
     <div
-      className={`kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border sm:rounded-2xl ${className}`}
+      className={`kiss-public-panel font-sans flex min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border sm:rounded-2xl ${className}`}
       style={{
         background: `linear-gradient(180deg, #0a101c 0%, ${theme.panelSurfaceHex} 45%, #05070d 100%)`,
         borderColor: theme.panelBorderHex,
@@ -184,10 +190,10 @@ export function RecentTracksPanel({
     >
       <GlxyHomePanelHeading title={panelTitle.toUpperCase()} theme={theme} />
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0 sm:px-3.5 sm:pb-3.5">
+      <div className="flex min-h-0 flex-col px-3 pb-3 pt-0 sm:px-3.5 sm:pb-3.5">
         {stationTabs.length > 0 ? (
           <div
-            className="mb-2 flex flex-wrap gap-1 rounded-lg p-1 ring-1 ring-white/[0.06] sm:mb-2.5"
+            className={`${GLXY_HOME_TAB_STRIP_CLASS} flex-wrap`}
             style={{ backgroundColor: theme.stationTabInactiveBgHex }}
             role="tablist"
             aria-label="Zender"
@@ -221,10 +227,10 @@ export function RecentTracksPanel({
           </div>
         ) : null}
 
-        <div className="kiss-public-panel-scroll min-h-0 flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
+        <div className={GLXY_HOME_LIST_SCROLL_CLASS}>
           <div className="flex flex-col gap-1.5">
             {rows.length === 0 ? (
-              <p className="rounded-lg border border-[#1e293b] bg-[#101822] px-3 py-5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <p className="py-5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                 Nog geen tracks gelogd.
               </p>
             ) : (
@@ -232,28 +238,35 @@ export function RecentTracksPanel({
                 const entry = t as StationPlayEntry & { stationId?: string };
                 const resolvedCover = entry.coverUrl?.trim() || extraCovers[trackKey(entry)] || null;
                 return (
-                  <div
+                  <article
                     key={`${entry.stationId ?? "x"}-${entry.id}-${entry.playedAt}`}
-                    className="group flex items-center gap-2.5 rounded-lg border border-[#1e293b] bg-[#101822] px-2 py-2 transition-all duration-200 hover:-translate-y-px hover:border-white/[0.12] hover:shadow-[0_8px_28px_rgba(0,0,0,0.55),0_0_0_1px_rgba(11,117,87,0.25)] sm:gap-3 sm:px-2.5 sm:py-2"
+                    className={GLXY_HOME_LIST_ROW_CLASS}
                   >
-                    <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md shadow-inner ring-1 ring-black/40 sm:h-12 sm:w-12 sm:rounded-lg">
-                      <TrackThumb cover={resolvedCover} stationLogo={activeStationLogo} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-[12px] font-bold uppercase leading-snug tracking-wide text-white sm:text-[13px]">
-                        {entry.title}
-                      </p>
-                      <p className="mt-0.5 line-clamp-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">
-                        {entry.artist}
-                      </p>
-                    </div>
-                    <time
-                      dateTime={entry.playedAt}
-                      className="shrink-0 text-right font-mono text-[10px] tabular-nums tracking-wide text-slate-500"
+                    <div
+                      className="flex w-[4.25rem] shrink-0 items-center justify-center px-1 py-2.5 sm:w-[4.75rem] sm:px-1.5 sm:py-3"
+                      style={glxyAccentRailStyle(theme)}
                     >
-                      {formatTime(entry.playedAt)}
-                    </time>
-                  </div>
+                      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md shadow-inner ring-1 ring-black/40 sm:h-12 sm:w-12 sm:rounded-lg">
+                        <TrackThumb cover={resolvedCover} stationLogo={activeStationLogo} />
+                      </div>
+                    </div>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 py-2 sm:px-3 sm:py-2.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-[12px] font-bold uppercase leading-tight tracking-wide text-white sm:text-[13px]">
+                          {entry.title}
+                        </p>
+                        <p className="mt-0.5 line-clamp-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[11px]">
+                          {entry.artist}
+                        </p>
+                      </div>
+                      <time
+                        dateTime={entry.playedAt}
+                        className="shrink-0 text-right font-mono text-[10px] font-semibold tabular-nums leading-none text-slate-400 sm:text-[11px]"
+                      >
+                        {formatTime(entry.playedAt)}
+                      </time>
+                    </div>
+                  </article>
                 );
               })
             )}

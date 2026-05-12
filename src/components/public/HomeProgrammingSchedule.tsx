@@ -6,15 +6,21 @@ import { mergeScheduleSlotsForDay } from "@/lib/effectiveSchedule";
 import type { MockProgrammingSlot } from "@/lib/mock/site";
 import { mergeJustPlayedConfig, type PublicJustPlayedConfig } from "@/lib/justPlayedConfig";
 import { GlxyHomePanelHeading } from "@/components/public/GlxyHomePanelHeading";
+import {
+  GLXY_HOME_LIST_ROW_CLASS,
+  GLXY_HOME_LIST_SCROLL_CLASS,
+  GLXY_HOME_TAB_STRIP_CLASS,
+  glxyAccentRailStyle,
+} from "@/components/public/glxyHomeWavePanelChrome";
 
 const DAYS: { id: number; label: string }[] = [
-  { id: 1, label: "Ma" },
-  { id: 2, label: "Di" },
-  { id: 3, label: "Wo" },
-  { id: 4, label: "Do" },
-  { id: 5, label: "Vr" },
-  { id: 6, label: "Za" },
-  { id: 7, label: "Zo" },
+  { id: 1, label: "MA" },
+  { id: 2, label: "DI" },
+  { id: 3, label: "WO" },
+  { id: 4, label: "DO" },
+  { id: 5, label: "VR" },
+  { id: 6, label: "ZA" },
+  { id: 7, label: "ZO" },
 ];
 
 function dayIdFromJs(day: number) {
@@ -109,7 +115,7 @@ export function HomeProgrammingSchedule({
 
   return (
     <div
-      className="kiss-public-panel font-sans flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border sm:rounded-2xl"
+      className="kiss-public-panel font-sans flex min-h-0 min-w-0 w-full flex-col overflow-hidden rounded-xl border sm:rounded-2xl"
       style={{
         background: `linear-gradient(180deg, #0a101c 0%, ${theme.panelSurfaceHex} 45%, #05070d 100%)`,
         borderColor: theme.panelBorderHex,
@@ -118,8 +124,13 @@ export function HomeProgrammingSchedule({
     >
       <GlxyHomePanelHeading title={panelTitle.toUpperCase()} theme={theme} />
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0 sm:px-3.5 sm:pb-3.5">
-        <div className="mb-2 flex gap-1 overflow-x-auto border-b pb-2 [-webkit-overflow-scrolling:touch] sm:mb-2.5" style={{ borderColor: theme.panelBorderHex }}>
+      <div className="flex min-h-0 flex-col px-3 pb-3 pt-0 sm:px-3.5 sm:pb-3.5">
+        <div
+          className={`${GLXY_HOME_TAB_STRIP_CLASS} flex-nowrap overflow-x-auto [-webkit-overflow-scrolling:touch]`}
+          style={{ backgroundColor: theme.stationTabInactiveBgHex }}
+          role="tablist"
+          aria-label="Dag"
+        >
           <div className="flex min-w-min gap-1">
             {dayMeta.map((day) => {
               const selected = day.id === selectedDay;
@@ -128,20 +139,21 @@ export function HomeProgrammingSchedule({
                 <button
                   key={day.id}
                   type="button"
+                  role="tab"
+                  aria-selected={selected}
                   onClick={() => setSelectedDay(day.id)}
-                  className="min-w-[2.25rem] shrink-0 rounded-md px-2 py-1 text-center text-[10px] font-bold uppercase tracking-[0.1em] transition-colors sm:min-w-[2.5rem] sm:px-2.5 sm:py-1.5 sm:text-[11px]"
-                  aria-pressed={selected}
+                  className="min-w-[2.25rem] shrink-0 truncate rounded-md px-2.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.14em] transition-all duration-200 sm:min-w-[2.5rem] sm:px-3 sm:text-[11px]"
                   title={day.fullLabel}
                   style={
                     selected
                       ? {
                           backgroundColor: theme.stationTabSelectedBgHex,
-                          color: "#ffffff",
+                          color: theme.stationTabSelectedTextHex,
                           boxShadow: `inset 0 -2px 0 0 ${theme.sectionAccentHex}`,
                         }
                       : {
                           backgroundColor: isToday ? "rgba(255,255,255,0.06)" : "transparent",
-                          color: isToday ? "#e2e8f0" : "#64748b",
+                          color: isToday ? "#e2e8f0" : "#94a3b8",
                         }
                   }
                 >
@@ -152,7 +164,7 @@ export function HomeProgrammingSchedule({
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
+        <div className={GLXY_HOME_LIST_SCROLL_CLASS}>
           {daySlots.length === 0 ? (
             <p className="py-5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               Geen programmering voor deze dag.
@@ -170,22 +182,12 @@ export function HomeProgrammingSchedule({
                   subtitleRaw && subtitleRaw.trim().toLowerCase() !== title.trim().toLowerCase() ? subtitleRaw : null;
                 const isLive = slot.id === nowPlayingId;
                 return (
-                  <article
-                    key={`${slot.source}-${slot.id}`}
-                    className="group flex overflow-hidden rounded-lg border border-[#1e293b] bg-[#101822] transition-all duration-200 hover:-translate-y-px hover:border-white/[0.12] hover:shadow-[0_10px_32px_rgba(0,0,0,0.55),0_0_0_1px_rgba(11,117,87,0.2)]"
-                  >
+                  <article key={`${slot.source}-${slot.id}`} className={GLXY_HOME_LIST_ROW_CLASS}>
                     <div
                       className="flex w-[4.25rem] shrink-0 flex-col justify-center px-2 py-2.5 sm:w-[4.75rem] sm:py-3"
-                      style={{
-                        backgroundColor: "#0c121c",
-                        borderRight: `1px solid ${theme.panelBorderHex}`,
-                        borderLeft: `3px solid ${theme.sectionAccentHex}`,
-                      }}
+                      style={glxyAccentRailStyle(theme)}
                     >
-                      <span
-                        className="font-mono text-[13px] font-bold tabular-nums leading-none text-white sm:text-sm"
-                        style={{ color: "#f8fafc" }}
-                      >
+                      <span className="font-mono text-[13px] font-bold tabular-nums leading-none text-white sm:text-sm">
                         {slot.startTime}
                       </span>
                       <span className="mt-1 font-mono text-[10px] font-semibold tabular-nums text-slate-400 sm:text-[11px]">

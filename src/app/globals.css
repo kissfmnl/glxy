@@ -576,7 +576,7 @@ input[type="range"] {
     display: grid;
     grid-template-columns: repeat(var(--kiss-station-n, 4), minmax(0, 1fr));
     gap: 0.75rem;
-    align-items: stretch;
+    align-items: start;
   }
   .kiss-jp-prog-row > .kiss-jp-prog-span {
     grid-column: 2 / -1;
